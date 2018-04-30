@@ -1,4 +1,4 @@
-# Projet_E3
+# Projet_E3 - Smooth-i
 
 Projet de Troisième année à ESIEE Paris (Application Android de musique)
 
