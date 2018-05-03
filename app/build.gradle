@@ -6,11 +6,7 @@ android {
             keyAlias 'Key_release'
             keyPassword 'smooth-i.key_release'
             storePassword 'esiee.key_release'
-        }
-        Key_developpement {
-            keyAlias 'Key_developpement'
-            storePassword 'esiee.key_developpement'
-            keyPassword 'smooth-i.key_developpement'
+            storeFile file('D:/AndroidKeys/AndroidKeysRelease.txt')
         }
     }
     compileSdkVersion 26
@@ -30,7 +26,6 @@ android {
             debuggable false
         }
         debug {
-            signingConfig signingConfigs.Key_developpement
             debuggable true
         }
     }
@@ -38,12 +33,20 @@ android {
     }
 }
 
+repositories {
+    mavenCentral()
+    flatDir {
+        dirs 'libs'
+    }
+}
+
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation 'com.android.support:appcompat-v7:27.0.2'
     implementation 'com.android.support.constraint:constraint-layout:1.1.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'com.spotify.android:auth:1.1.0'
+    implementation 'com.spotify.sdk:spotify-player-24-noconnect-2.20b@aar'
 }
