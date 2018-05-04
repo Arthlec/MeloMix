@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
 
 import com.spotify.sdk.android.authentication.AuthenticationClient;
 import com.spotify.sdk.android.authentication.AuthenticationRequest;
@@ -35,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements SpotifyPlayer.Not
 
         // The only thing that's different is we added the 5 lines below.
         AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID, AuthenticationResponse.Type.TOKEN, REDIRECT_URI);
-        builder.setScopes(new String[]{"user-read-private", "streaming"});
+        builder.setScopes(new String[]{"user-read-private","streaming", "user-top-read", "user-library-read"});
         AuthenticationRequest request = builder.build();
 
         AuthenticationClient.openLoginActivity(this, REQUEST_CODE, request);
@@ -100,6 +101,12 @@ public class MainActivity extends AppCompatActivity implements SpotifyPlayer.Not
 
         // This is the line that plays a song.
         mPlayer.playUri(null, "spotify:track:2TpxZ7JUBn3uw46aR7qd6V", 0, 0);
+        TextView text = findViewById(R.id.text);
+        String metadata = mPlayer.getMetadata().toString();
+        if (metadata == null)
+            text.setText("NULL");
+        else
+            text.setText(metadata);
     }
 
     @Override
