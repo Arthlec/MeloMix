@@ -6,7 +6,7 @@ android {
             keyAlias 'Key_release'
             keyPassword 'smooth-i.key_release'
             storePassword 'esiee.key_release'
-            storeFile file('D:/AndroidKeys/AndroidKeysRelease.txt')
+            storeFile file('D:/AndroidKeys/AndroidKeyStore.jks')
         }
     }
     compileSdkVersion 26
