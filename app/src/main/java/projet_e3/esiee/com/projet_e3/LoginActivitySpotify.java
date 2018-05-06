@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.spotify.sdk.android.authentication.AuthenticationClient;
 import com.spotify.sdk.android.authentication.AuthenticationRequest;
@@ -12,7 +13,6 @@ import com.spotify.sdk.android.authentication.AuthenticationResponse;
 import com.spotify.sdk.android.player.Config;
 import com.spotify.sdk.android.player.ConnectionStateCallback;
 import com.spotify.sdk.android.player.Error;
-import com.spotify.sdk.android.player.Metadata;
 import com.spotify.sdk.android.player.Player;
 import com.spotify.sdk.android.player.PlayerEvent;
 import com.spotify.sdk.android.player.Spotify;
@@ -20,11 +20,11 @@ import com.spotify.sdk.android.player.SpotifyPlayer;
 
 public class LoginActivitySpotify extends AppCompatActivity implements SpotifyPlayer.NotificationCallback, ConnectionStateCallback {
 
+
     private static final String CLIENT_ID = "1aee09c9f4504604b379f867207fd238";
     private static final String REDIRECT_URI = "smooth-i://logincallback";
 
     private Player mPlayer;
-    private Metadata mMetadata;
 
     // Request code that will be used to verify if the result comes from correct activity
     // Can be any integer
@@ -33,9 +33,10 @@ public class LoginActivitySpotify extends AppCompatActivity implements SpotifyPl
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
-        // The only thing that's different is we added the 5 lines below.
+        Toast.makeText(LoginActivitySpotify.this, "LoginActivitySpotify",
+                Toast.LENGTH_LONG).show();
+
         AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID, AuthenticationResponse.Type.TOKEN, REDIRECT_URI);
         builder.setScopes(new String[]{"user-top-read", "user-library-read"});
         AuthenticationRequest request = builder.build();
@@ -63,9 +64,12 @@ public class LoginActivitySpotify extends AppCompatActivity implements SpotifyPl
 
                     @Override
                     public void onError(Throwable throwable) {
-                        Log.e("MainActivity", "Could not initialize player: " + throwable.getMessage());
+                        Log.e("LoginActivitySpotify", "Could not initialize player: " + throwable.getMessage());
                     }
                 });
+
+                Intent getBackToMainActivity = new Intent(LoginActivitySpotify.this, MainActivity.class);
+                startActivity(getBackToMainActivity);
             }
         }
     }
@@ -78,7 +82,7 @@ public class LoginActivitySpotify extends AppCompatActivity implements SpotifyPl
 
     @Override
     public void onPlaybackEvent(PlayerEvent playerEvent) {
-        Log.d("MainActivity", "Playback event received: " + playerEvent.name());
+        Log.d("LoginActivitySpotify", "Playback event received: " + playerEvent.name());
         switch (playerEvent) {
             case kSpPlaybackNotifyPlay:
                 TextView text = findViewById(R.id.text);
@@ -94,7 +98,7 @@ public class LoginActivitySpotify extends AppCompatActivity implements SpotifyPl
 
     @Override
     public void onPlaybackError(Error error) {
-        Log.d("MainActivity", "Playback error received: " + error.name());
+        Log.d("LoginActivitySpotify", "Playback error received: " + error.name());
         switch (error) {
             // Handle error type as necessary
             default:
@@ -104,7 +108,7 @@ public class LoginActivitySpotify extends AppCompatActivity implements SpotifyPl
 
     @Override
     public void onLoggedIn() {
-        Log.d("MainActivity", "User logged in");
+        Log.d("LoginActivitySpotify", "User logged in");
 
         // This is the line that plays a song.
         mPlayer.playUri(null, "spotify:track:2TpxZ7JUBn3uw46aR7qd6V", 0, 0);
@@ -112,21 +116,21 @@ public class LoginActivitySpotify extends AppCompatActivity implements SpotifyPl
 
     @Override
     public void onLoggedOut() {
-        Log.d("MainActivity", "User logged out");
+        Log.d("LoginActivitySpotify", "User logged out");
     }
 
     @Override
     public void onLoginFailed(Error var1) {
-        Log.d("MainActivity", "Login failed");
+        Log.d("LoginActivitySpotify", "Login failed");
     }
 
     @Override
     public void onTemporaryError() {
-        Log.d("MainActivity", "Temporary error occurred");
+        Log.d("LoginActivitySpotify", "Temporary error occurred");
     }
 
     @Override
     public void onConnectionMessage(String message) {
-        Log.d("MainActivity", "Received connection message: " + message);
+        Log.d("LoginActivitySpotify", "Received connection message: " + message);
     }
 }
