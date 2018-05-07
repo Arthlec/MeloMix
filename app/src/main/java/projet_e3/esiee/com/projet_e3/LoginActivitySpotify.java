@@ -49,12 +49,11 @@ public class LoginActivitySpotify extends AppCompatActivity implements SpotifyPl
         super.onActivityResult(requestCode, resultCode, intent);
 
         // Check if result comes from the correct activity
-        // The next 19 lines of the code are what you need to copy & paste! :)
         if (requestCode == REQUEST_CODE) {
             AuthenticationResponse response = AuthenticationClient.getResponse(resultCode, intent);
             if (response.getType() == AuthenticationResponse.Type.TOKEN) {
                 Config playerConfig = new Config(this, response.getAccessToken(), CLIENT_ID);
-                Spotify.getPlayer(playerConfig, this, new SpotifyPlayer.InitializationObserver() {
+                /*Spotify.getPlayer(playerConfig, this, new SpotifyPlayer.InitializationObserver() {
                     @Override
                     public void onInitialized(SpotifyPlayer spotifyPlayer) {
                         mPlayer = spotifyPlayer;
@@ -66,10 +65,10 @@ public class LoginActivitySpotify extends AppCompatActivity implements SpotifyPl
                     public void onError(Throwable throwable) {
                         Log.e("LoginActivitySpotify", "Could not initialize player: " + throwable.getMessage());
                     }
-                });
-
+                });*/
+                /*
                 Intent getBackToMainActivity = new Intent(LoginActivitySpotify.this, MainActivity.class);
-                startActivity(getBackToMainActivity);
+                startActivity(getBackToMainActivity);*/
             }
         }
     }
@@ -84,13 +83,13 @@ public class LoginActivitySpotify extends AppCompatActivity implements SpotifyPl
     public void onPlaybackEvent(PlayerEvent playerEvent) {
         Log.d("LoginActivitySpotify", "Playback event received: " + playerEvent.name());
         switch (playerEvent) {
-            case kSpPlaybackNotifyPlay:
+            /*case kSpPlaybackNotifyPlay:
                 TextView text = findViewById(R.id.text);
                 String metadata = mPlayer.getMetadata().currentTrack.name;
                 if (metadata == null)
                     text.setText("NULL");
                 else
-                    text.setText(metadata);
+                    text.setText(metadata);*/
             default:
                 break;
         }
@@ -109,9 +108,9 @@ public class LoginActivitySpotify extends AppCompatActivity implements SpotifyPl
     @Override
     public void onLoggedIn() {
         Log.d("LoginActivitySpotify", "User logged in");
-
+        //LoginActivitySpotify.this.finish();
         // This is the line that plays a song.
-        mPlayer.playUri(null, "spotify:track:2TpxZ7JUBn3uw46aR7qd6V", 0, 0);
+        //mPlayer.playUri(null, "spotify:track:2TpxZ7JUBn3uw46aR7qd6V", 0, 0);
     }
 
     @Override
