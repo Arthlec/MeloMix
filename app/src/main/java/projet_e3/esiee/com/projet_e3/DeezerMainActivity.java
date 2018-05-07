@@ -25,10 +25,14 @@ import java.util.List;
 public class DeezerMainActivity extends Activity {
 
 
-    /** DeezerConnect objet utilisé pour l'authentifiaction */
+    /**
+     * DeezerConnect objet utilisé pour l'authentifiaction
+     */
     protected DeezerConnect mDeezerConnect = null;
 
-    /** Sample app Deezer appId. */
+    /**
+     * Sample app Deezer appId.
+     */
     public static final String SAMPLE_APP_ID = "279342";
 
     /**
@@ -46,27 +50,36 @@ public class DeezerMainActivity extends Activity {
     // The listener for authentication events
     DialogListener listener = new DialogListener() {
 
-        public void onComplete(Bundle values) {}
+        public void onComplete(Bundle values) {
+        }
 
-        public void onCancel() {}
+        public void onCancel() {
+        }
 
         public void onException(Exception e) {
-           Log.e("ERROR","Hey! Error to connect to Deezer!");
+            Log.e("ERROR", "Hey! Error to connect to Deezer!");
         }
     };
 
     // the request listener
-    RequestListener nListener = new JsonRequestListener() {
+    public RequestListener getAlbulm() {
+        RequestListener nlistener = new JsonRequestListener() {
 
-        public void onResult(Object result, Object requestId) {
-            List<Album> albums = (List<Album>) result;
-            Log.i("DATA",albums.toString());
+            public void onResult(Object result, Object requestId) {
+                List<Album> albums = (List<Album>) result;
+                Log.i("DATA", albums.toString());//ca marche pas encore
+            }
+
+            public void onUnparsedResult(String requestResponse, Object requestId) {
+            }
+
+            public void onException(Exception e, Object requestId) {
+            }
+        };
+        return nlistener;
+    }
 
 
-            public void onUnparsedResult(String requestResponse, Object requestId) {}
-
-            public void onException(Exception e, Object requestId) {}
-        }
 
     /* SessionStore sessionStore = new SessionStore();
     sessionStore.save(DeezerConnect, Context);
@@ -95,23 +108,30 @@ public class DeezerMainActivity extends Activity {
         mDeezerConnect = new DeezerConnect(this, SAMPLE_APP_ID);
         mDeezerConnect.authorize(this, PERMISSIONS, listener);
 
-        Button button_login = (Button) findViewById(R.id.button_login);
-        button_login.setOnClickListener(new View.OnClickListener() {
+        Button buttonLogin = (Button) findViewById(R.id.button_disconnect);
+        buttonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 disconnectFromDeezer();
                 Intent intent = new Intent(DeezerMainActivity.this, MainActivity.class);
                 startActivity(intent);
             }
-    }
+        });
+        Button buttonAlbum = (Button) findViewById(R.id.button_albulm);
+        buttonAlbum.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getAlbulm();
+            }
+        });
 
+    }
 
 
     /**
      * Handle errors by displaying a toast and logging.
      *
-     * @param exception
-     *            the exception that occured while contacting Deezer services.
+     * @param exception the exception that occured while contacting Deezer services.
      */
     protected void handleError(final Exception exception) {
         String message = exception.getMessage();
