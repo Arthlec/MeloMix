@@ -10,7 +10,6 @@ import android.widget.Toast;
 import com.spotify.sdk.android.authentication.AuthenticationClient;
 import com.spotify.sdk.android.authentication.AuthenticationRequest;
 import com.spotify.sdk.android.authentication.AuthenticationResponse;
-import com.spotify.sdk.android.player.Config;
 import com.spotify.sdk.android.player.ConnectionStateCallback;
 import com.spotify.sdk.android.player.Error;
 import com.spotify.sdk.android.player.Player;
@@ -33,15 +32,13 @@ public class LoginActivitySpotify extends AppCompatActivity implements SpotifyPl
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        Toast.makeText(LoginActivitySpotify.this, "LoginActivitySpotify",
-                Toast.LENGTH_LONG).show();
+        //setContentView(R.layout.activity_main);
 
         AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID, AuthenticationResponse.Type.TOKEN, REDIRECT_URI);
-        builder.setScopes(new String[]{"user-top-read", "user-library-read"});
+        builder.setScopes(new String[]{/*"user-read-private",*/ "user-top-read", "user-library-read"});
         AuthenticationRequest request = builder.build();
 
-        AuthenticationClient.openLoginActivity(this, REQUEST_CODE, request);
+        AuthenticationClient.openLoginActivity(LoginActivitySpotify.this, REQUEST_CODE, request);
     }
 
     @Override
@@ -51,24 +48,32 @@ public class LoginActivitySpotify extends AppCompatActivity implements SpotifyPl
         // Check if result comes from the correct activity
         if (requestCode == REQUEST_CODE) {
             AuthenticationResponse response = AuthenticationClient.getResponse(resultCode, intent);
-            if (response.getType() == AuthenticationResponse.Type.TOKEN) {
-                Config playerConfig = new Config(this, response.getAccessToken(), CLIENT_ID);
-                /*Spotify.getPlayer(playerConfig, this, new SpotifyPlayer.InitializationObserver() {
-                    @Override
-                    public void onInitialized(SpotifyPlayer spotifyPlayer) {
-                        mPlayer = spotifyPlayer;
-                        mPlayer.addConnectionStateCallback(LoginActivitySpotify.this);
-                        mPlayer.addNotificationCallback(LoginActivitySpotify.this);
-                    }
+            Intent getBackToMainActivity = new Intent(LoginActivitySpotify.this, MainActivity.class);
 
-                    @Override
-                    public void onError(Throwable throwable) {
-                        Log.e("LoginActivitySpotify", "Could not initialize player: " + throwable.getMessage());
-                    }
-                });*/
-                /*
-                Intent getBackToMainActivity = new Intent(LoginActivitySpotify.this, MainActivity.class);
-                startActivity(getBackToMainActivity);*/
+            switch (response.getType()) {
+                // Response was successful and contains auth token
+                case TOKEN:
+                    // Handle successful response
+                    TextView textMainActivity = findViewById(R.id.textSpotify);
+                    textMainActivity.setText("Connecté avec le compte :");
+                    Toast.makeText(LoginActivitySpotify.this,"Connexion réussie", Toast.LENGTH_LONG).show();
+                    startActivity(getBackToMainActivity);
+                    break;
+
+                // Auth flow returned an error
+                case ERROR:
+                    // Handle error response
+                    AuthenticationClient.stopLoginActivity(LoginActivitySpotify.this, REQUEST_CODE);
+                    Toast.makeText(LoginActivitySpotify.this,"Erreur de connexion", Toast.LENGTH_LONG).show();
+                    startActivity(getBackToMainActivity);
+                    break;
+
+                // Most likely auth flow was cancelled
+                default:
+                    // Handle other cases
+                    AuthenticationClient.stopLoginActivity(LoginActivitySpotify.this, REQUEST_CODE);
+                    Toast.makeText(LoginActivitySpotify.this,"Connexion annulée", Toast.LENGTH_LONG).show();
+                    startActivity(getBackToMainActivity);
             }
         }
     }
@@ -108,7 +113,6 @@ public class LoginActivitySpotify extends AppCompatActivity implements SpotifyPl
     @Override
     public void onLoggedIn() {
         Log.d("LoginActivitySpotify", "User logged in");
-        //LoginActivitySpotify.this.finish();
         // This is the line that plays a song.
         //mPlayer.playUri(null, "spotify:track:2TpxZ7JUBn3uw46aR7qd6V", 0, 0);
     }

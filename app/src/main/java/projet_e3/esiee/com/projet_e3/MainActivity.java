@@ -22,9 +22,5 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
-        Toast.makeText(MainActivity.this, "MainActivity",
-                Toast.LENGTH_LONG).show();
-
     }
 }
