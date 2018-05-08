@@ -4,15 +4,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.spotify.sdk.android.authentication.AuthenticationClient;
 import com.spotify.sdk.android.authentication.AuthenticationRequest;
 import com.spotify.sdk.android.authentication.AuthenticationResponse;
+import com.spotify.sdk.android.player.Config;
 import com.spotify.sdk.android.player.ConnectionStateCallback;
 import com.spotify.sdk.android.player.Error;
-import com.spotify.sdk.android.player.Player;
 import com.spotify.sdk.android.player.PlayerEvent;
 import com.spotify.sdk.android.player.Spotify;
 import com.spotify.sdk.android.player.SpotifyPlayer;
@@ -23,18 +22,17 @@ public class LoginActivitySpotify extends AppCompatActivity implements SpotifyPl
     private static final String CLIENT_ID = "1aee09c9f4504604b379f867207fd238";
     private static final String REDIRECT_URI = "smooth-i://logincallback";
 
-    private Player mPlayer;
+    public static SpotifyPlayer mPlayer;
 
     // Request code that will be used to verify if the result comes from correct activity
     // Can be any integer
-    private static final int REQUEST_CODE = 1337;
+    private static final int REQUEST_CODE = 1468;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_main);
 
-        AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID, AuthenticationResponse.Type.TOKEN, REDIRECT_URI);
+        AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID, AuthenticationResponse.Type.TOKEN, REDIRECT_URI).setShowDialog(true);
         builder.setScopes(new String[]{/*"user-read-private",*/ "user-top-read", "user-library-read"});
         AuthenticationRequest request = builder.build();
 
@@ -47,16 +45,30 @@ public class LoginActivitySpotify extends AppCompatActivity implements SpotifyPl
 
         // Check if result comes from the correct activity
         if (requestCode == REQUEST_CODE) {
-            AuthenticationResponse response = AuthenticationClient.getResponse(resultCode, intent);
+            final AuthenticationResponse response = AuthenticationClient.getResponse(resultCode, intent);
             Intent getBackToMainActivity = new Intent(LoginActivitySpotify.this, MainActivity.class);
 
             switch (response.getType()) {
                 // Response was successful and contains auth token
                 case TOKEN:
                     // Handle successful response
-                    TextView textMainActivity = findViewById(R.id.textSpotify);
-                    textMainActivity.setText("Connecté avec le compte :");
+                    Config playerConfig = new Config(this, response.getAccessToken(), CLIENT_ID);
+                    Spotify.getPlayer(playerConfig, this, new SpotifyPlayer.InitializationObserver() {
+                        @Override
+                        public void onInitialized(SpotifyPlayer spotifyPlayer) {
+                            mPlayer = spotifyPlayer;
+                            mPlayer.addConnectionStateCallback(LoginActivitySpotify.this);
+                            mPlayer.addNotificationCallback(LoginActivitySpotify.this);
+                            mPlayer.login(response.getAccessToken());
+                        }
+
+                        @Override
+                        public void onError(Throwable throwable) {
+                            Log.e("LoginActivitySpotify", "Could not initialize player: " + throwable.getMessage());
+                        }
+                    });
                     Toast.makeText(LoginActivitySpotify.this,"Connexion réussie", Toast.LENGTH_LONG).show();
+                    intent.putExtra("message", "Connecté avec le compte :");
                     startActivity(getBackToMainActivity);
                     break;
 
@@ -80,7 +92,7 @@ public class LoginActivitySpotify extends AppCompatActivity implements SpotifyPl
 
     @Override
     protected void onDestroy() {
-        Spotify.destroyPlayer(this);
+        Spotify.destroyPlayer(mPlayer);
         super.onDestroy();
     }
 
@@ -91,7 +103,7 @@ public class LoginActivitySpotify extends AppCompatActivity implements SpotifyPl
             /*case kSpPlaybackNotifyPlay:
                 TextView text = findViewById(R.id.text);
                 String metadata = mPlayer.getMetadata().currentTrack.name;
-                if (metadata == null)
+                if (metadata.equals(null))
                     text.setText("NULL");
                 else
                     text.setText(metadata);*/
@@ -120,6 +132,7 @@ public class LoginActivitySpotify extends AppCompatActivity implements SpotifyPl
     @Override
     public void onLoggedOut() {
         Log.d("LoginActivitySpotify", "User logged out");
+        //this.onDestroy();
     }
 
     @Override
