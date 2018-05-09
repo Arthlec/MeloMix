@@ -10,16 +10,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.deezer.sdk.model.Album;
 import com.deezer.sdk.model.Permissions;
 import com.deezer.sdk.network.connect.DeezerConnect;
 import com.deezer.sdk.network.connect.SessionStore;
 import com.deezer.sdk.network.connect.event.DialogListener;
-import com.deezer.sdk.network.request.event.JsonRequestListener;
-import com.deezer.sdk.network.request.event.RequestListener;
 
-import java.util.List;
 
 
 public class DeezerMainActivity extends Activity {
@@ -51,6 +46,9 @@ public class DeezerMainActivity extends Activity {
     DialogListener listener = new DialogListener() {
 
         public void onComplete(Bundle values) {
+            // store the current authentication info
+            SessionStore sessionStore = new SessionStore();
+            sessionStore.save(mDeezerConnect, DeezerMainActivity.this);
         }
 
         public void onCancel() {
@@ -61,37 +59,7 @@ public class DeezerMainActivity extends Activity {
         }
     };
 
-    // the request listener
-    public RequestListener getAlbulm() {
-        RequestListener nlistener = new JsonRequestListener() {
-
-            public void onResult(Object result, Object requestId) {
-                List<Album> albums = (List<Album>) result;
-                Log.i("DATA", albums.toString());//ca marche pas encore
-            }
-
-            public void onUnparsedResult(String requestResponse, Object requestId) {
-            }
-
-            public void onException(Exception e, Object requestId) {
-            }
-        };
-        return nlistener;
-    }
-
-
-
-    /* SessionStore sessionStore = new SessionStore();
-    sessionStore.save(DeezerConnect, Context);
-
-    SessionStore sessionStore = new SessionStore();
-    if (sessionStore.restore(deezerConnect, context)) {
-        // The restored session is valid, navigate to the Home Activity
-        Intent intent = new Intent(context, HomeActivity.class);
-        startActivity(intent);
-    }*/
-
-    private final void disconnectFromDeezer() {
+    private void disconnectFromDeezer() {
         // if deezerConnect is still valid, clear all auth info
         if (mDeezerConnect != null) {
             mDeezerConnect.logout(this);
@@ -100,14 +68,20 @@ public class DeezerMainActivity extends Activity {
         new SessionStore().clear(this);
     }
 
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.deezer_main_activity);
 
-        mDeezerConnect = new DeezerConnect(this, SAMPLE_APP_ID);
-        mDeezerConnect.authorize(this, PERMISSIONS, listener);
-
+        //authentification
+        if (mDeezerConnect == null) {
+            mDeezerConnect = new DeezerConnect(this, SAMPLE_APP_ID);
+            mDeezerConnect.authorize(this, PERMISSIONS, listener);
+        } else {
+            //restore authentification
+            new SessionStore().restore(mDeezerConnect, this);
+        }
         Button buttonLogin = (Button) findViewById(R.id.button_disconnect);
         buttonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -121,7 +95,8 @@ public class DeezerMainActivity extends Activity {
         buttonAlbum.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getAlbulm();
+                Intent intent = new Intent(DeezerMainActivity.this, DeezerAlbumActivity.class);
+                startActivity(intent);
             }
         });
 

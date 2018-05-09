@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Projet_E3</string>
+    <string name="ouvre_le_debug_bg">Ouvre le debug BG</string>
 </resources>
