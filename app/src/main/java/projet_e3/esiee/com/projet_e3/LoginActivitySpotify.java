@@ -1,8 +1,10 @@
 package projet_e3.esiee.com.projet_e3;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.JsonReader;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -16,11 +18,19 @@ import com.spotify.sdk.android.player.PlayerEvent;
 import com.spotify.sdk.android.player.Spotify;
 import com.spotify.sdk.android.player.SpotifyPlayer;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+
+import javax.net.ssl.HttpsURLConnection;
+
 public class LoginActivitySpotify extends AppCompatActivity implements SpotifyPlayer.NotificationCallback, ConnectionStateCallback {
 
 
     private static final String CLIENT_ID = "1aee09c9f4504604b379f867207fd238";
     private static final String REDIRECT_URI = "smooth-i://logincallback";
+    private String authToken;
 
     public static SpotifyPlayer mPlayer;
 
@@ -53,6 +63,7 @@ public class LoginActivitySpotify extends AppCompatActivity implements SpotifyPl
                 case TOKEN:
                     // Handle successful response
                     Config playerConfig = new Config(this, response.getAccessToken(), CLIENT_ID);
+                    authToken = response.getAccessToken();
                     Spotify.getPlayer(playerConfig, this, new SpotifyPlayer.InitializationObserver() {
                         @Override
                         public void onInitialized(SpotifyPlayer spotifyPlayer) {
@@ -69,6 +80,7 @@ public class LoginActivitySpotify extends AppCompatActivity implements SpotifyPl
                     });
                     Toast.makeText(LoginActivitySpotify.this,"Connexion réussie", Toast.LENGTH_LONG).show();
                     intent.putExtra("message", "Connecté avec le compte :");
+                    requestData();
                     startActivity(getBackToMainActivity);
                     break;
 
@@ -148,5 +160,52 @@ public class LoginActivitySpotify extends AppCompatActivity implements SpotifyPl
     @Override
     public void onConnectionMessage(String message) {
         Log.d("LoginActivitySpotify", "Received connection message: " + message);
+    }
+
+    public void requestData() {
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    // Create URL
+                    URL githubEndpoint = new URL("https://api.spotify.com/v1/me/playlists");
+
+                    // Create connection
+                    HttpsURLConnection myConnection = (HttpsURLConnection) githubEndpoint.openConnection();
+
+                    myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
+
+                    if (myConnection.getResponseCode() == 200) {
+                        // Success
+                        Log.i("Connection", "REUSSIE !");
+                        InputStream responseBody = myConnection.getInputStream();
+                        InputStreamReader responseBodyReader = new InputStreamReader(responseBody, "UTF-8");
+                        JsonReader jsonReader = new JsonReader(responseBodyReader);
+
+                        jsonReader.beginObject(); // Start processing the JSON object
+                        while (jsonReader.hasNext()) { // Loop through all keys
+                            String key = jsonReader.nextName(); // Fetch the next key
+                            if (key.equals("description")) { // Check if desired key
+                                // Fetch the value as a String
+                                String value = jsonReader.nextString();
+
+                                // Do something with the value
+                                Log.i("Value", value);
+
+                                break; // Break out of the loop
+                            } else {
+                                jsonReader.skipValue(); // Skip values of other keys
+                            }
+                        }
+                        jsonReader.close();
+                        myConnection.disconnect();
+                    } else {
+                        Log.i("responseCode", "" + myConnection.getResponseCode());
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
     }
 }
