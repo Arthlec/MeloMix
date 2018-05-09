@@ -1,7 +1,9 @@
 package projet_e3.esiee.com.projet_e3;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -55,7 +57,7 @@ public class DeezerMainActivity extends Activity {
         }
 
         public void onException(Exception e) {
-            Log.e("ERROR", "Hey! Error to connect to Deezer!");
+            Log.e("ERROR", "Hey! Fail to connect to Deezer!");
         }
     };
 
@@ -67,7 +69,6 @@ public class DeezerMainActivity extends Activity {
         // also clear the session store
         new SessionStore().clear(this);
     }
-
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
