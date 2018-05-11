@@ -8,10 +8,17 @@ import android.util.JsonReader;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.fasterxml.jackson.core.JsonEncoding;
+import com.fasterxml.jackson.core.TreeNode;
+import com.fasterxml.jackson.core.io.JsonStringEncoder;
+import com.fasterxml.jackson.jr.ob.JSON;
+import com.fasterxml.jackson.jr.private_.TreeNode;
+import com.fasterxml.jackson.jr.stree.JacksonJrsTreeCodec;
 import com.spotify.sdk.android.authentication.AuthenticationClient;
 import com.spotify.sdk.android.authentication.AuthenticationRequest;
 import com.spotify.sdk.android.authentication.AuthenticationResponse;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -66,6 +73,7 @@ public class LoginActivitySpotify extends AppCompatActivity {
                     // Handle error response
                     AuthenticationClient.stopLoginActivity(LoginActivitySpotify.this, REQUEST_CODE);
                     Toast.makeText(LoginActivitySpotify.this,"Erreur de connexion", Toast.LENGTH_LONG).show();
+                    Log.i("Connection", "ERROR");
                     startActivity(getBackToMainActivity);
                     break;
 
@@ -74,6 +82,7 @@ public class LoginActivitySpotify extends AppCompatActivity {
                     // Handle other cases
                     AuthenticationClient.stopLoginActivity(LoginActivitySpotify.this, REQUEST_CODE);
                     Toast.makeText(LoginActivitySpotify.this,"Connexion annulée", Toast.LENGTH_LONG).show();
+                    Log.i("Connection", "Cancelled");
                     startActivity(getBackToMainActivity);
             }
         }
@@ -97,13 +106,34 @@ public class LoginActivitySpotify extends AppCompatActivity {
                         Log.i("AsyncTask", "Connection REUSSIE !");
                         InputStream responseBody = myConnection.getInputStream();
                         InputStreamReader responseBodyReader = new InputStreamReader(responseBody, "UTF-8");
+                        /*BufferedReader bufferedReader = new BufferedReader(responseBodyReader);
+                        StringBuilder out = new StringBuilder();
+                        String line;
+                        while ((line = bufferedReader.readLine()) != null) {
+                            out.append(line);
+                        }
+                        Log.i("out", out.toString());
+                        bufferedReader.close();*/
+                        JSON json = JSON.std.with(new JacksonJrsTreeCodec());
+                        TreeNode root = json.treeFrom("{\"value\" : [1, 2, 3]}");
+
+                        //TUTO JSON JACKSON JR
+                        /*assertTrue(root.isObject());
+                        TreeNode array = root.get("value");
+                        assertTrue(array.isArray());
+                        JrsNumber n = (JrsNumber) array.get(1);
+                        assertEquals(2, n.getValue().intValue());*/
+
+                        json = (String) json.asString(root);
+
+                        //EN-DESSOUS VIEILLE VERSION DU JSON READER (PAS LA BIBLIOTHEQUE)
                         JsonReader jsonReader = new JsonReader(responseBodyReader);
 
                         jsonReader.beginObject(); // Start processing the JSON object
                         while (jsonReader.hasNext()) { // Loop through all keys
                             String key = jsonReader.nextName(); // Fetch the next key
-                            if (key.equals("description")) { // Check if desired key
-                                // Fetch the value as a String
+                            if (key.equals("total")) { // Check if desired key
+                                jsonReader.nextString();
                                 String value = jsonReader.nextString();
 
                                 // Do something with the value
