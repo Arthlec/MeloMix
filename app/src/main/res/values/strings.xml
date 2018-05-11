@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">Projet_E3</string>
     <string name="ouvre_le_debug_bg">Ouvre le debug BG</string>
+    <string name="welcolme_to_smooth_i">Welcolme to Smooth-i!</string>
+    <string name="log_in_deezer">Log in (Deezer)</string>
+    <string name="disconnect_deezer">Disconnect (Deezer)</string>
+    <string name="getalbums">GetAlbums</string>
 </resources>

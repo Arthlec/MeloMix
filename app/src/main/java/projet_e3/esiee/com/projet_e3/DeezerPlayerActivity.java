@@ -1,13 +1,7 @@
 package projet_e3.esiee.com.projet_e3;
 
-import android.view.View;
-import android.widget.ImageButton;
 import android.widget.SeekBar;
-import android.widget.TextView;
-import android.widget.Toast;
-
 import com.deezer.sdk.player.PlayerWrapper;
-import com.deezer.sdk.player.PlayerWrapper.RepeatMode;
 import com.deezer.sdk.player.event.BufferState;
 import com.deezer.sdk.player.event.OnBufferErrorListener;
 import com.deezer.sdk.player.event.OnBufferProgressListener;
@@ -21,31 +15,12 @@ import com.deezer.sdk.player.exception.StreamLimitationException;
 
 
 
-public class DeezerPlayerActivity extends DeezerMainActivity {
+public class DeezerPlayerActivity extends DeezerBaseActivity {
 
 
 
     private PlayerHandler mPlayerHandler = new PlayerHandler();
-    private OnClickHandler mOnClickHandler = new OnClickHandler();
-
-    protected ImageButton mButtonPlayerStop;
-    protected ImageButton mButtonPlayerPause;
-    protected ImageButton mButtonPlayerSkipForward;
-    protected ImageButton mButtonPlayerSkipBackward;
-    protected ImageButton mButtonPlayerSeekBackward;
-    protected ImageButton mButtonPlayerSeekForward;
-
-    protected ImageButton mButtonPlayerRepeat;
-
-
     private SeekBar mSeekBar;
-    private boolean mIsUserSeeking = false;
-    private TextView mTextTime;
-    private TextView mTextLength;
-
-    private TextView mTextArtist;
-    private TextView mTextTrack;
-
     private PlayerWrapper mPlayer;
 
     @Override
@@ -100,80 +75,6 @@ public class DeezerPlayerActivity extends DeezerMainActivity {
         }
     }
 
-
-    //////////////////////////////////////////////////////////////////////////////////////
-    // Click handler
-    //////////////////////////////////////////////////////////////////////////////////////
-
-    private class OnClickHandler implements View.OnClickListener {
-
-        @Override
-        public void onClick(final View v) {
-            if (v == mButtonPlayerPause) {
-                if (mPlayer.getPlayerState() == PlayerState.PLAYING) {
-                    mPlayer.pause();
-                } else {
-                    mPlayer.play();
-                }
-            } else if (v == mButtonPlayerStop) {
-                mPlayer.stop();
-                //setPlayerVisible(false);
-            } else if (v == mButtonPlayerSkipForward) {
-                onSkipToNextTrack();
-            } else if (v == mButtonPlayerSkipBackward) {
-                onSkipToPreviousTrack();
-            } else if (v == mButtonPlayerSeekBackward) {
-                try {
-                    mPlayer.seek(mPlayer.getPosition() - (10 * 1000));
-                }
-                catch (Exception e) {
-                    handleError(e);
-                }
-            } else if (v == mButtonPlayerSeekForward) {
-                try {
-                    mPlayer.seek(mPlayer.getPosition() + (10 * 1000));
-                }
-                catch (Exception e) {
-                    handleError(e);
-                }
-            } else if (v == mButtonPlayerRepeat) {
-                switchRepeatMode();
-            }
-        }
-    }
-
-    protected void onSkipToNextTrack() {
-
-    }
-
-    protected void onSkipToPreviousTrack() {
-
-    }
-
-    protected void switchRepeatMode() {
-        RepeatMode current = mPlayer.getRepeatMode();
-        RepeatMode next;
-        String toast;
-
-        switch (current) {
-            case NONE:
-                next = RepeatMode.ONE;
-                toast = "Repeat mode set to : Repeat One";
-                break;
-            case ONE:
-                next = RepeatMode.ALL;
-                toast = "Repeat mode set to : Repeat All";
-                break;
-            case ALL:
-            default:
-                next = RepeatMode.NONE;
-                toast = "Repeat mode set to : No Repeat";
-                break;
-        }
-
-        mPlayer.setRepeatMode(next);
-        Toast.makeText(this, toast, Toast.LENGTH_SHORT).show();
-    }
 
     //////////////////////////////////////////////////////////////////////////////////////
     // Player Handler

@@ -22,7 +22,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DeezerMainActivity"/>
+        <activity android:name=".DeezerBaseActivity"/>
         <activity android:name=".DeezerAlbumActivity"/>
         <activity android:name=".DeezerPlayerActivity"/>
     </application>

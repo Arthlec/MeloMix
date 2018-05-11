@@ -1,25 +1,10 @@
 package projet_e3.esiee.com.projet_e3;
 
 
-import android.content.Context;
-import android.content.Intent;
-import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
-
-import com.deezer.sdk.model.AImageOwner;
 import com.deezer.sdk.model.Album;
 import com.deezer.sdk.network.connect.SessionStore;
 import com.deezer.sdk.network.request.DeezerRequest;
@@ -29,7 +14,8 @@ import com.deezer.sdk.network.request.event.JsonRequestListener;
 import com.deezer.sdk.player.AlbumPlayer;
 import com.deezer.sdk.player.exception.TooManyPlayersExceptions;
 import com.deezer.sdk.player.networkcheck.WifiAndMobileNetworkStateChecker;
-import com.squareup.picasso.Picasso;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +29,7 @@ public class DeezerAlbumActivity extends DeezerPlayerActivity {
     private ArrayAdapter<Album> mAlbumsAdapter;
 
     private AlbumPlayer mAlbumPlayer;
+
 
     private void getAlbums() {
 
@@ -67,9 +54,23 @@ public class DeezerAlbumActivity extends DeezerPlayerActivity {
                     Toast.makeText(DeezerAlbumActivity.this, "You don't have album", Toast.LENGTH_LONG).show();
                 }
                 Log.d("list", mAlbumsList.toString());
-                for (Album album:mAlbumsList                     ) {
-                    Log.d("list", album.getTitle().toString());
+
+
+                // create Json file
+                JSONObject object = new JSONObject();
+                int m =0;int n=0;
+                for (Album album:mAlbumsList) {
+                    Log.d("list title", album.getTitle());
+
+                    try{
+                        object.put(album.toString(),m);
+                        object.put(album.getTitle(),n);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    m++;n++;
                 }
+                Log.i("Json",object.toString());
 
             }
 
