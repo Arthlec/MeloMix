@@ -185,7 +185,8 @@ public class LoginActivitySpotify extends AppCompatActivity implements SpotifyPl
                         jsonReader.beginObject(); // Start processing the JSON object
                         while (jsonReader.hasNext()) { // Loop through all keys
                             String key = jsonReader.nextName(); // Fetch the next key
-                            if (key.equals("description")) { // Check if desired key
+                            Log.i("Next key", key);
+                            if (key.equals("id")) { // Check if desired key
                                 // Fetch the value as a String
                                 String value = jsonReader.nextString();
 

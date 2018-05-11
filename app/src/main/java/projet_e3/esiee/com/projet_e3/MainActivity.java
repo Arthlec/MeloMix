@@ -65,50 +65,6 @@ public class MainActivity extends AppCompatActivity {
                     Spotify.destroyPlayer(LoginActivitySpotify.mPlayer);
             }
         });
-
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    // Create URL
-                    URL githubEndpoint = new URL("https://api.github.com/");
-
-                    // Create connection
-                    HttpsURLConnection myConnection = (HttpsURLConnection) githubEndpoint.openConnection();
-
-                    myConnection.setRequestProperty("User-Agent", "smooth-i-app-v1.0");
-
-                    if (myConnection.getResponseCode() == 200) {
-                        // Success
-                        InputStream responseBody = myConnection.getInputStream();
-                        InputStreamReader responseBodyReader = new InputStreamReader(responseBody, "UTF-8");
-                        JsonReader jsonReader = new JsonReader(responseBodyReader);
-
-                        jsonReader.beginObject(); // Start processing the JSON object
-                        while (jsonReader.hasNext()) { // Loop through all keys
-                            String key = jsonReader.nextName(); // Fetch the next key
-                            if (key.equals("organization_url")) { // Check if desired key
-                                // Fetch the value as a String
-                                String value = jsonReader.nextString();
-
-                                // Do something with the value
-                                Log.i("Value", value);
-
-                                break; // Break out of the loop
-                            } else {
-                                jsonReader.skipValue(); // Skip values of other keys
-                            }
-                        }
-                        jsonReader.close();
-                        myConnection.disconnect();
-                    } else {
-                        Log.i("responseCode", "" + myConnection.getResponseCode());
-                    }
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
     }
 
     public boolean isOnline() {
