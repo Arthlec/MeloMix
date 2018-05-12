@@ -4,27 +4,25 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.JsonReader;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.fasterxml.jackson.core.JsonEncoding;
-import com.fasterxml.jackson.core.TreeNode;
-import com.fasterxml.jackson.core.io.JsonStringEncoder;
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.private_.TreeNode;
 import com.fasterxml.jackson.jr.stree.JacksonJrsTreeCodec;
+import com.fasterxml.jackson.jr.stree.JrsString;
 import com.spotify.sdk.android.authentication.AuthenticationClient;
 import com.spotify.sdk.android.authentication.AuthenticationRequest;
 import com.spotify.sdk.android.authentication.AuthenticationResponse;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
+
+import static junit.framework.Assert.assertTrue;
 
 public class LoginActivitySpotify extends AppCompatActivity {
 
@@ -106,28 +104,50 @@ public class LoginActivitySpotify extends AppCompatActivity {
                         Log.i("AsyncTask", "Connection REUSSIE !");
                         InputStream responseBody = myConnection.getInputStream();
                         InputStreamReader responseBodyReader = new InputStreamReader(responseBody, "UTF-8");
-                        /*BufferedReader bufferedReader = new BufferedReader(responseBodyReader);
-                        StringBuilder out = new StringBuilder();
-                        String line;
-                        while ((line = bufferedReader.readLine()) != null) {
-                            out.append(line);
-                        }
-                        Log.i("out", out.toString());
-                        bufferedReader.close();*/
-                        JSON json = JSON.std.with(new JacksonJrsTreeCodec());
-                        TreeNode root = json.treeFrom("{\"value\" : [1, 2, 3]}");
 
                         //TUTO JSON JACKSON JR
-                        /*assertTrue(root.isObject());
-                        TreeNode array = root.get("value");
-                        assertTrue(array.isArray());
-                        JrsNumber n = (JrsNumber) array.get(1);
-                        assertEquals(2, n.getValue().intValue());*/
+                        JSON json = JSON.std.with(new JacksonJrsTreeCodec());
+                        //TreeNode root = json.treeFrom("{\"value\" : [1, 2, 3]}");
+                        TreeNode root = json.treeFrom("{\n" +
+                                "  \"birthdate\": \"1937-06-01\",\n" +
+                                "  \"country\": \"SE\",\n" +
+                                "  \"display_name\": \"JM Wizzler\",\n" +
+                                "  \"email\": \"email@example.com\",\n" +
+                                "  \"external_urls\": {\n" +
+                                "    \"spotify\": \"https://open.spotify.com/user/wizzler\"\n" +
+                                "  },\n" +
+                                "  \"followers\" : {\n" +
+                                "    \"href\" : null,\n" +
+                                "    \"total\" : 3829\n" +
+                                "  },\n" +
+                                "  \"href\": \"https://api.spotify.com/v1/users/wizzler\",\n" +
+                                "  \"id\": \"wizzler\",\n" +
+                                "  \"images\": [\n" +
+                                "    {\n" +
+                                "      \"height\": null,\n" +
+                                "      \"url\": \"https://fbcdn-profile-a.akamaihd.net/hprofile-ak-frc3/t1.0-1/1970403_10152215092574354_1798272330_n.jpg\",\n" +
+                                "      \"width\": null\n" +
+                                "    }\n" +
+                                "  ],\n" +
+                                "  \"product\": \"premium\",\n" +
+                                "  \"type\": \"user\",\n" +
+                                "  \"uri\": \"spotify:user:wizzler\"\n" +
+                                "}");
+                        assertTrue(root.isObject());
+                        //TreeNode array = root.get("display_name");
+                        JrsString name = (JrsString) root.get("display_name");
 
-                        json = (String) json.asString(root);
+                        //assertTrue(array.isArray());
+                        //assertTrue(name.isObject()); ERROR
+                        //JrsNumber n = (JrsNumber) name.get(1);
+                        //assertEquals(2, n.getValue().intValue());
+                        Log.i("Display_name",name.asText());
 
-                        //EN-DESSOUS VIEILLE VERSION DU JSON READER (PAS LA BIBLIOTHEQUE)
-                        JsonReader jsonReader = new JsonReader(responseBodyReader);
+                        String jsonString = json.asString(root);
+                        Log.i("jsonString", jsonString);
+
+                        //EN-DESSOUS VIEILLE VERSION DU JSON READER (SANS JACKSON JR)
+                        /*JsonReader jsonReader = new JsonReader(responseBodyReader);
 
                         jsonReader.beginObject(); // Start processing the JSON object
                         while (jsonReader.hasNext()) { // Loop through all keys
@@ -144,7 +164,7 @@ public class LoginActivitySpotify extends AppCompatActivity {
                                 jsonReader.skipValue(); // Skip values of other keys
                             }
                         }
-                        jsonReader.close();
+                        jsonReader.close();*/
                         myConnection.disconnect();
                     } else {
                         Log.i("responseCode", "" + myConnection.getResponseCode());
