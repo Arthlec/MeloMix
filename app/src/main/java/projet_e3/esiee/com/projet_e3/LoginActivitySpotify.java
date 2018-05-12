@@ -61,7 +61,7 @@ public class LoginActivitySpotify extends AppCompatActivity {
                     // Handle successful response
                     authToken = response.getAccessToken();
                     Toast.makeText(LoginActivitySpotify.this,"Connexion réussie", Toast.LENGTH_LONG).show();
-                    requestData("https://api.spotify.com/v1/me/top/tracks");
+                    requestData("https://api.spotify.com/v1/me");
                     MainActivity.isLoggedInSpotify = true;
                     startActivity(getBackToMainActivity);
                     break;
@@ -103,68 +103,16 @@ public class LoginActivitySpotify extends AppCompatActivity {
                         // Success
                         Log.i("AsyncTask", "Connection REUSSIE !");
                         InputStream responseBody = myConnection.getInputStream();
-                        InputStreamReader responseBodyReader = new InputStreamReader(responseBody, "UTF-8");
 
-                        //TUTO JSON JACKSON JR
                         JSON json = JSON.std.with(new JacksonJrsTreeCodec());
-                        //TreeNode root = json.treeFrom("{\"value\" : [1, 2, 3]}");
-                        TreeNode root = json.treeFrom("{\n" +
-                                "  \"birthdate\": \"1937-06-01\",\n" +
-                                "  \"country\": \"SE\",\n" +
-                                "  \"display_name\": \"JM Wizzler\",\n" +
-                                "  \"email\": \"email@example.com\",\n" +
-                                "  \"external_urls\": {\n" +
-                                "    \"spotify\": \"https://open.spotify.com/user/wizzler\"\n" +
-                                "  },\n" +
-                                "  \"followers\" : {\n" +
-                                "    \"href\" : null,\n" +
-                                "    \"total\" : 3829\n" +
-                                "  },\n" +
-                                "  \"href\": \"https://api.spotify.com/v1/users/wizzler\",\n" +
-                                "  \"id\": \"wizzler\",\n" +
-                                "  \"images\": [\n" +
-                                "    {\n" +
-                                "      \"height\": null,\n" +
-                                "      \"url\": \"https://fbcdn-profile-a.akamaihd.net/hprofile-ak-frc3/t1.0-1/1970403_10152215092574354_1798272330_n.jpg\",\n" +
-                                "      \"width\": null\n" +
-                                "    }\n" +
-                                "  ],\n" +
-                                "  \"product\": \"premium\",\n" +
-                                "  \"type\": \"user\",\n" +
-                                "  \"uri\": \"spotify:user:wizzler\"\n" +
-                                "}");
+                        TreeNode root = json.treeFrom(responseBody);
                         assertTrue(root.isObject());
-                        //TreeNode array = root.get("display_name");
-                        JrsString name = (JrsString) root.get("display_name");
-
-                        //assertTrue(array.isArray());
-                        //assertTrue(name.isObject()); ERROR
-                        //JrsNumber n = (JrsNumber) name.get(1);
-                        //assertEquals(2, n.getValue().intValue());
-                        Log.i("Display_name",name.asText());
 
                         String jsonString = json.asString(root);
                         Log.i("jsonString", jsonString);
+                        JrsString name = (JrsString) root.get("id");
+                        Log.i("Display_name",name.asText());
 
-                        //EN-DESSOUS VIEILLE VERSION DU JSON READER (SANS JACKSON JR)
-                        /*JsonReader jsonReader = new JsonReader(responseBodyReader);
-
-                        jsonReader.beginObject(); // Start processing the JSON object
-                        while (jsonReader.hasNext()) { // Loop through all keys
-                            String key = jsonReader.nextName(); // Fetch the next key
-                            if (key.equals("total")) { // Check if desired key
-                                jsonReader.nextString();
-                                String value = jsonReader.nextString();
-
-                                // Do something with the value
-                                Log.i("Value", value);
-
-                                break; // Break out of the loop
-                            } else {
-                                jsonReader.skipValue(); // Skip values of other keys
-                            }
-                        }
-                        jsonReader.close();*/
                         myConnection.disconnect();
                     } else {
                         Log.i("responseCode", "" + myConnection.getResponseCode());
