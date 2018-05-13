@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
@@ -51,6 +52,11 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         if(!MainActivity.this.isOnline())
             Toast.makeText(MainActivity.this,"Aucune connexion internet détectée", Toast.LENGTH_LONG).show();
+
+        TextView textSpotify = findViewById(R.id.textSpotify);
+        String userName = this.getIntent().getStringExtra("userName");
+        if(userName != null)
+            textSpotify.setText(userName);
     }
 
     public boolean isOnline() {

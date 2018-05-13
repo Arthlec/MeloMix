@@ -17,7 +17,6 @@ import com.spotify.sdk.android.authentication.AuthenticationResponse;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -29,7 +28,9 @@ public class LoginActivitySpotify extends AppCompatActivity {
 
     private static final String CLIENT_ID = "1aee09c9f4504604b379f867207fd238";
     private static final String REDIRECT_URI = "smooth-i://logincallback";
-    private static String authToken;
+    private static String authToken = "";
+    private static String userName = "";
+    private static boolean asyncTaskIsDone = false;
 
     // Request code that will be used to verify if the result comes from correct activity
     // Can be any integer
@@ -63,6 +64,11 @@ public class LoginActivitySpotify extends AppCompatActivity {
                     Toast.makeText(LoginActivitySpotify.this,"Connexion réussie", Toast.LENGTH_LONG).show();
                     requestData("https://api.spotify.com/v1/me");
                     MainActivity.isLoggedInSpotify = true;
+                    while(!asyncTaskIsDone){
+                        try { Thread.sleep(100); }
+                        catch (InterruptedException e) { e.printStackTrace(); }
+                    }
+                    getBackToMainActivity.putExtra("userName", "Connecté avec le compte : " + LoginActivitySpotify.userName);
                     startActivity(getBackToMainActivity);
                     break;
 
@@ -112,6 +118,7 @@ public class LoginActivitySpotify extends AppCompatActivity {
                         Log.i("jsonString", jsonString);
                         JrsString name = (JrsString) root.get("id");
                         Log.i("Display_name",name.asText());
+                        LoginActivitySpotify.setUserName(name.asText());
 
                         myConnection.disconnect();
                     } else {
@@ -120,7 +127,12 @@ public class LoginActivitySpotify extends AppCompatActivity {
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
+                LoginActivitySpotify.asyncTaskIsDone = true;
             }
         });
+    }
+
+    private static void setUserName(String userName){
+        LoginActivitySpotify.userName = userName;
     }
 }
