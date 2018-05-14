@@ -1,30 +1,36 @@
 package projet_e3.esiee.com.projet_e3;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import com.fasterxml.jackson.jr.ob.JSON;
+import com.fasterxml.jackson.jr.private_.TreeNode;
+import com.fasterxml.jackson.jr.stree.JacksonJrsTreeCodec;
+import com.fasterxml.jackson.jr.stree.JrsString;
 import com.spotify.sdk.android.authentication.AuthenticationClient;
 import com.spotify.sdk.android.authentication.AuthenticationRequest;
 import com.spotify.sdk.android.authentication.AuthenticationResponse;
-import com.spotify.sdk.android.player.Config;
-import com.spotify.sdk.android.player.ConnectionStateCallback;
-import com.spotify.sdk.android.player.Error;
-import com.spotify.sdk.android.player.Player;
-import com.spotify.sdk.android.player.PlayerEvent;
-import com.spotify.sdk.android.player.Spotify;
-import com.spotify.sdk.android.player.SpotifyPlayer;
 
-public class LoginActivitySpotify extends AppCompatActivity implements SpotifyPlayer.NotificationCallback, ConnectionStateCallback {
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+
+import javax.net.ssl.HttpsURLConnection;
+
+import static junit.framework.Assert.assertTrue;
+
+public class LoginActivitySpotify extends AppCompatActivity {
 
 
     private static final String CLIENT_ID = "1aee09c9f4504604b379f867207fd238";
     private static final String REDIRECT_URI = "smooth-i://logincallback";
-
-    private Player mPlayer;
+    private static String authToken = "";
+    private static String userName = "";
+    private static boolean asyncTaskIsDone = false;
 
     // Request code that will be used to verify if the result comes from correct activity
     // Can be any integer
@@ -34,14 +40,11 @@ public class LoginActivitySpotify extends AppCompatActivity implements SpotifyPl
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Toast.makeText(LoginActivitySpotify.this, "LoginActivitySpotify",
-                Toast.LENGTH_LONG).show();
-
-        AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID, AuthenticationResponse.Type.TOKEN, REDIRECT_URI);
+        AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID, AuthenticationResponse.Type.TOKEN, REDIRECT_URI).setShowDialog(true);
         builder.setScopes(new String[]{"user-top-read", "user-library-read"});
         AuthenticationRequest request = builder.build();
 
-        AuthenticationClient.openLoginActivity(this, REQUEST_CODE, request);
+        AuthenticationClient.openLoginActivity(LoginActivitySpotify.this, REQUEST_CODE, request);
     }
 
     @Override
@@ -50,86 +53,114 @@ public class LoginActivitySpotify extends AppCompatActivity implements SpotifyPl
 
         // Check if result comes from the correct activity
         if (requestCode == REQUEST_CODE) {
-            AuthenticationResponse response = AuthenticationClient.getResponse(resultCode, intent);
-            if (response.getType() == AuthenticationResponse.Type.TOKEN) {
-                Config playerConfig = new Config(this, response.getAccessToken(), CLIENT_ID);
-                /*Spotify.getPlayer(playerConfig, this, new SpotifyPlayer.InitializationObserver() {
-                    @Override
-                    public void onInitialized(SpotifyPlayer spotifyPlayer) {
-                        mPlayer = spotifyPlayer;
-                        mPlayer.addConnectionStateCallback(LoginActivitySpotify.this);
-                        mPlayer.addNotificationCallback(LoginActivitySpotify.this);
-                    }
+            final AuthenticationResponse response = AuthenticationClient.getResponse(resultCode, intent);
+            Intent getBackToMainActivity = new Intent(LoginActivitySpotify.this, MainActivity.class);
 
-                    @Override
-                    public void onError(Throwable throwable) {
-                        Log.e("LoginActivitySpotify", "Could not initialize player: " + throwable.getMessage());
+            switch (response.getType()) {
+                // Response was successful and contains auth token
+                case TOKEN:
+                    // Handle successful response
+                    authToken = response.getAccessToken();
+                    requestData();
+                    MainActivity.isLoggedInSpotify = true;
+                    while(!asyncTaskIsDone){
+                        try { Thread.sleep(100); }
+                        catch (InterruptedException e) { e.printStackTrace(); }
                     }
-                });*/
-                /*
-                Intent getBackToMainActivity = new Intent(LoginActivitySpotify.this, MainActivity.class);
-                startActivity(getBackToMainActivity);*/
+                    Toast.makeText(LoginActivitySpotify.this,"Connexion réussie", Toast.LENGTH_LONG).show();
+                    getBackToMainActivity.putExtra("userName", "Connecté avec le compte : " + LoginActivitySpotify.userName);
+                    startActivity(getBackToMainActivity);
+                    break;
+
+                // Auth flow returned an error
+                case ERROR:
+                    // Handle error response
+                    AuthenticationClient.stopLoginActivity(LoginActivitySpotify.this, REQUEST_CODE);
+                    Toast.makeText(LoginActivitySpotify.this,"Erreur de connexion", Toast.LENGTH_LONG).show();
+                    Log.i("Connection", "ERROR");
+                    startActivity(getBackToMainActivity);
+                    break;
+
+                // Most likely auth flow was cancelled
+                default:
+                    // Handle other cases
+                    AuthenticationClient.stopLoginActivity(LoginActivitySpotify.this, REQUEST_CODE);
+                    Toast.makeText(LoginActivitySpotify.this,"Connexion annulée", Toast.LENGTH_LONG).show();
+                    Log.i("Connection", "Cancelled");
+                    startActivity(getBackToMainActivity);
             }
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        Spotify.destroyPlayer(this);
-        super.onDestroy();
+    public static void requestData() {
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    this.getUserName();
+                    //this.getSavedTracks();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                LoginActivitySpotify.asyncTaskIsDone = true;
+            }
+
+            private void getUserName() throws IOException {
+                // Create URL
+                URL spotifyEndpoint = new URL("https://api.spotify.com/v1/me");
+
+                // Create connection
+                HttpsURLConnection myConnection = (HttpsURLConnection) spotifyEndpoint.openConnection();
+                myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
+                if (myConnection.getResponseCode() == 200) {
+                    // Success
+                    Log.i("AsyncTask", "Connection réussie pour le nom de l'utilisateur");
+                    InputStream responseBody = myConnection.getInputStream();
+
+                    JSON json = JSON.std.with(new JacksonJrsTreeCodec());
+                    TreeNode root = json.treeFrom(responseBody);
+                    assertTrue(root.isObject());
+                    String jsonString = json.asString(root);
+                    Log.i("jsonString", jsonString);
+                    JrsString name = (JrsString) root.get("id");
+                    Log.i("Display_name", name.asText());
+                    LoginActivitySpotify.setUserName(name.asText());
+
+                    myConnection.disconnect();
+                } else {
+                    Log.i("responseCode", "" + myConnection.getResponseCode());
+                }
+            }
+            private void getSavedTracks() throws IOException {
+                // Create URL
+                URL spotifyEndpoint = new URL("https://api.spotify.com/v1/me/tracks");
+
+                // Create connection
+                HttpsURLConnection myConnection = (HttpsURLConnection) spotifyEndpoint.openConnection();
+                myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
+                if (myConnection.getResponseCode() == 200) {
+                    // Success
+                    Log.i("AsyncTask", "Connection réussie pour les musiques sauvegardées");
+                    InputStream responseBody = myConnection.getInputStream();
+
+                    JSON json = JSON.std.with(new JacksonJrsTreeCodec());
+                    TreeNode root = json.treeFrom(responseBody);
+                    assertTrue(root.isObject());
+                    String jsonString = json.asString(root);
+                    Log.i("jsonString", jsonString);
+                    JrsString name = (JrsString) root.get("id");
+                    Log.i("Saved_tracks", name.asText());
+                    LoginActivitySpotify.setUserName(name.asText());
+
+                    myConnection.disconnect();
+                } else {
+                    Log.i("responseCode", "" + myConnection.getResponseCode());
+                }
+            }
+        });
     }
 
-    @Override
-    public void onPlaybackEvent(PlayerEvent playerEvent) {
-        Log.d("LoginActivitySpotify", "Playback event received: " + playerEvent.name());
-        switch (playerEvent) {
-            /*case kSpPlaybackNotifyPlay:
-                TextView text = findViewById(R.id.text);
-                String metadata = mPlayer.getMetadata().currentTrack.name;
-                if (metadata == null)
-                    text.setText("NULL");
-                else
-                    text.setText(metadata);*/
-            default:
-                break;
-        }
-    }
-
-    @Override
-    public void onPlaybackError(Error error) {
-        Log.d("LoginActivitySpotify", "Playback error received: " + error.name());
-        switch (error) {
-            // Handle error type as necessary
-            default:
-                break;
-        }
-    }
-
-    @Override
-    public void onLoggedIn() {
-        Log.d("LoginActivitySpotify", "User logged in");
-        //LoginActivitySpotify.this.finish();
-        // This is the line that plays a song.
-        //mPlayer.playUri(null, "spotify:track:2TpxZ7JUBn3uw46aR7qd6V", 0, 0);
-    }
-
-    @Override
-    public void onLoggedOut() {
-        Log.d("LoginActivitySpotify", "User logged out");
-    }
-
-    @Override
-    public void onLoginFailed(Error var1) {
-        Log.d("LoginActivitySpotify", "Login failed");
-    }
-
-    @Override
-    public void onTemporaryError() {
-        Log.d("LoginActivitySpotify", "Temporary error occurred");
-    }
-
-    @Override
-    public void onConnectionMessage(String message) {
-        Log.d("LoginActivitySpotify", "Received connection message: " + message);
+    private static void setUserName(String userName){
+        LoginActivitySpotify.userName = userName;
     }
 }
