@@ -35,9 +35,9 @@ android {
 
 repositories {
     mavenCentral()
-    /*flatDir {
+    flatDir {
         dirs 'libs'
-    }*/
+    }
 }
 
 dependencies {
@@ -48,6 +48,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'com.spotify.android:auth:1.1.0'
-    //implementation 'com.spotify.sdk:spotify-player-24-noconnect-2.20b@aar'
     implementation "com.android.support:customtabs:27.1.1"
+    implementation "com.fasterxml.jackson.jr:jackson-jr-all:2.9.5"
 }
