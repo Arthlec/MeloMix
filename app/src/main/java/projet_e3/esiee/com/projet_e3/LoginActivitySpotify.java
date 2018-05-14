@@ -10,14 +10,19 @@ import android.widget.Toast;
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.private_.TreeNode;
 import com.fasterxml.jackson.jr.stree.JacksonJrsTreeCodec;
+import com.fasterxml.jackson.jr.stree.JrsArray;
+import com.fasterxml.jackson.jr.stree.JrsObject;
 import com.fasterxml.jackson.jr.stree.JrsString;
+import com.fasterxml.jackson.jr.stree.JrsValue;
 import com.spotify.sdk.android.authentication.AuthenticationClient;
 import com.spotify.sdk.android.authentication.AuthenticationRequest;
 import com.spotify.sdk.android.authentication.AuthenticationResponse;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Iterator;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -41,7 +46,7 @@ public class LoginActivitySpotify extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID, AuthenticationResponse.Type.TOKEN, REDIRECT_URI).setShowDialog(true);
-        builder.setScopes(new String[]{"user-top-read", "user-library-read"});
+        builder.setScopes(new String[]{"user-top-read", "user-library-read", "playlist-read-private"});
         AuthenticationRequest request = builder.build();
 
         AuthenticationClient.openLoginActivity(LoginActivitySpotify.this, REQUEST_CODE, request);
@@ -98,8 +103,8 @@ public class LoginActivitySpotify extends AppCompatActivity {
             public void run() {
                 try {
                     this.getUserName();
-                    //this.getSavedTracks();
-                } catch (IOException e) {
+                    this.getSavedTracks();
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
                 LoginActivitySpotify.asyncTaskIsDone = true;
@@ -120,8 +125,6 @@ public class LoginActivitySpotify extends AppCompatActivity {
                     JSON json = JSON.std.with(new JacksonJrsTreeCodec());
                     TreeNode root = json.treeFrom(responseBody);
                     assertTrue(root.isObject());
-                    String jsonString = json.asString(root);
-                    Log.i("jsonString", jsonString);
                     JrsString name = (JrsString) root.get("id");
                     Log.i("Display_name", name.asText());
                     LoginActivitySpotify.setUserName(name.asText());
@@ -132,8 +135,9 @@ public class LoginActivitySpotify extends AppCompatActivity {
                 }
             }
             private void getSavedTracks() throws IOException {
+                String[] artistGenres;
                 // Create URL
-                URL spotifyEndpoint = new URL("https://api.spotify.com/v1/me/tracks");
+                URL spotifyEndpoint = new URL("https://api.spotify.com/v1/me/tracks?limit=50");
 
                 // Create connection
                 HttpsURLConnection myConnection = (HttpsURLConnection) spotifyEndpoint.openConnection();
@@ -146,16 +150,51 @@ public class LoginActivitySpotify extends AppCompatActivity {
                     JSON json = JSON.std.with(new JacksonJrsTreeCodec());
                     TreeNode root = json.treeFrom(responseBody);
                     assertTrue(root.isObject());
-                    String jsonString = json.asString(root);
-                    Log.i("jsonString", jsonString);
-                    JrsString name = (JrsString) root.get("id");
-                    Log.i("Saved_tracks", name.asText());
-                    LoginActivitySpotify.setUserName(name.asText());
+                    JrsArray listTracksArray = (JrsArray) root.get("items");
+                    Iterator<JrsValue> listTracksIterator = listTracksArray.elements();
+                    artistGenres = new String[listTracksArray.size()];
+                    for(int i = 0; listTracksIterator.hasNext(); i++){
+                        artistGenres[i] = listTracksIterator.next().asText();
+                        Log.i("artistGenres", artistGenres[i]);
+                    }
+                    JrsString idArtist = (JrsString) listTracks.get(0).get("track").get("album").get("artists").get(0).get("id");
+                    listArtistGenres = this.getArtistGenre(idArtist.asText());
 
                     myConnection.disconnect();
                 } else {
                     Log.i("responseCode", "" + myConnection.getResponseCode());
                 }
+            }
+
+            private String[] getArtistGenre(String id) throws IOException {
+                // Create URL
+                URL spotifyEndpoint = new URL("https://api.spotify.com/v1/artists/" + id);
+                String[] artistGenres = null;
+
+                // Create connection
+                HttpsURLConnection myConnection = (HttpsURLConnection) spotifyEndpoint.openConnection();
+                myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
+                if (myConnection.getResponseCode() == 200) {
+                    // Success
+                    Log.i("AsyncTask", "Connection réussie pour l'artiste");
+                    InputStream responseBody = myConnection.getInputStream();
+
+                    JSON json = JSON.std.with(new JacksonJrsTreeCodec());
+                    TreeNode root = json.treeFrom(responseBody);
+                    assertTrue(root.isObject());
+                    JrsArray listGenresArray = (JrsArray) root.get("genres");
+                    Iterator<JrsValue> listGenresIterator = listGenresArray.elements();
+                    artistGenres = new String[listGenresArray.size()];
+                    for(int i = 0; listGenresIterator.hasNext(); i++){
+                        artistGenres[i] = listGenresIterator.next().asText();
+                        Log.i("artistGenres", artistGenres[i]);
+                    }
+
+                    myConnection.disconnect();
+                } else {
+                    Log.i("responseCode", "" + myConnection.getResponseCode());
+                }
+                return artistGenres;
             }
         });
     }
