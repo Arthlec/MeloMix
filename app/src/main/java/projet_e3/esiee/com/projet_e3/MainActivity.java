@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+
 import com.deezer.sdk.model.Permissions;
 import com.deezer.sdk.network.connect.DeezerConnect;
 import com.deezer.sdk.network.connect.SessionStore;
@@ -34,7 +35,7 @@ public class MainActivity extends DeezerBaseActivity {
             new SessionStore().restore(mDeezerConnect, this);
         }
 
-        Button buttonConnect = (Button) findViewById(R.id.button_login);
+        Button buttonConnect = findViewById(R.id.button_login);
         buttonConnect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -42,18 +43,26 @@ public class MainActivity extends DeezerBaseActivity {
             }
         });
 
-        Button buttonDisconnect = (Button) findViewById(R.id.button_logout);
+        Button buttonDisconnect = findViewById(R.id.button_logout);
         buttonDisconnect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 disconnectFromDeezer();
             }
         });
-        Button buttonGetAlbum = (Button) findViewById(R.id.button_albulm);
+        Button buttonGetAlbum = findViewById(R.id.button_albulm);
         buttonGetAlbum.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, DeezerAlbumActivity.class);
+                startActivity(intent);
+            }
+        });
+        Button buttonGetTracks = findViewById(R.id.button_tracks);
+        buttonGetTracks.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, DeezerTracksActivity.class);
                 startActivity(intent);
             }
         });

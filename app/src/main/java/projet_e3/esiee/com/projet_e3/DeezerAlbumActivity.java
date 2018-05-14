@@ -6,6 +6,7 @@ import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 import com.deezer.sdk.model.Album;
+import com.deezer.sdk.model.Genre;
 import com.deezer.sdk.network.connect.SessionStore;
 import com.deezer.sdk.network.request.DeezerRequest;
 import com.deezer.sdk.network.request.DeezerRequestFactory;
@@ -25,8 +26,6 @@ public class DeezerAlbumActivity extends DeezerPlayerActivity {
 
     /** The list of albums of displayed by this activity. */
     private List<Album> mAlbumsList = new ArrayList<>();
-
-    private ArrayAdapter<Album> mAlbumsAdapter;
 
     private AlbumPlayer mAlbumPlayer;
 
@@ -56,12 +55,19 @@ public class DeezerAlbumActivity extends DeezerPlayerActivity {
                 Log.d("list", mAlbumsList.toString());
 
 
-                // create Json file
+                // create Json object
                 JSONObject object = new JSONObject();
                 int m =0;int n=0;
                 for (Album album:mAlbumsList) {
-                    Log.d("list title", album.getTitle());
 
+                    try {
+                        JSONObject mJson = album.toJson();
+                        Log.i("JsonObj",mJson.toString());
+                    } catch (Exception i) {
+                        i.printStackTrace();
+                    }
+                    //Log.d("title", album.getTitle());
+                    //Log.d("list genre", album.getGenres().toString());
                     try{
                         object.put(album.toString(),m);
                         object.put(album.getTitle(),n);
@@ -70,8 +76,7 @@ public class DeezerAlbumActivity extends DeezerPlayerActivity {
                     }
                     m++;n++;
                 }
-                Log.i("Json",object.toString());
-
+                Log.i("Json", object.toString());
             }
 
             @Override
@@ -85,8 +90,6 @@ public class DeezerAlbumActivity extends DeezerPlayerActivity {
                                     final Object requestId) {
                 handleError(exception);
             }
-
-
         });
     }
 

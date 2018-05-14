@@ -7,9 +7,9 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.deezer.sdk.network.connect.DeezerConnect;
 import com.deezer.sdk.network.connect.SessionStore;
-
 
 
 public class DeezerBaseActivity extends Activity {
@@ -40,7 +40,7 @@ public class DeezerBaseActivity extends Activity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mDeezerConnect = new DeezerConnect(this,SAMPLE_APP_ID);
+        mDeezerConnect = new DeezerConnect(this, SAMPLE_APP_ID);
     }
 
     /**
