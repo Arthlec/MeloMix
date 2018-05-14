@@ -43,6 +43,8 @@ public class MainActivity extends AppCompatActivity {
                 }else{
                     Toast.makeText(MainActivity.this,"Aucun compte n'est connecté", Toast.LENGTH_LONG).show();
                 }
+                TextView textSpotify = findViewById(R.id.textSpotify);
+                textSpotify.setText("Non connecté");
             }
         });
     }

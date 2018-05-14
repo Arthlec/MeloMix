@@ -61,13 +61,13 @@ public class LoginActivitySpotify extends AppCompatActivity {
                 case TOKEN:
                     // Handle successful response
                     authToken = response.getAccessToken();
-                    Toast.makeText(LoginActivitySpotify.this,"Connexion réussie", Toast.LENGTH_LONG).show();
-                    requestData("https://api.spotify.com/v1/me");
+                    requestData();
                     MainActivity.isLoggedInSpotify = true;
                     while(!asyncTaskIsDone){
                         try { Thread.sleep(100); }
                         catch (InterruptedException e) { e.printStackTrace(); }
                     }
+                    Toast.makeText(LoginActivitySpotify.this,"Connexion réussie", Toast.LENGTH_LONG).show();
                     getBackToMainActivity.putExtra("userName", "Connecté avec le compte : " + LoginActivitySpotify.userName);
                     startActivity(getBackToMainActivity);
                     break;
@@ -92,42 +92,70 @@ public class LoginActivitySpotify extends AppCompatActivity {
         }
     }
 
-    public static void requestData(final String request) {
+    public static void requestData() {
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
                 try {
-                    // Create URL
-                    URL spotifyEndpoint = new URL(request);
-
-                    // Create connection
-                    HttpsURLConnection myConnection = (HttpsURLConnection) spotifyEndpoint.openConnection();
-
-                    myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
-
-                    if (myConnection.getResponseCode() == 200) {
-                        // Success
-                        Log.i("AsyncTask", "Connection REUSSIE !");
-                        InputStream responseBody = myConnection.getInputStream();
-
-                        JSON json = JSON.std.with(new JacksonJrsTreeCodec());
-                        TreeNode root = json.treeFrom(responseBody);
-                        assertTrue(root.isObject());
-
-                        String jsonString = json.asString(root);
-                        Log.i("jsonString", jsonString);
-                        JrsString name = (JrsString) root.get("id");
-                        Log.i("Display_name",name.asText());
-                        LoginActivitySpotify.setUserName(name.asText());
-
-                        myConnection.disconnect();
-                    } else {
-                        Log.i("responseCode", "" + myConnection.getResponseCode());
-                    }
+                    this.getUserName();
+                    //this.getSavedTracks();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
                 LoginActivitySpotify.asyncTaskIsDone = true;
+            }
+
+            private void getUserName() throws IOException {
+                // Create URL
+                URL spotifyEndpoint = new URL("https://api.spotify.com/v1/me");
+
+                // Create connection
+                HttpsURLConnection myConnection = (HttpsURLConnection) spotifyEndpoint.openConnection();
+                myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
+                if (myConnection.getResponseCode() == 200) {
+                    // Success
+                    Log.i("AsyncTask", "Connection réussie pour le nom de l'utilisateur");
+                    InputStream responseBody = myConnection.getInputStream();
+
+                    JSON json = JSON.std.with(new JacksonJrsTreeCodec());
+                    TreeNode root = json.treeFrom(responseBody);
+                    assertTrue(root.isObject());
+                    String jsonString = json.asString(root);
+                    Log.i("jsonString", jsonString);
+                    JrsString name = (JrsString) root.get("id");
+                    Log.i("Display_name", name.asText());
+                    LoginActivitySpotify.setUserName(name.asText());
+
+                    myConnection.disconnect();
+                } else {
+                    Log.i("responseCode", "" + myConnection.getResponseCode());
+                }
+            }
+            private void getSavedTracks() throws IOException {
+                // Create URL
+                URL spotifyEndpoint = new URL("https://api.spotify.com/v1/me/tracks");
+
+                // Create connection
+                HttpsURLConnection myConnection = (HttpsURLConnection) spotifyEndpoint.openConnection();
+                myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
+                if (myConnection.getResponseCode() == 200) {
+                    // Success
+                    Log.i("AsyncTask", "Connection réussie pour les musiques sauvegardées");
+                    InputStream responseBody = myConnection.getInputStream();
+
+                    JSON json = JSON.std.with(new JacksonJrsTreeCodec());
+                    TreeNode root = json.treeFrom(responseBody);
+                    assertTrue(root.isObject());
+                    String jsonString = json.asString(root);
+                    Log.i("jsonString", jsonString);
+                    JrsString name = (JrsString) root.get("id");
+                    Log.i("Saved_tracks", name.asText());
+                    LoginActivitySpotify.setUserName(name.asText());
+
+                    myConnection.disconnect();
+                } else {
+                    Log.i("responseCode", "" + myConnection.getResponseCode());
+                }
             }
         });
     }
