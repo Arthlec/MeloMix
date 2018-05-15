@@ -1,7 +1,6 @@
 package projet_e3.esiee.com.projet_e3;
 
 import android.widget.SeekBar;
-
 import com.deezer.sdk.player.PlayerWrapper;
 import com.deezer.sdk.player.event.BufferState;
 import com.deezer.sdk.player.event.OnBufferErrorListener;

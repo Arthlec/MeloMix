@@ -5,9 +5,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-
+import android.widget.Toast;
 import com.deezer.sdk.model.Permissions;
-import com.deezer.sdk.network.connect.DeezerConnect;
 import com.deezer.sdk.network.connect.SessionStore;
 import com.deezer.sdk.network.connect.event.DialogListener;
 
@@ -23,6 +22,7 @@ public class MainActivity extends DeezerBaseActivity {
             Permissions.OFFLINE_ACCESS,
             Permissions.MANAGE_LIBRARY,
             Permissions.LISTENING_HISTORY
+
     };
 
     @Override
@@ -31,10 +31,11 @@ public class MainActivity extends DeezerBaseActivity {
         setContentView(R.layout.activity_main);
 
         // restore auth
-        if (mDeezerConnect != null) {
+        if (mDeezerConnect.isSessionValid()) {
             new SessionStore().restore(mDeezerConnect, this);
         }
 
+        //login the current user his Deezer account.
         Button buttonConnect = findViewById(R.id.button_login);
         buttonConnect.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -43,6 +44,7 @@ public class MainActivity extends DeezerBaseActivity {
             }
         });
 
+        //logout the current user his Deezer account.
         Button buttonDisconnect = findViewById(R.id.button_logout);
         buttonDisconnect.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -50,6 +52,8 @@ public class MainActivity extends DeezerBaseActivity {
                 disconnectFromDeezer();
             }
         });
+
+        //get the album of the current user.
         Button buttonGetAlbum = findViewById(R.id.button_albulm);
         buttonGetAlbum.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,6 +62,8 @@ public class MainActivity extends DeezerBaseActivity {
                 startActivity(intent);
             }
         });
+
+        //get the most played tracks of the current user.
         Button buttonGetTracks = findViewById(R.id.button_tracks);
         buttonGetTracks.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -66,6 +72,18 @@ public class MainActivity extends DeezerBaseActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    //Show a toast who indicate if the user is connected.
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (mDeezerConnect.isSessionValid()) {
+            Toast.makeText(MainActivity.this, mDeezerConnect.getCurrentUser().getName()+" you are connected to Deezer", Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(MainActivity.this, "You are not connected to Deezer", Toast.LENGTH_LONG).show();
+        }
     }
 
     /**

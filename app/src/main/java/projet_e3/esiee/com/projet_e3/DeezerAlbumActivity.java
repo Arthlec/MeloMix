@@ -57,24 +57,19 @@ public class DeezerAlbumActivity extends DeezerPlayerActivity {
 
                 // create Json object
                 JSONObject object = new JSONObject();
-                int m =0;int n=0;
                 for (Album album:mAlbumsList) {
 
                     try {
                         JSONObject mJson = album.toJson();
-                        Log.i("JsonObj",mJson.toString());
                     } catch (Exception i) {
                         i.printStackTrace();
                     }
-                    //Log.d("title", album.getTitle());
-                    //Log.d("list genre", album.getGenres().toString());
                     try{
-                        object.put(album.toString(),m);
-                        object.put(album.getTitle(),n);
+                        //object.put(album.toString(),true);
+                        object.put(album.getTitle(),true);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    m++;n++;
                 }
                 Log.i("Json", object.toString());
             }

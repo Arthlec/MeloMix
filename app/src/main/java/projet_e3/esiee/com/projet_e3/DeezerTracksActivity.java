@@ -2,8 +2,8 @@ package projet_e3.esiee.com.projet_e3;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ArrayAdapter;
 import android.widget.Toast;
-
 import com.deezer.sdk.model.Track;
 import com.deezer.sdk.network.connect.SessionStore;
 import com.deezer.sdk.network.request.AsyncDeezerTask;
@@ -28,6 +28,10 @@ public class DeezerTracksActivity extends DeezerPlayerActivity {
      */
     private List<Track> mTracksList = new ArrayList<>();
 
+    /** the tracks list adapter */
+    private ArrayAdapter<Track> mTracksAdapter;
+
+    // create the player track
     private TrackPlayer mTrackPlayer;
 
     @Override
@@ -44,7 +48,6 @@ public class DeezerTracksActivity extends DeezerPlayerActivity {
         // fetch tracks list
         getUserTracks();
     }
-
 
     /**
      * Creates the PlaylistPlayer
@@ -66,12 +69,12 @@ public class DeezerTracksActivity extends DeezerPlayerActivity {
     }
 
     /**
-     * Search for all tracks splitted by genre
+     * Search for all tracks
      */
     private void getUserTracks() {
 
         DeezerRequest request = DeezerRequestFactory.requestCurrentUserCharts();
-        mDeezerConnect.requestAsync(request, new JsonRequestListener() {
+        AsyncDeezerTask task = new AsyncDeezerTask(mDeezerConnect, new JsonRequestListener() {
 
             @SuppressWarnings("unchecked")
             @Override
@@ -90,20 +93,17 @@ public class DeezerTracksActivity extends DeezerPlayerActivity {
 
                 // create Json object
                 JSONObject mObject = new JSONObject();
-                int m = 0;
-                int n = 0;
                 for (Track track : mTracksList) {
                     try {
-                        mObject.put(track.toString(), m);
-                        mObject.put(track.getTitle(), n);
-                        //Log.i("Json", mObject.toString());
+                        //Store track in the JSONObject
+                        //mObject.put(track.toString(), true);
+                        mObject.put(track.getTitle(), true);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    m++;
-                    n++;
                     Log.d("title", track.getTitle());
                 }
+                Log.i("Json", mObject.toString());
             }
 
             @Override
@@ -111,12 +111,12 @@ public class DeezerTracksActivity extends DeezerPlayerActivity {
                 handleError(new DeezerError("Unparsed reponse"));
             }
 
-
             @Override
             public void onException(final Exception exception,
                                     final Object requestId) {
                 handleError(exception);
             }
         });
+        task.execute(request);
     }
 }
