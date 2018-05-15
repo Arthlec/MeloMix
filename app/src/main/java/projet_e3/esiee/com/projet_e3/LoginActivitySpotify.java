@@ -11,6 +11,7 @@ import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.private_.TreeNode;
 import com.fasterxml.jackson.jr.stree.JacksonJrsTreeCodec;
 import com.fasterxml.jackson.jr.stree.JrsArray;
+import com.fasterxml.jackson.jr.stree.JrsNumber;
 import com.fasterxml.jackson.jr.stree.JrsString;
 import com.spotify.sdk.android.authentication.AuthenticationClient;
 import com.spotify.sdk.android.authentication.AuthenticationRequest;
@@ -107,7 +108,7 @@ public class LoginActivitySpotify extends AppCompatActivity {
                     for(int i=0; i<playlistIds.length; i++) {
                         if(playlistIds[i] != null) {
                             Stack artistsIds = getArtistsStack(playlistIds[i]);
-                            for(int j=0; j<artistsIds.size(); j++)
+                            for (int j=0; j<artistsIds.size(); j++)
                                 getMusicGenreList(artistsIds.pop().toString());
                         }
                     }
@@ -171,6 +172,8 @@ public class LoginActivitySpotify extends AppCompatActivity {
                         JrsString playlistID = (JrsString) root.get("items").get(i).get("tracks").get("href");
                         if(playlistID.asText().matches(regex)) {
                             Log.i("Playlist_ID", playlistID.asText());
+                            JrsNumber totalPlaylistTracks = (JrsNumber) root.get("items").get(i).get("tracks").get("total");
+                            Log.i("Tracks/playlist", totalPlaylistTracks.asText());
                             playlistIdList[i] = playlistID.asText();
                         }
                     }
@@ -199,18 +202,27 @@ public class LoginActivitySpotify extends AppCompatActivity {
                     assertTrue(root.isObject());
                     String jsonString = json.asString(root);
                     int tracksNumber = root.get("items").size();
+                    Log.i("Nombre de musiques", "" + tracksNumber);
                     Stack artistsIDStack = new Stack();
                     Log.i("PlaylistJsonString", jsonString);
                     for (int i=0; i<tracksNumber; i++) {
                         int artistsNumber = root.get("items").get(i).get("track").get("artists").size();
+                        Log.i("Nombre d'artistes/music", "" + artistsNumber);
                         for (int j=0; j<artistsNumber; j++) {
                             JrsString artistID = (JrsString) root.get("items").get(i).get("track").get("artists").get(j).get("href");
-                            Log.i("Artist_ID", artistID.asText());
-                            artistsIDStack.push(artistID.asText());
+                            if(artistID != null) {
+                                Log.i("Artist_ID", artistID.asText());
+                                artistsIDStack.push(artistID.asText());
+                            }
                         }
                     }
                     Log.i("Artists_Stack", "" + artistsIDStack);
                     myConnection.disconnect();
+                    JrsString nextTracksID = (JrsString) root.get("next");
+                    if(nextTracksID != null) {
+                        getArtistsStack(nextTracksID.asText());
+                        Log.i("nextTracksID", nextTracksID.asText());
+                    }
                     return artistsIDStack;
                 } else {
                     Log.i("responseCode", "" + myConnection.getResponseCode());
