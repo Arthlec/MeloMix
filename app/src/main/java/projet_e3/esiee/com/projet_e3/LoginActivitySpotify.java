@@ -10,6 +10,7 @@ import android.widget.Toast;
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.private_.TreeNode;
 import com.fasterxml.jackson.jr.stree.JacksonJrsTreeCodec;
+import com.fasterxml.jackson.jr.stree.JrsArray;
 import com.fasterxml.jackson.jr.stree.JrsString;
 import com.spotify.sdk.android.authentication.AuthenticationClient;
 import com.spotify.sdk.android.authentication.AuthenticationRequest;
@@ -18,6 +19,9 @@ import com.spotify.sdk.android.authentication.AuthenticationResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.EmptyStackException;
+import java.util.List;
+import java.util.Stack;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -31,6 +35,7 @@ public class LoginActivitySpotify extends AppCompatActivity {
     private static String authToken = "";
     private static String userName = "";
     private static boolean asyncTaskIsDone = false;
+    private static Stack genresStack = new Stack();
 
     // Request code that will be used to verify if the result comes from correct activity
     // Can be any integer
@@ -41,7 +46,7 @@ public class LoginActivitySpotify extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID, AuthenticationResponse.Type.TOKEN, REDIRECT_URI).setShowDialog(true);
-        builder.setScopes(new String[]{"user-top-read", "user-library-read"});
+        builder.setScopes(new String[]{"user-top-read", "user-library-read", "playlist-read-private"});
         AuthenticationRequest request = builder.build();
 
         AuthenticationClient.openLoginActivity(LoginActivitySpotify.this, REQUEST_CODE, request);
@@ -98,14 +103,22 @@ public class LoginActivitySpotify extends AppCompatActivity {
             public void run() {
                 try {
                     this.getUserName();
-                    //this.getSavedTracks();
+                    String[] playlistIds = this.getPlaylistsIds();
+                    for(int i=0; i<playlistIds.length; i++) {
+                        if(playlistIds[i] != null) {
+                            Stack artistsIds = getArtistsStack(playlistIds[i]);
+                            for(int j=0; j<artistsIds.size(); j++)
+                                getMusicGenreList(artistsIds.pop().toString());
+                        }
+                    }
+                    Log.i("Liste des genres", genresStack.toString());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
                 LoginActivitySpotify.asyncTaskIsDone = true;
             }
 
-            private void getUserName() throws IOException {
+            private String getUserName() throws IOException {
                 // Create URL
                 URL spotifyEndpoint = new URL("https://api.spotify.com/v1/me");
 
@@ -114,7 +127,7 @@ public class LoginActivitySpotify extends AppCompatActivity {
                 myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
                 if (myConnection.getResponseCode() == 200) {
                     // Success
-                    Log.i("AsyncTask", "Connection réussie pour le nom de l'utilisateur");
+                    Log.i("AsyncTask", "Connexion réussie pour le nom de l'utilisateur");
                     InputStream responseBody = myConnection.getInputStream();
 
                     JSON json = JSON.std.with(new JacksonJrsTreeCodec());
@@ -127,30 +140,108 @@ public class LoginActivitySpotify extends AppCompatActivity {
                     LoginActivitySpotify.setUserName(name.asText());
 
                     myConnection.disconnect();
+                    return name.asText();
                 } else {
                     Log.i("responseCode", "" + myConnection.getResponseCode());
+                    return "";
                 }
             }
-            private void getSavedTracks() throws IOException {
+            private String[] getPlaylistsIds() throws IOException {
                 // Create URL
-                URL spotifyEndpoint = new URL("https://api.spotify.com/v1/me/tracks");
+                URL spotifyEndpoint = new URL("https://api.spotify.com/v1/me/playlists");
 
                 // Create connection
                 HttpsURLConnection myConnection = (HttpsURLConnection) spotifyEndpoint.openConnection();
                 myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
                 if (myConnection.getResponseCode() == 200) {
                     // Success
-                    Log.i("AsyncTask", "Connection réussie pour les musiques sauvegardées");
+                    Log.i("AsyncTask", "Connexion réussie pour les playlists personnelles");
                     InputStream responseBody = myConnection.getInputStream();
 
                     JSON json = JSON.std.with(new JacksonJrsTreeCodec());
                     TreeNode root = json.treeFrom(responseBody);
                     assertTrue(root.isObject());
                     String jsonString = json.asString(root);
-                    Log.i("jsonString", jsonString);
-                    JrsString name = (JrsString) root.get("id");
-                    Log.i("Saved_tracks", name.asText());
-                    LoginActivitySpotify.setUserName(name.asText());
+                    int playlistNumber = root.get("items").size();
+                    String[] playlistIdList = new String[playlistNumber];
+                    String regex = "\\S+" + getUserName() + "\\S+";
+                    Log.i("UserPlaylistJsonString", jsonString);
+                    //Log.i("Nombre de playlists", "" + playlistNumber);
+                    for (int i=0; i<playlistNumber; i++) {
+                        JrsString playlistID = (JrsString) root.get("items").get(i).get("tracks").get("href");
+                        if(playlistID.asText().matches(regex)) {
+                            Log.i("Playlist_ID", playlistID.asText());
+                            playlistIdList[i] = playlistID.asText();
+                        }
+                    }
+
+                    myConnection.disconnect();
+                    return playlistIdList;
+                } else {
+                    Log.i("responseCode", "" + myConnection.getResponseCode());
+                    return null;
+                }
+            }
+            private Stack getArtistsStack(String playlistID) throws IOException {
+                // Create URL
+                URL spotifyEndpoint = new URL(playlistID);
+
+                // Create connection
+                HttpsURLConnection myConnection = (HttpsURLConnection) spotifyEndpoint.openConnection();
+                myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
+                if (myConnection.getResponseCode() == 200) {
+                    // Success
+                    Log.i("AsyncTask", "Connexion réussie pour la playlist demandée");
+                    InputStream responseBody = myConnection.getInputStream();
+
+                    JSON json = JSON.std.with(new JacksonJrsTreeCodec());
+                    TreeNode root = json.treeFrom(responseBody);
+                    assertTrue(root.isObject());
+                    String jsonString = json.asString(root);
+                    int tracksNumber = root.get("items").size();
+                    Stack artistsIDStack = new Stack();
+                    Log.i("PlaylistJsonString", jsonString);
+                    for (int i=0; i<tracksNumber; i++) {
+                        int artistsNumber = root.get("items").get(i).get("track").get("artists").size();
+                        for (int j=0; j<artistsNumber; j++) {
+                            JrsString artistID = (JrsString) root.get("items").get(i).get("track").get("artists").get(j).get("href");
+                            Log.i("Artist_ID", artistID.asText());
+                            artistsIDStack.push(artistID.asText());
+                        }
+                    }
+                    Log.i("Artists_Stack", "" + artistsIDStack);
+                    myConnection.disconnect();
+                    return artistsIDStack;
+                } else {
+                    Log.i("responseCode", "" + myConnection.getResponseCode());
+                    return null;
+                }
+            }
+            private void getMusicGenreList(String artistID) throws IOException {
+                // Create URL
+                URL spotifyEndpoint = new URL(artistID);
+
+                // Create connection
+                HttpsURLConnection myConnection = (HttpsURLConnection) spotifyEndpoint.openConnection();
+                myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
+                if (myConnection.getResponseCode() == 200) {
+                    // Success
+                    Log.i("AsyncTask", "Connexion réussie pour l'artiste demandé");
+                    InputStream responseBody = myConnection.getInputStream();
+
+                    JSON json = JSON.std.with(new JacksonJrsTreeCodec());
+                    TreeNode root = json.treeFrom(responseBody);
+                    assertTrue(root.isObject());
+                    String jsonString = json.asString(root);
+                    Log.i("ArtistsJsonString", jsonString);
+                    int genresNumber = root.get("genres").size();
+                    if (genresNumber != 0) {
+                        for (int i=0; i<genresNumber; i++) {
+                            JrsString genre = (JrsString) root.get("genres").get(i);
+                            Log.i("Genre", genre.asText());
+                            genresStack.push(genre.asText());
+                        }
+                    }
 
                     myConnection.disconnect();
                 } else {
