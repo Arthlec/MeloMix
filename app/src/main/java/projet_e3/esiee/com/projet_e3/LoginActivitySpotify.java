@@ -121,15 +121,17 @@ public class LoginActivitySpotify extends AppCompatActivity {
                         }
                     }
 
-                    int requestsNumber = artistsIDStack.size()/50;
-                    for (int j=0; j<=requestsNumber; j++) {
-                        String severalIDS = artistsIDStack.pop().toString();
-                        for (int artistsCounter=0; artistsCounter<49; artistsCounter++) {
-                            if(artistsIDStack.size() == 0) break;
-                            severalIDS = severalIDS + "%2C" + artistsIDStack.pop().toString();
+                    if(!artistsIDStack.isEmpty()){
+                        int requestsNumber = artistsIDStack.size()/50;
+                        for (int j=0; j<=requestsNumber; j++) {
+                            String severalIDS = artistsIDStack.pop().toString();
+                            for (int artistsCounter=0; artistsCounter<49; artistsCounter++) {
+                                if(artistsIDStack.size() == 0) break;
+                                severalIDS = severalIDS + "%2C" + artistsIDStack.pop().toString();
+                            }
+                            Log.i("Several IDS", severalIDS);
+                            getMusicGenreList(severalIDS);
                         }
-                        Log.i("Several IDS", severalIDS);
-                        getMusicGenreList(severalIDS);
                     }
 
                     Log.i("Liste des genres", genresStack.toString());
