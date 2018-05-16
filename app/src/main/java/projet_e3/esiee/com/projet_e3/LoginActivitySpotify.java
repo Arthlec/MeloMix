@@ -11,6 +11,7 @@ import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.private_.TreeNode;
 import com.fasterxml.jackson.jr.stree.JacksonJrsTreeCodec;
 import com.fasterxml.jackson.jr.stree.JrsArray;
+import com.fasterxml.jackson.jr.stree.JrsNumber;
 import com.fasterxml.jackson.jr.stree.JrsObject;
 import com.fasterxml.jackson.jr.stree.JrsString;
 import com.fasterxml.jackson.jr.stree.JrsValue;
@@ -22,7 +23,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -103,7 +106,7 @@ public class LoginActivitySpotify extends AppCompatActivity {
             public void run() {
                 try {
                     this.getUserName();
-                    this.getTrackGenre();
+                    this.getTrackGenre(this.getSavedTracksIds());
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -119,7 +122,6 @@ public class LoginActivitySpotify extends AppCompatActivity {
                 myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
                 if (myConnection.getResponseCode() == 200) {
                     // Success
-                    Log.i("AsyncTask", "Connection réussie pour le nom de l'utilisateur");
                     InputStream responseBody = myConnection.getInputStream();
 
                     JSON json = JSON.std.with(new JacksonJrsTreeCodec());
@@ -134,10 +136,14 @@ public class LoginActivitySpotify extends AppCompatActivity {
                     Log.i("responseCode", "" + myConnection.getResponseCode());
                 }
             }
-            private void getTrackGenre(String[] idsTracks) throws IOException {
-                if(idsTracks.length > 50)
-                    throw new IOException("Trop de musiques en paramètres. La limite max de la requête est de 50 musiques par appel de la fonction");
-                String[] trackGenres = null;
+            private void getTrackGenre(List<String> idsTracksList) throws IOException {
+                String[] idsTracksFull = idsTracksList.toArray(new String[idsTracksList.size()]);
+                int indiceMax = 50;
+                for(int i =0; i<idsTracksList.size();i+50){
+
+                }
+                String[] idsTracks = idsTracksFull[]
+                List<String> trackGenres = new ArrayList<>();
                 // Create URL
                 String request = "https://api.spotify.com/v1/tracks?ids=";
                 for (int i=0; i<idsTracks.length-1; i++){ //s'arrête à l'avant-dernier élément pour ne pas mettre de virgule après
@@ -151,22 +157,23 @@ public class LoginActivitySpotify extends AppCompatActivity {
                 myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
                 if (myConnection.getResponseCode() == 200) {
                     // Success
-                    Log.i("AsyncTask", "Connection réussie pour les genres des musiques");
                     InputStream responseBody = myConnection.getInputStream();
 
                     JSON json = JSON.std.with(new JacksonJrsTreeCodec());
                     TreeNode root = json.treeFrom(responseBody);
                     assertTrue(root.isObject());
-                    JrsArray listTracksArray = (JrsArray) root.get("items");
-                    Log.i("AsyncTask", listTracksArray.asText());
-                    Iterator<JrsValue> listTracksIterator = listTracksArray.elements();
-                    artistGenres = new String[listTracksArray.size()];
-                    for(int i = 0; listTracksIterator.hasNext(); i++){
-                        artistGenres[i] = listTracksIterator.next().asText();
-                        Log.i("artistGenres", artistGenres[i]);
+                    for(int m = 0; m< idsTracks.length; m++) {
+                        JrsArray artistsArray = (JrsArray) root.get("tracks").get(m).get("album").get("artists");
+                        Iterator<JrsValue> artistsIterator = artistsArray.elements();
+                        for (int i = 0; artistsIterator.hasNext(); i++) {
+                            JrsString id = (JrsString) artistsIterator.next().get("id");
+                            String[] artistGenres = this.getArtistGenre(id.asText());
+                            for (String artistGenre : artistGenres) {
+                                trackGenres.add(artistGenre);
+                                Log.i("trackGenres", artistGenre);
+                            }
+                        }
                     }
-                    JrsString idArtist = (JrsString) listTracks.get(0).get("track").get("album").get("artists").get(0).get("id");
-                    listArtistGenres = this.getArtistGenre(idArtist.asText());
 
                     myConnection.disconnect();
                 } else {
@@ -184,7 +191,6 @@ public class LoginActivitySpotify extends AppCompatActivity {
                 myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
                 if (myConnection.getResponseCode() == 200) {
                     // Success
-                    Log.i("AsyncTask", "Connection réussie pour l'artiste");
                     InputStream responseBody = myConnection.getInputStream();
 
                     JSON json = JSON.std.with(new JacksonJrsTreeCodec());
@@ -195,7 +201,7 @@ public class LoginActivitySpotify extends AppCompatActivity {
                     artistGenres = new String[listGenresArray.size()];
                     for(int i = 0; listGenresIterator.hasNext(); i++){
                         artistGenres[i] = listGenresIterator.next().asText();
-                        Log.i("artistGenres", artistGenres[i]);
+                        Log.i("artist", artistGenres[i]);
                     }
 
                     myConnection.disconnect();
@@ -205,37 +211,42 @@ public class LoginActivitySpotify extends AppCompatActivity {
                 return artistGenres;
             }
 
-            /*private void getTrackGenre(String idTrack) throws IOException {
+            private List<String> getSavedTracksIds() throws IOException {
                 // Create URL
-                URL spotifyEndpoint = new URL("https://api.spotify.com/v1/me/tracks?limit=50");
-                String[] trackGenres = null;
+                List<String> listTracksIds = new ArrayList<>();
+                String request = "https://api.spotify.com/v1/me/tracks?limit=50&offset=0";
+                JrsString nextRequest = null;
+                do{
+                    URL spotifyEndpoint = new URL(request);
 
-                // Create connection
-                HttpsURLConnection myConnection = (HttpsURLConnection) spotifyEndpoint.openConnection();
-                myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
-                if (myConnection.getResponseCode() == 200) {
-                    // Success
-                    Log.i("AsyncTask", "Connection réussie pour les genres de la musique");
-                    InputStream responseBody = myConnection.getInputStream();
+                    // Create connection
+                    HttpsURLConnection myConnection = (HttpsURLConnection) spotifyEndpoint.openConnection();
+                    myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
+                    if (myConnection.getResponseCode() == 200) {
+                        // Success
+                        InputStream responseBody = myConnection.getInputStream();
 
-                    JSON json = JSON.std.with(new JacksonJrsTreeCodec());
-                    TreeNode root = json.treeFrom(responseBody);
-                    assertTrue(root.isObject());
-                    JrsArray listTracksArray = (JrsArray) root.get("items");
-                    Iterator<JrsValue> listTracksIterator = listTracksArray.elements();
-                    artistGenres = new String[listTracksArray.size()];
-                    for(int i = 0; listTracksIterator.hasNext(); i++){
-                        artistGenres[i] = listTracksIterator.next().asText();
-                        Log.i("artistGenres", artistGenres[i]);
+                        JSON json = JSON.std.with(new JacksonJrsTreeCodec());
+                        TreeNode root = json.treeFrom(responseBody);
+                        assertTrue(root.isObject());
+                        JrsArray listTracksArray = (JrsArray) root.get("items");
+                        Iterator<JrsValue> listTracksIterator = listTracksArray.elements();
+                        for(int i = 0; listTracksIterator.hasNext(); i++){
+                            JrsString idTrack = (JrsString) listTracksIterator.next().get("track").get("id");
+                            listTracksIds.add(idTrack.asText());
+                            //Log.i("i", "" + i);
+                        }
+                        myConnection.disconnect();
+
+                        nextRequest = (JrsString) root.get("next");
+                        if(nextRequest != null)
+                            request = nextRequest.asText();
+                    } else {
+                        Log.i("responseCode", "" + myConnection.getResponseCode());
                     }
-                    JrsString idArtist = (JrsString) listTracks.get(0).get("track").get("album").get("artists").get(0).get("id");
-                    listArtistGenres = this.getArtistGenre(idArtist.asText());
-
-                    myConnection.disconnect();
-                } else {
-                    Log.i("responseCode", "" + myConnection.getResponseCode());
-                }
-            }*/
+                }while (nextRequest != null);
+                return listTracksIds;
+            }
         });
     }
 
