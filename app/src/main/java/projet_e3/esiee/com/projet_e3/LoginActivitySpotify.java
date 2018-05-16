@@ -24,8 +24,10 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -106,6 +108,7 @@ public class LoginActivitySpotify extends AppCompatActivity {
 
             private Stack genresStack = new Stack();
             private Stack artistsIDStack = new Stack();
+            private HashMap<String, Integer> genresHashMap = new HashMap<String, Integer>();
 
             @Override
             public void run() {
@@ -136,6 +139,7 @@ public class LoginActivitySpotify extends AppCompatActivity {
 
                     Log.i("Liste des genres", genresStack.toString());
                     Log.i("Nombre de genres", "" + genresStack.size());
+                    createGenresHashMap(genresStack);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -278,42 +282,20 @@ public class LoginActivitySpotify extends AppCompatActivity {
                 }
             }
 
-            /*private List<String> getSavedTracksIds() throws IOException {
-                // Create URL
-                List<String> listTracksIds = new ArrayList<>();
-                String request = "https://api.spotify.com/v1/me/tracks?limit=50&offset=0";
-                JrsString nextRequest = null;
-                do{
-                    URL spotifyEndpoint = new URL(request);
-
-                    // Create connection
-                    HttpsURLConnection myConnection = (HttpsURLConnection) spotifyEndpoint.openConnection();
-                    myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
-                    if (myConnection.getResponseCode() == 200) {
-                        // Success
-                        InputStream responseBody = myConnection.getInputStream();
-
-                        JSON json = JSON.std.with(new JacksonJrsTreeCodec());
-                        TreeNode root = json.treeFrom(responseBody);
-                        assertTrue(root.isObject());
-                        JrsArray listTracksArray = (JrsArray) root.get("items");
-                        Iterator<JrsValue> listTracksIterator = listTracksArray.elements();
-                        for(int i = 0; listTracksIterator.hasNext(); i++){
-                            JrsString idTrack = (JrsString) listTracksIterator.next().get("track").get("artists").get("id");
-                            listTracksIds.add(idTrack.asText());
-                            //Log.i("i", "" + i);
-                        }
-                        myConnection.disconnect();
-
-                        nextRequest = (JrsString) root.get("next");
-                        if(nextRequest != null)
-                            request = nextRequest.asText();
-                    } else {
-                        Log.i("responseCode", "" + myConnection.getResponseCode());
+            private void createGenresHashMap(Stack genresStack) {
+                for (int i=0; i<genresStack.size();i++) {
+                    String selectedGenre = genresStack.pop().toString();
+                    if (genresHashMap.containsKey(selectedGenre)) {
+                        int selectedGenreNumber = genresHashMap.get(selectedGenre);
+                        genresHashMap.put(selectedGenre,selectedGenreNumber + 1);
                     }
-                }while (nextRequest != null);
-                return listTracksIds;
-            }*/
+                    else {
+                        genresHashMap.put(selectedGenre,1);
+                    }
+                }
+                Log.i("HashMapSize", "" + genresHashMap.size());
+                Log.i("HashMapString", genresHashMap.toString());
+            }
         });
     }
 
