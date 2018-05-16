@@ -122,6 +122,7 @@ public class LoginActivitySpotify extends AppCompatActivity {
                         }
                     }
                     Log.i("Liste des genres", genresStack.toString());
+                    Log.i("GenresNumber", "" + genresStack.size());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
