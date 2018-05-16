@@ -37,6 +37,7 @@ public class LoginActivitySpotify extends AppCompatActivity {
     private static String userName = "";
     private static boolean asyncTaskIsDone = false;
     private static Stack genresStack = new Stack();
+    private static Stack artistsIDStack = new Stack();
 
     // Request code that will be used to verify if the result comes from correct activity
     // Can be any integer
@@ -108,8 +109,16 @@ public class LoginActivitySpotify extends AppCompatActivity {
                     for(int i=0; i<playlistIds.length; i++) {
                         if(playlistIds[i] != null) {
                             Stack artistsIds = getArtistsStack(playlistIds[i]);
-                            for (int j=0; j<artistsIds.size(); j++)
-                                getMusicGenreList(artistsIds.pop().toString());
+                            int requestsNumber = artistsIds.size()/50;
+                            for (int j=0; j<=requestsNumber; j++) {
+                                String severalIDS = artistsIds.pop().toString();
+                                for (int artistsCounter=0; artistsCounter<49; artistsCounter++) {
+                                    if(artistsIds.size() == 0) break;
+                                    severalIDS = severalIDS + "%2C" + artistsIds.pop().toString();
+                                }
+                                Log.i("Several IDS", severalIDS);
+                                getMusicGenreList(severalIDS);
+                            }
                         }
                     }
                     Log.i("Liste des genres", genresStack.toString());
@@ -203,13 +212,12 @@ public class LoginActivitySpotify extends AppCompatActivity {
                     String jsonString = json.asString(root);
                     int tracksNumber = root.get("items").size();
                     Log.i("Nombre de musiques", "" + tracksNumber);
-                    Stack artistsIDStack = new Stack();
                     Log.i("PlaylistJsonString", jsonString);
                     for (int i=0; i<tracksNumber; i++) {
                         int artistsNumber = root.get("items").get(i).get("track").get("artists").size();
                         Log.i("Nombre d'artistes/music", "" + artistsNumber);
                         for (int j=0; j<artistsNumber; j++) {
-                            JrsString artistID = (JrsString) root.get("items").get(i).get("track").get("artists").get(j).get("href");
+                            JrsString artistID = (JrsString) root.get("items").get(i).get("track").get("artists").get(j).get("id");
                             if(artistID != null) {
                                 Log.i("Artist_ID", artistID.asText());
                                 artistsIDStack.push(artistID.asText());
@@ -231,7 +239,7 @@ public class LoginActivitySpotify extends AppCompatActivity {
             }
             private void getMusicGenreList(String artistID) throws IOException {
                 // Create URL
-                URL spotifyEndpoint = new URL(artistID);
+                URL spotifyEndpoint = new URL("https://api.spotify.com/v1/artists?ids=" + artistID);
 
                 // Create connection
                 HttpsURLConnection myConnection = (HttpsURLConnection) spotifyEndpoint.openConnection();
@@ -244,14 +252,19 @@ public class LoginActivitySpotify extends AppCompatActivity {
                     JSON json = JSON.std.with(new JacksonJrsTreeCodec());
                     TreeNode root = json.treeFrom(responseBody);
                     assertTrue(root.isObject());
-                    String jsonString = json.asString(root);
+                    String jsonString = json.asString(root.get("artists"));
                     Log.i("ArtistsJsonString", jsonString);
-                    int genresNumber = root.get("genres").size();
-                    if (genresNumber != 0) {
-                        for (int i=0; i<genresNumber; i++) {
-                            JrsString genre = (JrsString) root.get("genres").get(i);
-                            Log.i("Genre", genre.asText());
-                            genresStack.push(genre.asText());
+                    int artistsNumber = root.get("artists").size();
+                    Log.i("Artists_Number", "" + artistsNumber);
+                    for (int i=0; i<artistsNumber; i++) {
+                        int genresNumber = root.get("artists").get(i).get("genres").size();
+                        Log.i("Genres_Number", "" + genresNumber);
+                        if (genresNumber != 0) {
+                            for (int j=0; j<genresNumber; j++) {
+                                JrsString genre = (JrsString) root.get("artists").get(i).get("genres").get(j);
+                                Log.i("Genre", genre.asText());
+                                genresStack.push(genre.asText());
+                            }
                         }
                     }
 
