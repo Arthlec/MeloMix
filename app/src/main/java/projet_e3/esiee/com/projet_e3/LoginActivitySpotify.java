@@ -113,24 +113,27 @@ public class LoginActivitySpotify extends AppCompatActivity {
                     this.setUserName();
                     String[] playlistsURLs = this.getPlaylistsURLs();
 
-                    //for(int i=0; i<playlistsURLs.length; i++) {
-                        //if(playlistsURLs[i] != null) {
-                            //Stack artistsIds = getArtistsStack(playlistsURLs[i]);
-                            Stack artistsIds = getArtistsStack("https://api.spotify.com/v1/me/tracks?limit=50&offset=0");
-                            int requestsNumber = artistsIds.size()/50;
-                            for (int j=0; j<=requestsNumber; j++) {
-                                String severalIDS = artistsIds.pop().toString();
-                                for (int artistsCounter=0; artistsCounter<49; artistsCounter++) {
-                                    if(artistsIds.size() == 0) break;
-                                    severalIDS = severalIDS + "%2C" + artistsIds.pop().toString();
-                                }
-                                Log.i("Several IDS", severalIDS);
-                                getMusicGenreList(severalIDS);
-                            }
-                        //}
-                    //}
+                    getArtistsStack("https://api.spotify.com/v1/me/tracks?limit=50&offset=0");
+
+                    for(int i=0; i<playlistsURLs.length; i++) {
+                        if(playlistsURLs[i] != null) {
+                            getArtistsStack(playlistsURLs[i]);
+                        }
+                    }
+
+                    int requestsNumber = artistsIDStack.size()/50;
+                    for (int j=0; j<=requestsNumber; j++) {
+                        String severalIDS = artistsIDStack.pop().toString();
+                        for (int artistsCounter=0; artistsCounter<49; artistsCounter++) {
+                            if(artistsIDStack.size() == 0) break;
+                            severalIDS = severalIDS + "%2C" + artistsIDStack.pop().toString();
+                        }
+                        Log.i("Several IDS", severalIDS);
+                        getMusicGenreList(severalIDS);
+                    }
+
                     Log.i("Liste des genres", genresStack.toString());
-                    Log.i("Liste des genres", "" + genresStack.size());
+                    Log.i("Nombre de genres", "" + genresStack.size());
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
