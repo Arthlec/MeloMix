@@ -77,6 +77,15 @@ public class LogActivity extends AppCompatActivity {
 
             }
         });
+
+        Button buttonNext = findViewById(R.id.buttonNext);
+        buttonNext.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LogActivity.this, ChooseGroupActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override

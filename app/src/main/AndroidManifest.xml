@@ -49,6 +49,9 @@
         <activity
             android:name="com.spotify.sdk.android.authentication.LoginActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity android:name=".HostGroupActivity"/>
+        <activity android:name=".ChooseGroupActivity"/>
+        <activity android:name=".SearchForGroupActivity"/>
     </application>
 
 </manifest>
