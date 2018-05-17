@@ -325,11 +325,13 @@ public class LoginActivitySpotify extends AppCompatActivity {
             }
 
             private void createGenresHashMap() {
-                int totalGenresNumber = genresStack.size() + topGenresStack.size();
+                int genresNumber = genresStack.size();
+                int topGenresNumber = topGenresStack.size();
+                int totalGenresNumber = genresNumber + topGenresNumber;
                 float topGenresPercentage = 40;
                 float classicGenresWeight = (totalGenresNumber * (100 - topGenresPercentage) / 100) / genresStack.size();
                 float topGenresWeight = (totalGenresNumber * topGenresPercentage / 100) / topGenresStack.size();
-                for (int i=0; i<genresStack.size();i++) {
+                for (int i=0; i<genresNumber; i++) {
                     String selectedGenre = genresStack.pop().toString();
                     if (genresHashMap.containsKey(selectedGenre)) {
                         float selectedGenreNumber = genresHashMap.get(selectedGenre);
@@ -339,7 +341,7 @@ public class LoginActivitySpotify extends AppCompatActivity {
                         genresHashMap.put(selectedGenre, classicGenresWeight);
                     }
                 }
-                for (int j=0; j<topGenresStack.size(); j++) {
+                for (int j=0; j<topGenresNumber; j++) {
                     String selectedTopGenre = topGenresStack.pop().toString();
                     if (genresHashMap.containsKey(selectedTopGenre)) {
                         float selectedGenreNumber = genresHashMap.get(selectedTopGenre);
@@ -349,8 +351,17 @@ public class LoginActivitySpotify extends AppCompatActivity {
                         genresHashMap.put(selectedTopGenre, topGenresWeight);
                     }
                 }
+                Set keys = genresHashMap.keySet();
+                Object[] keysArray = keys.toArray();
+                float genresSum = 0;
+                for (int i=0; i<keysArray.length; i++) {
+                    float selectedGenreNumber = genresHashMap.get(keysArray[i].toString());
+                    genresHashMap.put(keysArray[i].toString(), selectedGenreNumber / totalGenresNumber);
+                    genresSum = genresSum + selectedGenreNumber / totalGenresNumber;
+                }
                 Log.i("HashMapSize", "" + genresHashMap.size());
                 Log.i("HashMapString", genresHashMap.toString());
+                Log.i("Genres_Sum", "" + genresSum);
             }
         });
     }
