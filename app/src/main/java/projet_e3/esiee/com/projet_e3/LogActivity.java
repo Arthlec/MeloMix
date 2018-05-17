@@ -56,7 +56,7 @@ public class LogActivity extends Activity {
         logoSpotify.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!MainActivity.isLoggedInSpotify) {
+                if (!LogActivity.isLoggedInSpotify) {
                     Intent intent = new Intent(LogActivity.this, LogSpotifyActivity.class);
                     startActivity(intent);
                 } else

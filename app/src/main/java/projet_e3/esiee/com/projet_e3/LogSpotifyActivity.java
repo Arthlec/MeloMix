@@ -58,7 +58,7 @@ public class LogSpotifyActivity extends Activity {
                     // Handle successful response
                     authToken = response.getAccessToken();
                     //requestData();
-                    MainActivity.isLoggedInSpotify = true;
+                    LogActivity.isLoggedInSpotify = true;
                     while(!asyncTaskIsDone){
                         try { Thread.sleep(100); }
                         catch (InterruptedException e) { e.printStackTrace(); }
