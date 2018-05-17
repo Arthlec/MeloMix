@@ -3,30 +3,28 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".MenuActivity">
 
-    <TextView
-        android:id="@+id/textView"
+    <Button
+        android:id="@+id/H_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/app_name"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.967"
-        tools:text="Gest Part" />
+        app:layout_constraintVertical_bias="0.345" />
 
-    <ListView
-        android:id="@+id/mainlist"
+    <Button
+        android:id="@+id/G_btn"
         android:layout_width="wrap_content"
-        android:layout_height="394dp"
+        android:layout_height="wrap_content"
+        android:text="GUEST"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toBottomOf="@+id/H_btn"
+        app:layout_constraintVertical_bias="0.315" />
 
 </android.support.constraint.ConstraintLayout>
