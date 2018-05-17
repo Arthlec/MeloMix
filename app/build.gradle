@@ -2,6 +2,15 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 27
+    signingConfigs {
+        Key_release {
+            keyAlias 'Key_release'
+            keyPassword 'smooth-i.key_release'
+            storePassword 'esiee.key_release'
+            storeFile file('D:/AndroidKeys/AndroidKeyStore.jks')
+        }
+    }
+    compileSdkVersion 27
     defaultConfig {
         applicationId "projet_e3.esiee.com.projet_e3"
         minSdkVersion 19
@@ -14,7 +23,21 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.Key_release
+            debuggable false
         }
+        debug {
+            debuggable true
+        }
+    }
+    productFlavors {
+    }
+}
+
+repositories {
+    mavenCentral()
+    flatDir {
+        dirs 'libs'
     }
 }
 
