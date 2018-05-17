@@ -14,13 +14,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.fasterxml.jackson.jr.ob.JSON;
-import com.fasterxml.jackson.jr.ob.impl.JSONWriter;
 import com.fasterxml.jackson.jr.stree.JacksonJrsTreeCodec;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
@@ -68,20 +65,22 @@ public class MainActivity extends AppCompatActivity {
 
         TextView textSpotify = findViewById(R.id.textSpotify);
         String userName = this.getIntent().getStringExtra("userName");
-        if(userName != null)
-            textSpotify.setText(userName);
+        //String userName = LoginActivitySpotify.userName;
+        if(userName != null && !userName.equals(""))
+            textSpotify.setText("Connecté avec le compte : " + userName);
 
-        HashMap<String, Integer> userGenres = (HashMap<String, Integer>) this.getIntent().getSerializableExtra("genres");
+        HashMap<String, Float> userGenres = (HashMap<String, Float>) this.getIntent().getSerializableExtra("genres");
+        //HashMap<String, Float> userGenres = LoginActivitySpotify.userGenres;
         if(userGenres != null)
             this.writeJSONfile(userGenres);
     }
 
-    private void writeJSONfile(HashMap<String, Integer> userGenres){
+    private void writeJSONfile(HashMap<String, Float> userGenres){
         //String json = JSON.std.asString(map);
         try {
             File file = new File(this.getFilesDir(), "userGenres");
             //JSON.std.write(userGenres, file);
-            file.delete();
+            //file.delete();
             Log.i("FileExist", "" + file.exists());
             Log.i("FileIsHidden", "" + file.isHidden());
 
@@ -103,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
                 inputStream.read(bytes);
             //byte[] bytes = doc.getBytes("UTF-8");
             String userGenresString = new String(bytes, "UTF-8");
-            Log.i("userGenres", userGenresString.toString());
+            Log.i("userGenres", userGenresString);
             inputStream.close();
         } catch (Exception e) {
             e.printStackTrace();

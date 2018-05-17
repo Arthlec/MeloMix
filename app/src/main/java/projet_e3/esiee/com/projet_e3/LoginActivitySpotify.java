@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.Stack;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -34,7 +35,7 @@ public class LoginActivitySpotify extends AppCompatActivity {
     private static String authToken = "";
     private static String userName = "";
     private static boolean asyncTaskIsDone = false;
-    private static HashMap<String, Integer> userGenres = new HashMap<String, Integer>();
+    private static HashMap<String, Float> userGenres = new HashMap<String, Float>();
 
     // Request code that will be used to verify if the result comes from correct activity
     // Can be any integer
@@ -135,9 +136,9 @@ public class LoginActivitySpotify extends AppCompatActivity {
                     getTopArtistsGenres();
 
                     Log.i("Liste des genres", genresStack.toString());
-                    Log.i("Liste des genres", topGenresStack.toString());
+                    Log.i("Liste des genres top", topGenresStack.toString());
                     Log.i("Nombre de genres", "" + genresStack.size());
-                    Log.i("Nombre de genres", "" + topGenresStack.size());
+                    Log.i("Nombre de genres top", "" + topGenresStack.size());
                     createGenresHashMap();
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -152,6 +153,19 @@ public class LoginActivitySpotify extends AppCompatActivity {
                 // Create connection
                 HttpsURLConnection myConnection = (HttpsURLConnection) spotifyEndpoint.openConnection();
                 myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
+
+                String waitTime = myConnection.getHeaderField("Retry-After");
+                int waitTimeSeconds = 0;
+                if(waitTime != null && !waitTime.equals("")) {
+                    try {
+                        waitTimeSeconds = Integer.parseInt(waitTime);
+                        Thread.sleep(waitTimeSeconds * 1000);
+                        Log.i("WaitTime", waitTime);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
                 if (myConnection.getResponseCode() == 200) {
                     // Success
                     InputStream responseBody = myConnection.getInputStream();
@@ -175,6 +189,19 @@ public class LoginActivitySpotify extends AppCompatActivity {
                 // Create connection
                 HttpsURLConnection myConnection = (HttpsURLConnection) spotifyEndpoint.openConnection();
                 myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
+
+                String waitTime = myConnection.getHeaderField("Retry-After");
+                int waitTimeSeconds = 0;
+                if(waitTime != null && !waitTime.equals("")) {
+                    try {
+                        waitTimeSeconds = Integer.parseInt(waitTime);
+                        Thread.sleep(waitTimeSeconds * 1000);
+                        Log.i("WaitTime", waitTime);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
                 if (myConnection.getResponseCode() == 200) {
                     // Success
                     InputStream responseBody = myConnection.getInputStream();
@@ -209,6 +236,19 @@ public class LoginActivitySpotify extends AppCompatActivity {
                 // Create connection
                 HttpsURLConnection myConnection = (HttpsURLConnection) spotifyEndpoint.openConnection();
                 myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
+
+                String waitTime = myConnection.getHeaderField("Retry-After");
+                int waitTimeSeconds = 0;
+                if(waitTime != null && !waitTime.equals("")) {
+                    try {
+                        waitTimeSeconds = Integer.parseInt(waitTime);
+                        Thread.sleep(waitTimeSeconds * 1000);
+                        Log.i("WaitTime", waitTime);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
                 if (myConnection.getResponseCode() == 200) {
                     // Success
                     InputStream responseBody = myConnection.getInputStream();
@@ -244,6 +284,19 @@ public class LoginActivitySpotify extends AppCompatActivity {
                 // Create connection
                 HttpsURLConnection myConnection = (HttpsURLConnection) spotifyEndpoint.openConnection();
                 myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
+
+                String waitTime = myConnection.getHeaderField("Retry-After");
+                int waitTimeSeconds = 0;
+                if(waitTime != null && !waitTime.equals("")) {
+                    try {
+                        waitTimeSeconds = Integer.parseInt(waitTime);
+                        Thread.sleep(waitTimeSeconds * 1000);
+                        Log.i("WaitTime", waitTime);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
                 if (myConnection.getResponseCode() == 200) {
                     // Success
                     InputStream responseBody = myConnection.getInputStream();
@@ -251,14 +304,11 @@ public class LoginActivitySpotify extends AppCompatActivity {
                     TreeNode root = json.treeFrom(responseBody);
                     assertTrue(root.isObject());
                     int artistsNumber = root.get("artists").size();
-                    Log.i("Artists_Number", "" + artistsNumber);
                     for (int i=0; i<artistsNumber; i++) {
                         int genresNumber = root.get("artists").get(i).get("genres").size();
-                        Log.i("Genres_Number", "" + genresNumber);
                         if (genresNumber != 0) {
                             for (int j=0; j<genresNumber; j++) {
                                 JrsString genre = (JrsString) root.get("artists").get(i).get("genres").get(j);
-                                Log.i("Genre", genre.asText());
                                 genresStack.push(genre.asText());
                             }
                         }
@@ -277,16 +327,26 @@ public class LoginActivitySpotify extends AppCompatActivity {
                 // Create connection
                 HttpsURLConnection myConnection = (HttpsURLConnection) spotifyEndpoint.openConnection();
                 myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
+
+                String waitTime = myConnection.getHeaderField("Retry-After");
+                int waitTimeSeconds = 0;
+                if(waitTime != null && !waitTime.equals("")) {
+                    try {
+                        waitTimeSeconds = Integer.parseInt(waitTime);
+                        Thread.sleep(waitTimeSeconds * 1000);
+                        Log.i("WaitTime", waitTime);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
                 if (myConnection.getResponseCode() == 200) {
                     // Success
-                    Log.i("AsyncTask", "Connexion réussie pour l'artiste demandé");
                     InputStream responseBody = myConnection.getInputStream();
 
                     JSON json = JSON.std.with(new JacksonJrsTreeCodec());
                     TreeNode root = json.treeFrom(responseBody);
                     assertTrue(root.isObject());
-                    String jsonString = json.asString(root.get("items"));
-                    Log.i("TopArtistsJsonString", jsonString);
                     int artistsNumber = root.get("items").size();
                     Log.i("Top_Artists_Number", "" + artistsNumber);
                     for (int i=0; i<artistsNumber; i++) {
@@ -354,7 +414,7 @@ public class LoginActivitySpotify extends AppCompatActivity {
         LoginActivitySpotify.userName = userName;
     }
 
-    private static void setGenres(HashMap<String, Integer> userGenres){
+    private static void setGenres(HashMap<String, Float> userGenres){
         LoginActivitySpotify.userGenres = userGenres;
     }
 }
