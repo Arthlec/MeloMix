@@ -6,11 +6,22 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.fasterxml.jackson.jr.ob.JSON;
+import com.fasterxml.jackson.jr.ob.impl.JSONWriter;
+import com.fasterxml.jackson.jr.stree.JacksonJrsTreeCodec;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -59,6 +70,44 @@ public class MainActivity extends AppCompatActivity {
         String userName = this.getIntent().getStringExtra("userName");
         if(userName != null)
             textSpotify.setText(userName);
+
+        HashMap<String, Integer> userGenres = (HashMap<String, Integer>) this.getIntent().getSerializableExtra("genres");
+        if(userGenres != null)
+            this.writeJSONfile(userGenres);
+    }
+
+    private void writeJSONfile(HashMap<String, Integer> userGenres){
+        //String json = JSON.std.asString(map);
+        try {
+            File file = new File(this.getFilesDir(), "userGenres");
+            //JSON.std.write(userGenres, file);
+            file.delete();
+            Log.i("FileExist", "" + file.exists());
+            Log.i("FileIsHidden", "" + file.isHidden());
+
+            JSON json = JSON.std.with(new JacksonJrsTreeCodec())
+                    .with(JSON.Feature.PRETTY_PRINT_OUTPUT)
+                    .without(JSON.Feature.WRITE_NULL_PROPERTIES);
+            if(file.canWrite())
+                json.write(userGenres, file);
+
+            file.setReadable(true);
+            Log.i("FileToString", file.toString());
+            Log.i("FileToString", "" + file.length());
+            Log.i("MainActivity", "Fichier créé !");
+
+            FileInputStream inputStream;
+            inputStream = openFileInput("userGenres");
+            byte[] bytes = new byte[12288];
+            if(file.canRead())
+                inputStream.read(bytes);
+            //byte[] bytes = doc.getBytes("UTF-8");
+            String userGenresString = new String(bytes, "UTF-8");
+            Log.i("userGenres", userGenresString.toString());
+            inputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean isOnline() {

@@ -10,24 +10,16 @@ import android.widget.Toast;
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.private_.TreeNode;
 import com.fasterxml.jackson.jr.stree.JacksonJrsTreeCodec;
-import com.fasterxml.jackson.jr.stree.JrsArray;
 import com.fasterxml.jackson.jr.stree.JrsNumber;
-import com.fasterxml.jackson.jr.stree.JrsObject;
 import com.fasterxml.jackson.jr.stree.JrsString;
-import com.fasterxml.jackson.jr.stree.JrsValue;
 import com.spotify.sdk.android.authentication.AuthenticationClient;
 import com.spotify.sdk.android.authentication.AuthenticationRequest;
 import com.spotify.sdk.android.authentication.AuthenticationResponse;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 import java.util.Stack;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -42,6 +34,7 @@ public class LoginActivitySpotify extends AppCompatActivity {
     private static String authToken = "";
     private static String userName = "";
     private static boolean asyncTaskIsDone = false;
+    private static HashMap<String, Integer> userGenres = new HashMap<String, Integer>();
 
     // Request code that will be used to verify if the result comes from correct activity
     // Can be any integer
@@ -79,7 +72,9 @@ public class LoginActivitySpotify extends AppCompatActivity {
                         catch (InterruptedException e) { e.printStackTrace(); }
                     }
                     Toast.makeText(LoginActivitySpotify.this,"Connexion réussie", Toast.LENGTH_LONG).show();
+
                     getBackToMainActivity.putExtra("userName", "Connecté avec le compte : " + LoginActivitySpotify.userName);
+                    getBackToMainActivity.putExtra("genres", this.userGenres);
                     startActivity(getBackToMainActivity);
                     break;
 
@@ -132,7 +127,6 @@ public class LoginActivitySpotify extends AppCompatActivity {
                                 if(artistsIDStack.size() == 0) break;
                                 severalIDS = severalIDS + "%2C" + artistsIDStack.pop().toString();
                             }
-                            Log.i("Several IDS", severalIDS);
                             getMusicGenreList(severalIDS);
                         }
                     }
@@ -161,7 +155,6 @@ public class LoginActivitySpotify extends AppCompatActivity {
                     TreeNode root = json.treeFrom(responseBody);
                     assertTrue(root.isObject());
                     JrsString name = (JrsString) root.get("id");
-                    Log.i("Display_name", name.asText());
                     LoginActivitySpotify.setUserName(name.asText());
 
                     myConnection.disconnect();
@@ -179,7 +172,6 @@ public class LoginActivitySpotify extends AppCompatActivity {
                 myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
                 if (myConnection.getResponseCode() == 200) {
                     // Success
-                    Log.i("AsyncTask", "Connexion réussie pour les playlists personnelles");
                     InputStream responseBody = myConnection.getInputStream();
 
                     JSON json = JSON.std.with(new JacksonJrsTreeCodec());
@@ -214,25 +206,20 @@ public class LoginActivitySpotify extends AppCompatActivity {
                 myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
                 if (myConnection.getResponseCode() == 200) {
                     // Success
-                    Log.i("AsyncTask", "Connexion réussie pour la playlist demandée");
                     InputStream responseBody = myConnection.getInputStream();
-
                     JSON json = JSON.std.with(new JacksonJrsTreeCodec());
                     TreeNode root = json.treeFrom(responseBody);
                     assertTrue(root.isObject());
                     int tracksNumber = root.get("items").size();
                     for (int i=0; i<tracksNumber; i++) {
                         int artistsNumber = root.get("items").get(i).get("track").get("artists").size();
-                        Log.i("Nombre d'artistes/music", "" + artistsNumber);
                         for (int j=0; j<artistsNumber; j++) {
                             JrsString artistID = (JrsString) root.get("items").get(i).get("track").get("artists").get(j).get("id");
                             if(artistID != null) {
-                                Log.i("Artist_ID", artistID.asText());
                                 artistsIDStack.push(artistID.asText());
                             }
                         }
                     }
-                    Log.i("Artists_Stack", "" + artistsIDStack);
                     myConnection.disconnect();
                     JrsString nextTracksID = (JrsString) root.get("next");
                     if(nextTracksID != null) {
@@ -254,14 +241,10 @@ public class LoginActivitySpotify extends AppCompatActivity {
                 myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
                 if (myConnection.getResponseCode() == 200) {
                     // Success
-                    Log.i("AsyncTask", "Connexion réussie pour l'artiste demandé");
                     InputStream responseBody = myConnection.getInputStream();
-
                     JSON json = JSON.std.with(new JacksonJrsTreeCodec());
                     TreeNode root = json.treeFrom(responseBody);
                     assertTrue(root.isObject());
-                    String jsonString = json.asString(root.get("artists"));
-                    Log.i("ArtistsJsonString", jsonString);
                     int artistsNumber = root.get("artists").size();
                     Log.i("Artists_Number", "" + artistsNumber);
                     for (int i=0; i<artistsNumber; i++) {
@@ -293,6 +276,7 @@ public class LoginActivitySpotify extends AppCompatActivity {
                         genresHashMap.put(selectedGenre,1);
                     }
                 }
+                LoginActivitySpotify.setGenres(this.genresHashMap);
                 Log.i("HashMapSize", "" + genresHashMap.size());
                 Log.i("HashMapString", genresHashMap.toString());
             }
@@ -301,5 +285,9 @@ public class LoginActivitySpotify extends AppCompatActivity {
 
     private static void setUserName(String userName){
         LoginActivitySpotify.userName = userName;
+    }
+
+    private static void setGenres(HashMap<String, Integer> userGenres){
+        LoginActivitySpotify.userGenres = userGenres;
     }
 }
