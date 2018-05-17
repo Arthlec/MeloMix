@@ -103,7 +103,8 @@ public class LoginActivitySpotify extends AppCompatActivity {
 
             private Stack genresStack = new Stack();
             private Stack artistsIDStack = new Stack();
-            private HashMap<String, Integer> genresHashMap = new HashMap<String, Integer>();
+            private Stack topGenresStack = new Stack();
+            private HashMap<String, Float> genresHashMap = new HashMap<>();
 
             @Override
             public void run() {
@@ -131,9 +132,13 @@ public class LoginActivitySpotify extends AppCompatActivity {
                         }
                     }
 
+                    getTopArtistsGenres();
+
                     Log.i("Liste des genres", genresStack.toString());
+                    Log.i("Liste des genres", topGenresStack.toString());
                     Log.i("Nombre de genres", "" + genresStack.size());
-                    createGenresHashMap(genresStack);
+                    Log.i("Nombre de genres", "" + topGenresStack.size());
+                    createGenresHashMap();
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -265,20 +270,82 @@ public class LoginActivitySpotify extends AppCompatActivity {
                 }
             }
 
-            private void createGenresHashMap(Stack genresStack) {
-                for (int i=0; i<genresStack.size();i++) {
+            private void getTopArtistsGenres() throws IOException {
+                // Create URL
+                URL spotifyEndpoint = new URL("https://api.spotify.com/v1/me/top/artists?time_range=short_term&limit=50");
+
+                // Create connection
+                HttpsURLConnection myConnection = (HttpsURLConnection) spotifyEndpoint.openConnection();
+                myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
+                if (myConnection.getResponseCode() == 200) {
+                    // Success
+                    Log.i("AsyncTask", "Connexion réussie pour l'artiste demandé");
+                    InputStream responseBody = myConnection.getInputStream();
+
+                    JSON json = JSON.std.with(new JacksonJrsTreeCodec());
+                    TreeNode root = json.treeFrom(responseBody);
+                    assertTrue(root.isObject());
+                    String jsonString = json.asString(root.get("items"));
+                    Log.i("TopArtistsJsonString", jsonString);
+                    int artistsNumber = root.get("items").size();
+                    Log.i("Top_Artists_Number", "" + artistsNumber);
+                    for (int i=0; i<artistsNumber; i++) {
+                        int topGenresNumber = root.get("items").get(i).get("genres").size();
+                        Log.i("Top_Genres_Number", "" + topGenresNumber);
+                        if (topGenresNumber != 0) {
+                            for (int j=0; j<topGenresNumber; j++) {
+                                JrsString genre = (JrsString) root.get("items").get(i).get("genres").get(j);
+                                Log.i("Genre", genre.asText());
+                                topGenresStack.push(genre.asText());
+                            }
+                        }
+                    }
+
+                    myConnection.disconnect();
+                } else {
+                    Log.i("responseCode", "" + myConnection.getResponseCode());
+                }
+            }
+
+            private void createGenresHashMap() {
+                int genresNumber = genresStack.size();
+                int topGenresNumber = topGenresStack.size();
+                int totalGenresNumber = genresNumber + topGenresNumber;
+                float topGenresPercentage = 40;
+                float classicGenresWeight = (totalGenresNumber * (100 - topGenresPercentage) / 100) / genresStack.size();
+                float topGenresWeight = (totalGenresNumber * topGenresPercentage / 100) / topGenresStack.size();
+                for (int i=0; i<genresNumber; i++) {
                     String selectedGenre = genresStack.pop().toString();
                     if (genresHashMap.containsKey(selectedGenre)) {
-                        int selectedGenreNumber = genresHashMap.get(selectedGenre);
-                        genresHashMap.put(selectedGenre,selectedGenreNumber + 1);
+                        float selectedGenreNumber = genresHashMap.get(selectedGenre);
+                        genresHashMap.put(selectedGenre, selectedGenreNumber + classicGenresWeight);
                     }
                     else {
-                        genresHashMap.put(selectedGenre,1);
+                        genresHashMap.put(selectedGenre, classicGenresWeight);
                     }
+                }
+                for (int j=0; j<topGenresNumber; j++) {
+                    String selectedTopGenre = topGenresStack.pop().toString();
+                    if (genresHashMap.containsKey(selectedTopGenre)) {
+                        float selectedGenreNumber = genresHashMap.get(selectedTopGenre);
+                        genresHashMap.put(selectedTopGenre,selectedGenreNumber + topGenresWeight);
+                    }
+                    else {
+                        genresHashMap.put(selectedTopGenre, topGenresWeight);
+                    }
+                }
+                Set keys = genresHashMap.keySet();
+                Object[] keysArray = keys.toArray();
+                float genresSum = 0;
+                for (int i=0; i<keysArray.length; i++) {
+                    float selectedGenreNumber = genresHashMap.get(keysArray[i].toString());
+                    genresHashMap.put(keysArray[i].toString(), selectedGenreNumber / totalGenresNumber);
+                    genresSum = genresSum + selectedGenreNumber / totalGenresNumber;
                 }
                 LoginActivitySpotify.setGenres(this.genresHashMap);
                 Log.i("HashMapSize", "" + genresHashMap.size());
                 Log.i("HashMapString", genresHashMap.toString());
+                Log.i("Genres_Sum", "" + genresSum);
             }
         });
     }
