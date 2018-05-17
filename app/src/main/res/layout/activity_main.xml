@@ -13,7 +13,7 @@
         android:inputType="textPersonName|textCapSentences"
         android:layout_gravity="center"
         android:gravity="bottom"
-        android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890 "
+        android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_ "
         android:hint="@string/pseudo" />
 
     <TextView

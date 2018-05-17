@@ -13,10 +13,31 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.LAUNCHER" />
+
+                <data
+                    android:host="logincallback"
+                    android:scheme="smooth-i" />
+
             </intent-filter>
         </activity>
         <activity android:name=".LogActivity"/>
+        <activity android:name=".LogSpotifyActivity"
+            android:label="Connection Spotify"
+            android:parentActivityName=".MainActivity">
+            <!-- The meta-data element is needed for versions lower than 4.1 -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <category android:name="com.spotify.sdk.android.authentication.LoginActivity" />
+                <data android:scheme="smooth-i" android:host="callback"/>
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

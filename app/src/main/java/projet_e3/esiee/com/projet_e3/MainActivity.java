@@ -10,8 +10,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
-
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -31,6 +29,27 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        try {
+            FileInputStream input = openFileInput(PERSONAL);
+            int value;
+            // On utilise un StringBuffer pour construire la chaîne au fur et à mesure
+            StringBuffer lu = new StringBuffer();
+            // On lit les caractères les uns après les autres
+            while ((value = input.read()) != -1) {
+                // On écrit dans le fichier le caractère lu
+                lu.append((char) value);
+            }
+            if (input != null) {
+                input.close();
+                Intent intent = new Intent(MainActivity.this, LogActivity.class);
+                startActivity(intent);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         //Récupération des vues
         pseudo = findViewById(R.id.pseudo);
