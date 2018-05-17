@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="projet_e3.esiee.com.projet_e3">
 
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -14,23 +14,21 @@
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-
                 <data
                     android:host="logincallback"
                     android:scheme="smooth-i" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-
-                <data
-                    android:host="logincallback"
-                    android:scheme="smooth-i" />
-
             </intent-filter>
         </activity>
-        <activity android:name=".LogActivity"/>
-        <activity android:name=".LogSpotifyActivity"
+
+        <activity android:name=".LogActivity">
+        </activity>
+        <activity
+            android:name=".LoginActivitySpotify"
             android:label="Connection Spotify"
             android:parentActivityName=".MainActivity">
             <!-- The meta-data element is needed for versions lower than 4.1 -->
@@ -38,10 +36,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
             <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="com.spotify.sdk.android.authentication.LoginActivity" />
-                <data android:scheme="smooth-i" android:host="callback"/>
+
+                <data
+                    android:host="callback"
+                    android:scheme="smooth-i" />
             </intent-filter>
         </activity>
         <activity
