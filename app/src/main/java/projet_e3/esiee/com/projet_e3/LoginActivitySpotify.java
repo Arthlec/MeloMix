@@ -151,20 +151,22 @@ public class LoginActivitySpotify extends AppCompatActivity {
                 URL spotifyEndpoint = new URL("https://api.spotify.com/v1/me");
 
                 // Create connection
-                HttpsURLConnection myConnection = (HttpsURLConnection) spotifyEndpoint.openConnection();
-                myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
-
-                String waitTime = myConnection.getHeaderField("Retry-After");
-                int waitTimeSeconds = 0;
-                if(waitTime != null && !waitTime.equals("")) {
-                    try {
-                        waitTimeSeconds = Integer.parseInt(waitTime);
-                        Thread.sleep(waitTimeSeconds * 1000);
+                HttpsURLConnection myConnection;
+                String waitTime;
+                do{
+                    myConnection = (HttpsURLConnection) spotifyEndpoint.openConnection();
+                    myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
+                    waitTime = myConnection.getHeaderField("Retry-After");
+                    if(waitTime != null){
+                        int waitTimeSeconds = Integer.parseInt(waitTime);
+                        try {
+                            Thread.sleep(waitTimeSeconds * 1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                         Log.i("WaitTime", waitTime);
-                    } catch (Exception e) {
-                        e.printStackTrace();
                     }
-                }
+                }while(waitTime != null);
 
                 if (myConnection.getResponseCode() == 200) {
                     // Success
@@ -187,20 +189,22 @@ public class LoginActivitySpotify extends AppCompatActivity {
                 URL spotifyEndpoint = new URL("https://api.spotify.com/v1/me/playlists");
 
                 // Create connection
-                HttpsURLConnection myConnection = (HttpsURLConnection) spotifyEndpoint.openConnection();
-                myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
-
-                String waitTime = myConnection.getHeaderField("Retry-After");
-                int waitTimeSeconds = 0;
-                if(waitTime != null && !waitTime.equals("")) {
-                    try {
-                        waitTimeSeconds = Integer.parseInt(waitTime);
-                        Thread.sleep(waitTimeSeconds * 1000);
+                HttpsURLConnection myConnection;
+                String waitTime;
+                do{
+                    myConnection = (HttpsURLConnection) spotifyEndpoint.openConnection();
+                    myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
+                    waitTime = myConnection.getHeaderField("Retry-After");
+                    if(waitTime != null){
+                        int waitTimeSeconds = Integer.parseInt(waitTime);
+                        try {
+                            Thread.sleep(waitTimeSeconds * 1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                         Log.i("WaitTime", waitTime);
-                    } catch (Exception e) {
-                        e.printStackTrace();
                     }
-                }
+                }while(waitTime != null);
 
                 if (myConnection.getResponseCode() == 200) {
                     // Success
@@ -234,20 +238,22 @@ public class LoginActivitySpotify extends AppCompatActivity {
                 URL spotifyEndpoint = new URL(tracksURL);
 
                 // Create connection
-                HttpsURLConnection myConnection = (HttpsURLConnection) spotifyEndpoint.openConnection();
-                myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
-
-                String waitTime = myConnection.getHeaderField("Retry-After");
-                int waitTimeSeconds = 0;
-                if(waitTime != null && !waitTime.equals("")) {
-                    try {
-                        waitTimeSeconds = Integer.parseInt(waitTime);
-                        Thread.sleep(waitTimeSeconds * 1000);
+                HttpsURLConnection myConnection;
+                String waitTime;
+                do{
+                    myConnection = (HttpsURLConnection) spotifyEndpoint.openConnection();
+                    myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
+                    waitTime = myConnection.getHeaderField("Retry-After");
+                    if(waitTime != null){
+                        int waitTimeSeconds = Integer.parseInt(waitTime);
+                        try {
+                            Thread.sleep(waitTimeSeconds * 1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                         Log.i("WaitTime", waitTime);
-                    } catch (Exception e) {
-                        e.printStackTrace();
                     }
-                }
+                }while(waitTime != null);
 
                 if (myConnection.getResponseCode() == 200) {
                     // Success
@@ -282,20 +288,22 @@ public class LoginActivitySpotify extends AppCompatActivity {
                 URL spotifyEndpoint = new URL("https://api.spotify.com/v1/artists?ids=" + artistID);
 
                 // Create connection
-                HttpsURLConnection myConnection = (HttpsURLConnection) spotifyEndpoint.openConnection();
-                myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
-
-                String waitTime = myConnection.getHeaderField("Retry-After");
-                int waitTimeSeconds = 0;
-                if(waitTime != null && !waitTime.equals("")) {
-                    try {
-                        waitTimeSeconds = Integer.parseInt(waitTime);
-                        Thread.sleep(waitTimeSeconds * 1000);
+                HttpsURLConnection myConnection;
+                String waitTime;
+                do{
+                    myConnection = (HttpsURLConnection) spotifyEndpoint.openConnection();
+                    myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
+                    waitTime = myConnection.getHeaderField("Retry-After");
+                    if(waitTime != null){
+                        int waitTimeSeconds = Integer.parseInt(waitTime);
+                        try {
+                            Thread.sleep(waitTimeSeconds * 1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                         Log.i("WaitTime", waitTime);
-                    } catch (Exception e) {
-                        e.printStackTrace();
                     }
-                }
+                }while(waitTime != null);
 
                 if (myConnection.getResponseCode() == 200) {
                     // Success
@@ -325,20 +333,22 @@ public class LoginActivitySpotify extends AppCompatActivity {
                 URL spotifyEndpoint = new URL("https://api.spotify.com/v1/me/top/artists?time_range=short_term&limit=50");
 
                 // Create connection
-                HttpsURLConnection myConnection = (HttpsURLConnection) spotifyEndpoint.openConnection();
-                myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
-
-                String waitTime = myConnection.getHeaderField("Retry-After");
-                int waitTimeSeconds = 0;
-                if(waitTime != null && !waitTime.equals("")) {
-                    try {
-                        waitTimeSeconds = Integer.parseInt(waitTime);
-                        Thread.sleep(waitTimeSeconds * 1000);
+                HttpsURLConnection myConnection;
+                String waitTime;
+                do{
+                    myConnection = (HttpsURLConnection) spotifyEndpoint.openConnection();
+                    myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
+                    waitTime = myConnection.getHeaderField("Retry-After");
+                    if(waitTime != null){
+                        int waitTimeSeconds = Integer.parseInt(waitTime);
+                        try {
+                            Thread.sleep(waitTimeSeconds * 1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                         Log.i("WaitTime", waitTime);
-                    } catch (Exception e) {
-                        e.printStackTrace();
                     }
-                }
+                }while(waitTime != null);
 
                 if (myConnection.getResponseCode() == 200) {
                     // Success
