@@ -18,14 +18,12 @@ public class HostBroadCast extends BroadcastReceiver {
         this.manager = pmanager;
         this.channel = pchannel;
         this.hostActivity = pmainActivity;
-
     }
 
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
-        Log.d("p2p","receive");
-        Toast.makeText(context, "receive", Toast.LENGTH_SHORT).show();
+
         if (WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION.equals(action)) {
 
             Log.d("p2p","state change");
@@ -39,21 +37,16 @@ public class HostBroadCast extends BroadcastReceiver {
 
         }
         else if( WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
-            Toast.makeText(context, "peer change", Toast.LENGTH_SHORT).show();
-            Log.d("p2p","peer change");
             if(manager != null){
                 manager.requestPeers(channel,hostActivity.peerListListener);
             }
         }
         else if(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)){
-            Toast.makeText(context, "connection change", Toast.LENGTH_SHORT).show();
-            Log.d("p2p","connection change");
             if(manager== null){
                 return;
             }
             NetworkInfo networkInfo = intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
             networkInfo.getDetailedState();
-            Log.i("Network",networkInfo.getTypeName());
             if(networkInfo.isConnected()){
                 manager.requestConnectionInfo(channel, hostActivity.connectionInfoListener);
             }
@@ -64,7 +57,6 @@ public class HostBroadCast extends BroadcastReceiver {
         }
         else if(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)){
             Toast.makeText(context, "device change!", Toast.LENGTH_SHORT).show();
-            Log.d("p2p","Device change");
         }
     }
 

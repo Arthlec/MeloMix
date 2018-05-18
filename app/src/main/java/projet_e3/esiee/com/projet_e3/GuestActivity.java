@@ -2,9 +2,7 @@ package projet_e3.esiee.com.projet_e3;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
@@ -13,11 +11,8 @@ import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
-import android.os.AsyncTask;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -25,41 +20,30 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-
 
 public class GuestActivity extends AppCompatActivity {
-    Button buttonOnOff, buttonDisco;
-    ListView listView;
-    TextView TxtState, TxtMsg, TxtKiKi;
-    View theView;
+    private Button buttonOnOff, buttonDisco, btnSend;
+    private ListView listView;
+    private TextView TxtState, TxtMsg, TxtKiKi;
 
-    WifiManager wifiManager;
-    WifiP2pManager aManager;
-    WifiP2pManager.Channel aChannel;
-    BroadcastReceiver mReceiver;
-    IntentFilter mIntent;
+    private WifiManager wifiManager;
+    private WifiP2pManager aManager;
+    private WifiP2pManager.Channel aChannel;
+    private BroadcastReceiver mReceiver;
+    private IntentFilter mIntent;
 
-    List<WifiP2pDevice> peers = new ArrayList<WifiP2pDevice>();
-    ArrayAdapter<String> hAdapter;
-    String[] deviceName;
-    WifiP2pDevice[] deviceArray;
+    private List<WifiP2pDevice> peers = new ArrayList<WifiP2pDevice>();
+    private ArrayAdapter<String> hAdapter;
+    private String[] deviceName;
+    private WifiP2pDevice[] deviceArray;
 
-    final WifiP2pConfig config = new WifiP2pConfig();
+    private final WifiP2pConfig config = new WifiP2pConfig();
 
-    HostClass hostClass;
-    GuestClass guestClass;
+    private HostClass hostClass;
+    private GuestClass guestClass;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +53,7 @@ public class GuestActivity extends AppCompatActivity {
         exqWork();
     }
 
-    private void exqWork() {
+    private void exqWork(){
         buttonOnOff.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -107,14 +91,11 @@ public class GuestActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int i, long id) {
                 final WifiP2pDevice device = deviceArray[i];
-
-
                 config.deviceAddress = device.deviceAddress;
                 config.wps.setup = WpsInfo.PBC;
                 aManager.connect(aChannel, config, new WifiP2pManager.ActionListener() {
                     @Override
                     public void onSuccess() {
-                        //TxtKiKi.setText(config.groupOwnerIntent);
                         Toast.makeText(getApplicationContext(),"connected to "+ device.deviceName, Toast.LENGTH_SHORT).show();
                     }
 
@@ -126,6 +107,8 @@ public class GuestActivity extends AppCompatActivity {
             }
         });
 
+
+
     }
 
     private void work() {
@@ -135,7 +118,9 @@ public class GuestActivity extends AppCompatActivity {
         TxtMsg = findViewById(R.id.msg_b);
         TxtState = findViewById(R.id.status_b);
         TxtKiKi = findViewById(R.id.KieKi);
-        theView = findViewById(R.id.my_view);
+        btnSend = findViewById(R.id.send);
+        btnSend.setText("SHARE TASTE");
+        btnSend.setEnabled(false);
 
         buttonDisco.setText("DISCOVER");
 
@@ -155,7 +140,6 @@ public class GuestActivity extends AppCompatActivity {
         mReceiver = new GuestBroadCast(aManager,aChannel,this);
         mIntent = new IntentFilter();
         setAction();
-
     }
 
     public void setAction(){
@@ -176,7 +160,6 @@ public class GuestActivity extends AppCompatActivity {
                 int index =0;
                 for(WifiP2pDevice device : peersDevice.getDeviceList())
                 {
-
                     deviceName[index] = device.deviceName;
                     deviceArray[index] = device;
                     index++;
@@ -195,15 +178,16 @@ public class GuestActivity extends AppCompatActivity {
         @Override
         public void onConnectionInfoAvailable(WifiP2pInfo info) {
             final InetAddress groupOwnerAdress = info.groupOwnerAddress;
-            if(info.groupFormed && info.isGroupOwner){
-                TxtKiKi.setText("Host");
-                hostClass = new HostClass(theView,getApplicationContext());
-                hostClass.start();
-
-            }else if (info.groupFormed) {
+            if (info.groupFormed) {
                 TxtKiKi.setText("Guest");
                 guestClass = new GuestClass(groupOwnerAdress, getApplicationContext());
-                guestClass.start();
+                btnSend.setEnabled(true);
+                btnSend.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        guestClass.start();
+                    }
+                });
             }
         }
     };
@@ -240,12 +224,10 @@ public class GuestActivity extends AppCompatActivity {
 
                             @Override
                             public void onSuccess() {
-                                //  Toast.makeText(getApplicationContext(), "removeGroup onSuccess -").show();
                             }
 
                             @Override
                             public void onFailure(int reason) {
-                                // Log.d(Tag, "removeGroup onFailure -" + reason);
                             }
                         });
                     }

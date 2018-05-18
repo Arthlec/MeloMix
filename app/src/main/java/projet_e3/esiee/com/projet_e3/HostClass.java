@@ -5,29 +5,31 @@ import android.os.AsyncTask;
 import android.view.View;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class HostClass extends Thread{
-    Socket socket;
-    ServerSocket serverSocket;
-    View view;
-    Context context;
 
-    public HostClass(View view1, Context pCo){
-        view = view1;
+    private ServerSocket serverSocket;
+    private Context context;
+    private String FileName;
+
+    public HostClass(Context pCo, String file){
         context = pCo;
+        FileName = file;
     }
     @Override
     public void run() {
         super.run();
         try {
-            serverSocket = new ServerSocket(8988);
-            socket = serverSocket.accept();
-            new HostActivity.FileServerAsyncTask(context,view).execute();
+            serverSocket = new ServerSocket();
+            serverSocket.setReuseAddress(true);
+            serverSocket.bind(new InetSocketAddress(8988));
+            Socket client = serverSocket.accept();
+            new HostActivity.FileServerAsyncTask(context, client,serverSocket,FileName).execute();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 }

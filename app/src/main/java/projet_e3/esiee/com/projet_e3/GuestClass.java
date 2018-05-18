@@ -1,10 +1,7 @@
 package projet_e3.esiee.com.projet_e3;
 
 import android.annotation.SuppressLint;
-import android.content.ContentResolver;
 import android.content.Context;
-import android.net.Uri;
-import android.os.Environment;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -29,16 +26,16 @@ public class GuestClass extends Thread {
     @SuppressLint("ResourceType")
     @Override
     public void run() {
-        byte[] buffer = new byte[51200];
+        byte[] buffer = new byte[8500];
         try {
             socket.bind(null);
             socket.connect(new InetSocketAddress(HostAdd, 8988), 50000);
             OutputStream outputStream = socket.getOutputStream();
             outputStream.flush();
-            //ContentResolver cr = context.getContentResolver();
             InputStream inputStream = null;
-            //File file = new File(R.drawable.img_2018);//"/storage/download/IMG_4057.png");
-            //inputStream = context.getResources().openRawResource(); //cr.openInputStream(Uri.parse(file.getAbsolutePath()));
+            File file = new File(String.valueOf(R.drawable.ic_launcher_background));//"/storage/download/IMG_4057.png");
+            inputStream = context.getResources().openRawResource(R.drawable.ic_launcher_background); //cr.openInputStream(Uri.parse(file.getAbsolutePath()));
+
             int len;
             assert inputStream != null;
             while ((len = inputStream.read(buffer)) != -1) {

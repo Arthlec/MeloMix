@@ -2,10 +2,7 @@ package projet_e3.esiee.com.projet_e3;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
@@ -14,7 +11,6 @@ import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.AsyncTask;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -37,28 +33,28 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class HostActivity extends AppCompatActivity {
-    Button buttonOnOff, buttonDisco;
-    ListView listView;
-    TextView TxtState, TxtMsg, TxtKiKi;
-    View theView;
+    private Button buttonOnOff, buttonDisco;
+    private ListView listView;
+    private TextView TxtState, TxtMsg, TxtKiKi;
 
-    WifiManager wifiManager;
-    WifiP2pManager aManager;
-    WifiP2pManager.Channel aChannel;
-    BroadcastReceiver mReceiver;
-    IntentFilter mIntent;
+    private WifiManager wifiManager;
+    private WifiP2pManager aManager;
+    private WifiP2pManager.Channel aChannel;
+    private BroadcastReceiver mReceiver;
+    private IntentFilter mIntent;
 
-    List<WifiP2pDevice> peers = new ArrayList<WifiP2pDevice>();
-    ArrayAdapter<String> hAdapter;
-    String[] deviceName;
-    WifiP2pDevice[] deviceArray;
-    final WifiP2pConfig config = new WifiP2pConfig();
+    private List<WifiP2pDevice> peers = new ArrayList<WifiP2pDevice>();
+    private ArrayAdapter<String> hAdapter;
+    private String[] deviceName;
+    private WifiP2pDevice[] deviceArray;
+    private final WifiP2pConfig config = new WifiP2pConfig();
 
-    HostClass hostClass;
-    GuestClass guestClass;
+    private HostClass hostClass;
+    private GuestClass guestClass;
+
+    private String FileName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,17 +100,13 @@ public class HostActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int i, long id) {
                 final WifiP2pDevice device = deviceArray[i];
-
                 config.deviceAddress = device.deviceAddress;
                 config.wps.setup = WpsInfo.PBC;
-
                 aManager.connect(aChannel, config, new WifiP2pManager.ActionListener() {
                     @Override
                     public void onSuccess() {
-                        //TxtKiKi.setText(config.groupOwnerIntent);
                         Toast.makeText(getApplicationContext(),"connected to "+ device.deviceName, Toast.LENGTH_SHORT).show();
                     }
-
                     @Override
                     public void onFailure(int i) {
                         Toast.makeText(getApplicationContext(),"Fail connected to "+ device.deviceName, Toast.LENGTH_SHORT).show();
@@ -132,13 +124,12 @@ public class HostActivity extends AppCompatActivity {
         TxtMsg = findViewById(R.id.msg_b);
         TxtState = findViewById(R.id.status_b);
         TxtKiKi = findViewById(R.id.KieKi);
-        theView = findViewById(R.id.my_view);
 
         buttonDisco.setText("DISCOVER");
-
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         aManager = (WifiP2pManager) getApplicationContext().getSystemService(Context.WIFI_P2P_SERVICE);
         aChannel = aManager.initialize(this,getMainLooper(),null);
+
         config.groupOwnerIntent = 15;
 
         if (wifiManager.isWifiEnabled()){
@@ -191,19 +182,15 @@ public class HostActivity extends AppCompatActivity {
     WifiP2pManager.ConnectionInfoListener connectionInfoListener = new WifiP2pManager.ConnectionInfoListener() {
         @Override
         public void onConnectionInfoAvailable(WifiP2pInfo info) {
-            final InetAddress groupOwnerAdress = info.groupOwnerAddress;
             if(info.groupFormed && info.isGroupOwner){
                 TxtKiKi.setText("Host");
-                hostClass = new HostClass(theView,getApplicationContext());
+                FileName = String.valueOf(System.currentTimeMillis());
+                hostClass = new HostClass(getApplicationContext(), FileName);
                 hostClass.start();
-
-            }else if (info.groupFormed) {
-                TxtKiKi.setText("Guest");
-                guestClass = new GuestClass(groupOwnerAdress, getApplicationContext());
-                guestClass.start();
             }
         }
     };
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -223,36 +210,40 @@ public class HostActivity extends AppCompatActivity {
     public static class FileServerAsyncTask extends AsyncTask<Void,Void,String> {
 
         private Context context;
-        private TextView statusText;
+        private  Socket client;
+        private ServerSocket serverSocket;
+        private  String theFile;
 
-        public FileServerAsyncTask(Context context, View statusText) {
+        public FileServerAsyncTask(Context context, Socket soc,ServerSocket serv, String file) {
             this.context = context;
-            this.statusText = (TextView) statusText;
+            this.client = soc;
+            this.serverSocket = serv;
+            this.theFile = file;
         }
 
         @Override
         protected String doInBackground(Void... params) {
             try {
-                ServerSocket serverSocket = new ServerSocket(8988);
-                Socket client = serverSocket.accept();
 
-                final File f = new File(Environment.getExternalStorageDirectory() + "/"
-                        + context.getPackageName() + "/wifip2pshared-" + System.currentTimeMillis()
-                        + ".png");
+                final File f = new File(context.getFilesDir(),theFile+".xml");
+
 
                 File dirs = new File(f.getParent());
-                if (!dirs.exists())
+                if (!dirs.exists()){
                     dirs.mkdirs();
+                }
                 f.createNewFile();
+
                 InputStream inputstream = client.getInputStream();
-                //copyFile(inputstream, new FileOutputStream(f));
-                //serverSocket.close();
+                copyFile(inputstream, new FileOutputStream(f));
+                serverSocket.close();
+
                 return f.getAbsolutePath();
             } catch (SocketException e){
                 e.getMessage();
                 return  null;
             } catch (IOException e) {
-                Log.e("execpttion", e.getMessage());
+                e.getMessage();
                 return null;
             }
         }
@@ -260,16 +251,14 @@ public class HostActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
             if (result != null) {
-                statusText.setText("File copied - " + result);
-                Intent intent = new Intent();
-                intent.setAction(android.content.Intent.ACTION_VIEW);
-                intent.setDataAndType(Uri.parse("file://" + result), "image/*");
-                context.startActivity(intent);
+                Toast.makeText(context,"File copied - " + result,Toast.LENGTH_SHORT).show();
             }
         }
 
+
         public static boolean copyFile(InputStream inputStream, OutputStream out) {
-            byte buf[] = new byte[51200];
+
+            byte buf[] = new byte[8500];
             int len;
             long startTime=System.currentTimeMillis();
 
