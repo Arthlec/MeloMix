@@ -74,8 +74,10 @@ public class LoginActivitySpotify extends AppCompatActivity {
                     }
                     Toast.makeText(LoginActivitySpotify.this,"Connexion réussie", Toast.LENGTH_LONG).show();
 
-                    getBackToMainActivity.putExtra("userName", "Connecté avec le compte : " + LoginActivitySpotify.userName);
-                    getBackToMainActivity.putExtra("genres", this.userGenres);
+                    Bundle extras = new Bundle();
+                    extras.putString("userName", LoginActivitySpotify.userName);
+                    extras.putSerializable("userGenres",LoginActivitySpotify.userGenres);
+                    getBackToMainActivity.putExtras(extras);
                     startActivity(getBackToMainActivity);
                     break;
 

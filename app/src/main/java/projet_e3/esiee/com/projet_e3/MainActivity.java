@@ -29,6 +29,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if(!MainActivity.this.isOnline())
+            Toast.makeText(MainActivity.this,"Aucune connexion internet détectée", Toast.LENGTH_LONG).show();
+
         ImageButton logoSpotify = findViewById(R.id.imageButton);
         logoSpotify.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,18 +61,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume(){
-        super.onResume();
-        if(!MainActivity.this.isOnline())
-            Toast.makeText(MainActivity.this,"Aucune connexion internet détectée", Toast.LENGTH_LONG).show();
+    protected void onNewIntent(Intent intent){
+        Bundle bundle = intent.getExtras();
+        HashMap<String, Float> userGenres = null;
+        String userName = null;
+        if(bundle != null) {
+            userGenres = (HashMap<String, Float>) bundle.getSerializable("userGenres");
+            userName = bundle.getString("userName", "Non connectée");
+        }
 
         TextView textSpotify = findViewById(R.id.textSpotify);
-        String userName = this.getIntent().getStringExtra("userName");
+        //String userName = this.getIntent().getStringExtra("userName");
         //String userName = LoginActivitySpotify.userName;
-        if(userName != null && !userName.equals(""))
+        if(userName != null)
             textSpotify.setText("Connecté avec le compte : " + userName);
 
-        HashMap<String, Float> userGenres = (HashMap<String, Float>) this.getIntent().getSerializableExtra("genres");
+        //HashMap<String, Float> userGenres = this.getIntent().getSerializableExtra("genres");
         //HashMap<String, Float> userGenres = LoginActivitySpotify.userGenres;
         if(userGenres != null)
             this.writeJSONfile(userGenres);
@@ -78,32 +85,32 @@ public class MainActivity extends AppCompatActivity {
     private void writeJSONfile(HashMap<String, Float> userGenres){
         //String json = JSON.std.asString(map);
         try {
-            File file = new File(this.getFilesDir(), "userGenres");
+            MainActivity.this.deleteFile("userGenres.json");
+            File file = new File(this.getFilesDir(), "userGenres.json");
             //JSON.std.write(userGenres, file);
-            //file.delete();
-            Log.i("FileExist", "" + file.exists());
+            Log.i("FileExists", "" + file.exists());
             Log.i("FileIsHidden", "" + file.isHidden());
 
             JSON json = JSON.std.with(new JacksonJrsTreeCodec())
                     .with(JSON.Feature.PRETTY_PRINT_OUTPUT)
                     .without(JSON.Feature.WRITE_NULL_PROPERTIES);
-            if(file.canWrite())
-                json.write(userGenres, file);
+            //if(file.canWrite())
+            json.write(userGenres, file);
 
-            file.setReadable(true);
+            //file.setReadable(true);
             Log.i("FileToString", file.toString());
             Log.i("FileToString", "" + file.length());
             Log.i("MainActivity", "Fichier créé !");
 
-            FileInputStream inputStream;
+            /*FileInputStream inputStream;
             inputStream = openFileInput("userGenres");
-            byte[] bytes = new byte[12288];
+            byte[] bytes = new byte[34407];
             if(file.canRead())
                 inputStream.read(bytes);
             //byte[] bytes = doc.getBytes("UTF-8");
             String userGenresString = new String(bytes, "UTF-8");
             Log.i("userGenres", userGenresString);
-            inputStream.close();
+            inputStream.close();*/
         } catch (Exception e) {
             e.printStackTrace();
         }
