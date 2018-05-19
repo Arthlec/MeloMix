@@ -83,34 +83,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void writeJSONfile(HashMap<String, Float> userGenres){
-        //String json = JSON.std.asString(map);
         try {
-            MainActivity.this.deleteFile("userGenres.json");
+            //MainActivity.this.deleteFile("userGenres.json");
             File file = new File(this.getFilesDir(), "userGenres.json");
-            //JSON.std.write(userGenres, file);
+
             Log.i("FileExists", "" + file.exists());
-            Log.i("FileIsHidden", "" + file.isHidden());
+            //Log.i("FileIsHidden", "" + file.isHidden());
 
             JSON json = JSON.std.with(new JacksonJrsTreeCodec())
                     .with(JSON.Feature.PRETTY_PRINT_OUTPUT)
                     .without(JSON.Feature.WRITE_NULL_PROPERTIES);
-            //if(file.canWrite())
-            json.write(userGenres, file);
 
-            //file.setReadable(true);
-            Log.i("FileToString", file.toString());
-            Log.i("FileToString", "" + file.length());
+            Log.i("prettyPrintEnabled", "" + json.isEnabled(JSON.Feature.PRETTY_PRINT_OUTPUT));
+
+            if(file.canWrite())
+                json.write(userGenres, file);
+
+            Log.i("FileLength", "" + file.length());
             Log.i("MainActivity", "Fichier créé !");
-
-            /*FileInputStream inputStream;
-            inputStream = openFileInput("userGenres");
-            byte[] bytes = new byte[34407];
-            if(file.canRead())
-                inputStream.read(bytes);
-            //byte[] bytes = doc.getBytes("UTF-8");
-            String userGenresString = new String(bytes, "UTF-8");
-            Log.i("userGenres", userGenresString);
-            inputStream.close();*/
         } catch (Exception e) {
             e.printStackTrace();
         }
