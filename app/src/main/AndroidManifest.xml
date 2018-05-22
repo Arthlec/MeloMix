@@ -56,5 +56,4 @@
         <activity android:name=".SearchForGroupActivity"/>
         <activity android:name=".ResultsActivity"/>
     </application>
-
 </manifest>
