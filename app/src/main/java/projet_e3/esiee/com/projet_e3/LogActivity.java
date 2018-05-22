@@ -20,7 +20,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.HashMap;
 
-public class MainActivity extends AppCompatActivity {
+public class LogActivity extends AppCompatActivity {
 
     public static boolean isLoggedInSpotify = false;
 
@@ -29,18 +29,18 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if(!MainActivity.this.isOnline())
-            Toast.makeText(MainActivity.this,"Aucune connexion internet détectée", Toast.LENGTH_LONG).show();
+        if(!LogActivity.this.isOnline())
+            Toast.makeText(LogActivity.this,"Aucune connexion internet détectée", Toast.LENGTH_LONG).show();
 
         ImageButton logoSpotify = findViewById(R.id.imageButton);
         logoSpotify.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!MainActivity.isLoggedInSpotify){
-                    Intent intent = new Intent(MainActivity.this, LoginActivitySpotify.class);
+                if (!LogActivity.isLoggedInSpotify){
+                    Intent intent = new Intent(LogActivity.this, LoginActivitySpotify.class);
                     startActivity(intent);
                 }else
-                    Toast.makeText(MainActivity.this,"Compte déjà connecté", Toast.LENGTH_LONG).show();
+                    Toast.makeText(LogActivity.this,"Compte déjà connecté", Toast.LENGTH_LONG).show();
             }
         });
 
@@ -48,11 +48,11 @@ public class MainActivity extends AppCompatActivity {
         buttonDisconnect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(MainActivity.isLoggedInSpotify){
-                    MainActivity.isLoggedInSpotify = false;
-                    Toast.makeText(MainActivity.this,"Déconnexion réussie", Toast.LENGTH_LONG).show();
+                if(LogActivity.isLoggedInSpotify){
+                    LogActivity.isLoggedInSpotify = false;
+                    Toast.makeText(LogActivity.this,"Déconnexion réussie", Toast.LENGTH_LONG).show();
                 }else{
-                    Toast.makeText(MainActivity.this,"Aucun compte n'est connecté", Toast.LENGTH_LONG).show();
+                    Toast.makeText(LogActivity.this,"Aucun compte n'est connecté", Toast.LENGTH_LONG).show();
                 }
                 TextView textSpotify = findViewById(R.id.textSpotify);
                 textSpotify.setText("Non connecté");

@@ -59,7 +59,7 @@ public class LoginActivitySpotify extends AppCompatActivity {
         // Check if result comes from the correct activity
         if (requestCode == REQUEST_CODE) {
             final AuthenticationResponse response = AuthenticationClient.getResponse(resultCode, intent);
-            Intent getBackToMainActivity = new Intent(LoginActivitySpotify.this, MainActivity.class);
+            Intent getBackToMainActivity = new Intent(LoginActivitySpotify.this, LogActivity.class);
 
             switch (response.getType()) {
                 // Response was successful and contains auth token
@@ -67,7 +67,7 @@ public class LoginActivitySpotify extends AppCompatActivity {
                     // Handle successful response
                     authToken = response.getAccessToken();
                     requestData();
-                    MainActivity.isLoggedInSpotify = true;
+                    LogActivity.isLoggedInSpotify = true;
                     while(!asyncTaskIsDone){
                         try { Thread.sleep(100); }
                         catch (InterruptedException e) { e.printStackTrace(); }
