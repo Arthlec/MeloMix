@@ -6,6 +6,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -15,6 +16,12 @@ import android.widget.Toast;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import com.fasterxml.jackson.jr.ob.JSON;
+import com.fasterxml.jackson.jr.stree.JacksonJrsTreeCodec;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.HashMap;
 
 public class LogActivity extends AppCompatActivity {
 
@@ -26,6 +33,10 @@ public class LogActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        if(!LogActivity.this.isOnline())
+            Toast.makeText(LogActivity.this,"Aucune connexion internet détectée", Toast.LENGTH_LONG).show();
         setContentView(R.layout.log_activity);
 
         userName = findViewById(R.id.userName);
@@ -89,15 +100,49 @@ public class LogActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume(){
-        super.onResume();
-        if(!LogActivity.this.isOnline())
-            Toast.makeText(LogActivity.this,"Aucune connexion internet détectée", Toast.LENGTH_LONG).show();
+    protected void onNewIntent(Intent intent){
+        Bundle bundle = intent.getExtras();
+        HashMap<String, Float> userGenres = null;
+        String userName = null;
+        if(bundle != null) {
+            userGenres = (HashMap<String, Float>) bundle.getSerializable("userGenres");
+            userName = bundle.getString("userName", "Non connectée");
+        }
 
         TextView textSpotify = findViewById(R.id.textSpotify);
-        String userName = this.getIntent().getStringExtra("userName");
+        //String userName = this.getIntent().getStringExtra("userName");
+        //String userName = LoginActivitySpotify.userName;
         if(userName != null)
-            textSpotify.setText(userName);
+            textSpotify.setText("Connecté avec le compte : " + userName);
+
+        //HashMap<String, Float> userGenres = this.getIntent().getSerializableExtra("genres");
+        //HashMap<String, Float> userGenres = LoginActivitySpotify.userGenres;
+        if(userGenres != null)
+            this.writeJSONfile(userGenres);
+    }
+
+    private void writeJSONfile(HashMap<String, Float> userGenres){
+        try {
+            //MainActivity.this.deleteFile("userGenres.json");
+            File file = new File(this.getFilesDir(), "userGenres.json");
+
+            Log.i("FileExists", "" + file.exists());
+            //Log.i("FileIsHidden", "" + file.isHidden());
+
+            JSON json = JSON.std.with(new JacksonJrsTreeCodec())
+                    .with(JSON.Feature.PRETTY_PRINT_OUTPUT)
+                    .without(JSON.Feature.WRITE_NULL_PROPERTIES);
+
+            Log.i("prettyPrintEnabled", "" + json.isEnabled(JSON.Feature.PRETTY_PRINT_OUTPUT));
+
+            if(file.canWrite())
+                json.write(userGenres, file);
+
+            Log.i("FileLength", "" + file.length());
+            Log.i("MainActivity", "Fichier créé !");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean isOnline() {
