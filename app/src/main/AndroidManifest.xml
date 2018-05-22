@@ -47,26 +47,6 @@
 
         <activity android:name=".LogActivity">
         </activity>
-        <activity
-            android:name=".LoginActivitySpotify"
-            android:label="Connection Spotify"
-            android:parentActivityName=".MainActivity">
-            <!-- The meta-data element is needed for versions lower than 4.1 -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.BROWSABLE" />
-                <category android:name="com.spotify.sdk.android.authentication.LoginActivity" />
-
-                <data
-                    android:host="callback"
-                    android:scheme="smooth-i" />
-            </intent-filter>
-        </activity>
-        <activity
             android:name="com.spotify.sdk.android.authentication.LoginActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <activity android:name=".HostGroupActivity"/>
