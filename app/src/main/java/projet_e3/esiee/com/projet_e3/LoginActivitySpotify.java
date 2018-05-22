@@ -35,7 +35,7 @@ public class LoginActivitySpotify extends AppCompatActivity {
     private static String authToken = "";
     private static String userName = "";
     private static boolean asyncTaskIsDone = false;
-    private static HashMap<String, Float> userGenres = new HashMap<String, Float>();
+    private static HashMap<String, Float> userGenres = new HashMap<>();
 
     // Request code that will be used to verify if the result comes from correct activity
     // Can be any integer
