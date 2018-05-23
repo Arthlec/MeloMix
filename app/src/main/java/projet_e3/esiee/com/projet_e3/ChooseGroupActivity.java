@@ -1,12 +1,13 @@
 package projet_e3.esiee.com.projet_e3;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 
-public class ChooseGroupActivity extends AppCompatActivity {
+public class ChooseGroupActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -17,7 +18,7 @@ public class ChooseGroupActivity extends AppCompatActivity {
         buttonDJ.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ChooseGroupActivity.this, HostGroupActivity.class);
+                Intent intent = new Intent(ChooseGroupActivity.this, HostMainActivity.class);
                 startActivity(intent);
             }
         });
@@ -26,7 +27,7 @@ public class ChooseGroupActivity extends AppCompatActivity {
         buttonSearchForGroup.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ChooseGroupActivity.this, SearchForGroupActivity.class);
+                Intent intent = new Intent(ChooseGroupActivity.this, GuestMainActivity.class);
                 startActivity(intent);
             }
         });

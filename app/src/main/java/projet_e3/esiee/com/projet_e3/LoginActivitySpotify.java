@@ -1,5 +1,6 @@
 package projet_e3.esiee.com.projet_e3;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -27,7 +28,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 import static junit.framework.Assert.assertTrue;
 
-public class LoginActivitySpotify extends AppCompatActivity {
+public class LoginActivitySpotify extends Activity {
 
 
     private static final String CLIENT_ID = "1aee09c9f4504604b379f867207fd238";
@@ -67,7 +68,7 @@ public class LoginActivitySpotify extends AppCompatActivity {
                     // Handle successful response
                     authToken = response.getAccessToken();
                     requestData();
-                    LogActivity.isLoggedInSpotify = true;
+                    ProfileActivity.isLoggedInSpotify = true;
                     while(!asyncTaskIsDone){
                         try { Thread.sleep(100); }
                         catch (InterruptedException e) { e.printStackTrace(); }

@@ -1,5 +1,6 @@
 package projet_e3.esiee.com.projet_e3;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -20,10 +21,9 @@ import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.stree.JacksonJrsTreeCodec;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.HashMap;
 
-public class LogActivity extends AppCompatActivity {
+public class ProfileActivity extends Activity {
 
     public static boolean isLoggedInSpotify = false;
     private String PERSONAL = "personal.txt";
@@ -35,9 +35,9 @@ public class LogActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if(!LogActivity.this.isOnline())
-            Toast.makeText(LogActivity.this,"Aucune connexion internet détectée", Toast.LENGTH_LONG).show();
-        setContentView(R.layout.log_activity);
+        if(!ProfileActivity.this.isOnline())
+            Toast.makeText(ProfileActivity.this,"Aucune connexion internet détectée", Toast.LENGTH_LONG).show();
+        setContentView(R.layout.profile_activity);
 
         userName = findViewById(R.id.userName);
 
@@ -65,11 +65,11 @@ public class LogActivity extends AppCompatActivity {
         logoSpotify.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!LogActivity.isLoggedInSpotify){
-                    Intent intent = new Intent(LogActivity.this, LoginActivitySpotify.class);
+                if (!ProfileActivity.isLoggedInSpotify){
+                    Intent intent = new Intent(ProfileActivity.this, LoginActivitySpotify.class);
                     startActivity(intent);
                 }else
-                    Toast.makeText(LogActivity.this,"Compte déjà connecté", Toast.LENGTH_LONG).show();
+                    Toast.makeText(ProfileActivity.this,"Compte déjà connecté", Toast.LENGTH_LONG).show();
             }
         });
 
@@ -77,11 +77,11 @@ public class LogActivity extends AppCompatActivity {
         buttonDisconnect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(LogActivity.isLoggedInSpotify){
-                    LogActivity.isLoggedInSpotify = false;
-                    Toast.makeText(LogActivity.this,"Déconnexion réussie", Toast.LENGTH_LONG).show();
+                if(ProfileActivity.isLoggedInSpotify){
+                    ProfileActivity.isLoggedInSpotify = false;
+                    Toast.makeText(ProfileActivity.this,"Déconnexion réussie", Toast.LENGTH_LONG).show();
                 }else{
-                    Toast.makeText(LogActivity.this,"Aucun compte n'est connecté", Toast.LENGTH_LONG).show();
+                    Toast.makeText(ProfileActivity.this,"Aucun compte n'est connecté", Toast.LENGTH_LONG).show();
                 }
                 TextView textSpotify = findViewById(R.id.textSpotify);
                 textSpotify.setText("Non connecté");
@@ -93,7 +93,7 @@ public class LogActivity extends AppCompatActivity {
         buttonNext.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(LogActivity.this, ChooseGroupActivity.class);
+                Intent intent = new Intent(ProfileActivity.this, ChooseGroupActivity.class);
                 startActivity(intent);
             }
         });

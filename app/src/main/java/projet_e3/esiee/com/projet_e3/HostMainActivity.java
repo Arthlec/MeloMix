@@ -1,5 +1,6 @@
 package projet_e3.esiee.com.projet_e3;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ArrayAdapter;
@@ -9,7 +10,7 @@ import android.widget.ListView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HostGroupActivity extends AppCompatActivity  {
+public class HostMainActivity extends Activity {
 
     ListView userList = null;
 
@@ -17,7 +18,7 @@ public class HostGroupActivity extends AppCompatActivity  {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.hostgroup_activity);
+        setContentView(R.layout.host_main_activity);
 
         userList = findViewById(R.id.host_list);
         List<String> userRepertoire = new ArrayList<>();

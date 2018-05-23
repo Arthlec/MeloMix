@@ -11,7 +11,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
+        android:theme="@android:style/Theme.Light.NoTitleBar"
         android:screenOrientation="portrait">
         <activity android:name=".MainActivity">
         <intent-filter>
@@ -24,17 +24,19 @@
         </activity>
 
         <activity
-            android:name=".LogActivity"
+            android:name=".ProfileActivity"
+            android:theme="@android:style/Theme.Light.NoTitleBar"
+            android:parentActivityName=".MainActivity"
             android:launchMode="singleTask">
         </activity>
         <activity
             android:name=".LoginActivitySpotify"
-            android:label="Connection Spotify"
-            android:parentActivityName=".LogActivity">
+            android:label="Connexion Spotify"
+            android:parentActivityName=".ProfileActivity">
             <!-- The meta-data element is needed for versions lower than 4.1 -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".LogActivity" />
+                android:value=".ProfileActivity" />
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.BROWSABLE" />
@@ -46,10 +48,9 @@
         <activity
             android:name="com.spotify.sdk.android.authentication.LoginActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-        <activity android:name=".HostGroupActivity" />
+        <activity android:name=".HostMainActivity" />
         <activity android:name=".ChooseGroupActivity" />
-        <activity android:name=".SearchForGroupActivity" />
-        <activity android:name=".ResultsActivity" />
+        <activity android:name=".GuestMainActivity" />
     </application>
 
 </manifest>
