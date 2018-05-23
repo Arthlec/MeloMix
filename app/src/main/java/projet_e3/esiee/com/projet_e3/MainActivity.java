@@ -6,11 +6,14 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -21,6 +24,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class MainActivity extends Activity {
 
@@ -28,6 +32,7 @@ public class MainActivity extends Activity {
     private String PERSONAL = "personal.txt";
     private Button mEnter = null;
     private boolean condition = false;
+
 
     EditText pseudo = null;
     TextView result = null;
@@ -123,8 +128,31 @@ public class MainActivity extends Activity {
     };
 
     private void showDialogue() {
-        /* Boite de dialogue */
-        AlertDialog.Builder builder;
+
+        /* Boite de dialogue
+         * S'ouvre seulement au permier lancement de l'application
+         */
+        final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean agreed = sharedPreferences.getBoolean("agreed",false);
+        if (!agreed) {
+            new AlertDialog.Builder(this)
+                    .setTitle("License agreement")
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putBoolean("agreed", true);
+                            editor.commit();
+                            condition = true;
+                        }
+                    })
+                    .setNegativeButton("No", null)
+                    .setMessage("Le fichier.txt des conditions")
+                    .show();
+        }
+
+
+        /*AlertDialog.Builder builder;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);
         } else {
@@ -146,6 +174,6 @@ public class MainActivity extends Activity {
                     }
                 })
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
+                .show();*/
     }
 }
