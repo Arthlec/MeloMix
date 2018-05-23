@@ -3,28 +3,24 @@ package projet_e3.esiee.com.projet_e3;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
+
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class MainActivity extends Activity {
 
@@ -32,6 +28,7 @@ public class MainActivity extends Activity {
     private String PERSONAL = "personal.txt";
     private Button mEnter = null;
     private boolean condition = false;
+    private String[] mStrings = {"J'accepte","Je refuse"};
 
 
     EditText pseudo = null;
@@ -57,6 +54,7 @@ public class MainActivity extends Activity {
             }
             if (input != null) {
                 input.close();
+                condition=true;
                 Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
                 startActivity(intent);
             }
@@ -137,7 +135,9 @@ public class MainActivity extends Activity {
         if (!agreed) {
             new AlertDialog.Builder(this)
                     .setTitle("License agreement")
-                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    // Specify the list array, the items to be selected by default (null for none),
+                    // and the listener through which to receive callbacks when items are selected
+                   .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             SharedPreferences.Editor editor = sharedPreferences.edit();
