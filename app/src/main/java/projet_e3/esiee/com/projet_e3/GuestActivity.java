@@ -20,6 +20,8 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
@@ -111,6 +113,22 @@ public class GuestActivity extends AppCompatActivity {
 
     }
 
+    private void deletePersistentGroup(){
+        try {
+            Method[] methods = WifiP2pManager.class.getMethods();
+            for (int i = 0; i < methods.length; i++) {
+                if (methods[i].getName().equals("deletePersistentGroup")) {
+                    // Delete any persistent group
+                    for (int netid = 0; netid < 32; netid++) {
+                        methods[i].invoke(aManager, aChannel, netid, null);
+                    }
+                }
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private void work() {
         buttonOnOff =(Button) findViewById(R.id.onOff);
         buttonDisco = findViewById(R.id.button2);
@@ -127,7 +145,18 @@ public class GuestActivity extends AppCompatActivity {
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         aManager = (WifiP2pManager) getApplicationContext().getSystemService(Context.WIFI_P2P_SERVICE);
         aChannel = aManager.initialize(this,getMainLooper(),null);
+        deletePersistentGroup();
+        aManager.removeGroup(aChannel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
 
+            }
+
+            @Override
+            public void onFailure(int i) {
+
+            }
+        });
         config.groupOwnerIntent = 0;
 
         if (wifiManager.isWifiEnabled()){
@@ -160,12 +189,17 @@ public class GuestActivity extends AppCompatActivity {
                 int index =0;
                 for(WifiP2pDevice device : peersDevice.getDeviceList())
                 {
+                   // if(device.isGroupOwner())
+                   // {
                     deviceName[index] = device.deviceName;
                     deviceArray[index] = device;
+                  //  }
                     index++;
                 }
-                hAdapter = new ArrayAdapter<String>(listView.getContext(),android.R.layout.simple_list_item_1,deviceName);
-                listView.setAdapter(hAdapter);
+                if(deviceName.length != 0) {
+                    hAdapter = new ArrayAdapter<String>(listView.getContext(), android.R.layout.simple_list_item_1, deviceName);
+                    listView.setAdapter(hAdapter);
+                }
             }
             if (peers.isEmpty()) {
                 Toast.makeText(getApplicationContext(), "No devices found", Toast.LENGTH_SHORT).show();
@@ -178,7 +212,7 @@ public class GuestActivity extends AppCompatActivity {
         @Override
         public void onConnectionInfoAvailable(WifiP2pInfo info) {
             final InetAddress groupOwnerAdress = info.groupOwnerAddress;
-            if (info.groupFormed) {
+            if (info.groupFormed && !info.isGroupOwner) {
                 TxtKiKi.setText("Guest");
                 guestClass = new GuestClass(groupOwnerAdress, getApplicationContext());
                 btnSend.setEnabled(true);
@@ -203,36 +237,7 @@ public class GuestActivity extends AppCompatActivity {
         unregisterReceiver(mReceiver);
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        disconnect();
-    }
-
     public TextView getTxtState() {
         return TxtState;
-    }
-
-    public void disconnect() {
-        if (aManager != null && aChannel != null) {
-            aManager.requestGroupInfo(aChannel, new WifiP2pManager.GroupInfoListener() {
-                @Override
-                public void onGroupInfoAvailable(WifiP2pGroup group) {
-                    if (group != null && aManager != null && aChannel != null
-                            && !group.isGroupOwner()) {
-                        aManager.removeGroup(aChannel, new WifiP2pManager.ActionListener() {
-
-                            @Override
-                            public void onSuccess() {
-                            }
-
-                            @Override
-                            public void onFailure(int reason) {
-                            }
-                        });
-                    }
-                }
-            });
-        }
     }
 }

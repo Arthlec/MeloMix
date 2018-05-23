@@ -11,6 +11,7 @@ import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.AsyncTask;
+
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -27,14 +28,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.InetAddress;
+import java.lang.reflect.Method;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
+import java.lang.System;
 
 public class HostActivity extends AppCompatActivity {
+
     private Button buttonOnOff, buttonDisco;
     private ListView listView;
     private TextView TxtState, TxtMsg, TxtKiKi;
@@ -112,9 +115,26 @@ public class HostActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(),"Fail connected to "+ device.deviceName, Toast.LENGTH_SHORT).show();
                     }
                 });
+
             }
         });
 
+    }
+
+    private void deletePersistentGroup(){
+        try {
+            Method[] methods = WifiP2pManager.class.getMethods();
+            for (int i = 0; i < methods.length; i++) {
+                if (methods[i].getName().equals("deletePersistentGroup")) {
+                    // Delete any persistent group
+                    for (int netid = 0; netid < 32; netid++) {
+                        methods[i].invoke(aManager, aChannel, netid, null);
+                    }
+                }
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void work() {
@@ -129,8 +149,21 @@ public class HostActivity extends AppCompatActivity {
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         aManager = (WifiP2pManager) getApplicationContext().getSystemService(Context.WIFI_P2P_SERVICE);
         aChannel = aManager.initialize(this,getMainLooper(),null);
+        deletePersistentGroup();
+        aManager.removeGroup(aChannel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onFailure(int i) {
+
+            }
+        });
 
         config.groupOwnerIntent = 15;
+
 
         if (wifiManager.isWifiEnabled()){
             buttonOnOff.setText("WIFI is ON");
@@ -144,6 +177,18 @@ public class HostActivity extends AppCompatActivity {
         mReceiver = new HostBroadCast(aManager,aChannel,this);
         mIntent = new IntentFilter();
         setAction();
+
+        aManager.createGroup(aChannel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(getApplicationContext(),"Group create ", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(int i) {
+                Toast.makeText(getApplicationContext(),"Fail create group ", Toast.LENGTH_SHORT).show();
+            }
+        });
 
     }
 
@@ -165,8 +210,10 @@ public class HostActivity extends AppCompatActivity {
                 int index =0;
                 for(WifiP2pDevice device : peersDevice.getDeviceList())
                 {
-                    deviceName[index] = device.deviceName;
-                    deviceArray[index] = device;
+                    //if(!device.isGroupOwner()) {
+                        deviceName[index] = device.deviceName;
+                        deviceArray[index] = device;
+                    //}
                     index++;
                 }
                 hAdapter = new ArrayAdapter<String>(listView.getContext(),android.R.layout.simple_list_item_1,deviceName);
@@ -203,6 +250,22 @@ public class HostActivity extends AppCompatActivity {
         unregisterReceiver(mReceiver);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        aManager.removeGroup(aChannel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onFailure(int i) {
+
+            }
+        });
+    }
+
     public TextView getTxtState() {
         return TxtState;
     }
@@ -213,6 +276,7 @@ public class HostActivity extends AppCompatActivity {
         private  Socket client;
         private ServerSocket serverSocket;
         private  String theFile;
+        private HostClass host;
 
         public FileServerAsyncTask(Context context, Socket soc,ServerSocket serv, String file) {
             this.context = context;
@@ -227,12 +291,14 @@ public class HostActivity extends AppCompatActivity {
 
                 final File f = new File(context.getFilesDir(),theFile+".xml");
 
-
                 File dirs = new File(f.getParent());
                 if (!dirs.exists()){
                     dirs.mkdirs();
                 }
                 f.createNewFile();
+
+                f.setReadable(true,true);
+                f.setWritable(true,true);
 
                 InputStream inputstream = client.getInputStream();
                 copyFile(inputstream, new FileOutputStream(f));

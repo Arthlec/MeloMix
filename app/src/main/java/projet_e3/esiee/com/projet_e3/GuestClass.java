@@ -1,9 +1,12 @@
 package projet_e3.esiee.com.projet_e3;
 
 import android.annotation.SuppressLint;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.net.Uri;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,8 +36,7 @@ public class GuestClass extends Thread {
             OutputStream outputStream = socket.getOutputStream();
             outputStream.flush();
             InputStream inputStream = null;
-            File file = new File(String.valueOf(R.drawable.ic_launcher_background));//"/storage/download/IMG_4057.png");
-            inputStream = context.getResources().openRawResource(R.drawable.ic_launcher_background); //cr.openInputStream(Uri.parse(file.getAbsolutePath()));
+            inputStream = context.getResources().openRawResource(R.drawable.ic_launcher_background);
 
             int len;
             assert inputStream != null;
