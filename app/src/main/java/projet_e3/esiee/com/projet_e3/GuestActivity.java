@@ -2,7 +2,6 @@ package projet_e3.esiee.com.projet_e3;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -11,7 +10,7 @@ import android.widget.Toast;
 
 
 
-public class GuestMainActivity extends Activity {
+public class GuestActivity extends Activity {
 
     ListView hostList = null;
 
@@ -23,7 +22,7 @@ public class GuestMainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.guest_main_activity);
+        setContentView(R.layout.guest_activity);
 
         hostList = findViewById(R.id.DJ_list);
         mSend = findViewById(R.id.send_button);
@@ -37,12 +36,12 @@ public class GuestMainActivity extends Activity {
         mSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(GuestMainActivity.this, "Merci ! Les données ont été envoyées !", Toast.LENGTH_LONG).show();
+                Toast.makeText(GuestActivity.this, "Merci ! Les données ont été envoyées !", Toast.LENGTH_LONG).show();
 
                 //On déclare qu'on ne peut plus sélectionner d'élément
                 hostList.setChoiceMode(ListView.CHOICE_MODE_NONE);
                 //On affiche un layout qui ne permet pas de sélection
-                hostList.setAdapter(new ArrayAdapter<>(GuestMainActivity.this, android.R.layout.simple_list_item_1,
+                hostList.setAdapter(new ArrayAdapter<>(GuestActivity.this, android.R.layout.simple_list_item_1,
                         mHosts));
 
                 //On désactive le bouton

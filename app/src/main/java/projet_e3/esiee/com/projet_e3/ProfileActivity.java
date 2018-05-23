@@ -27,6 +27,7 @@ public class ProfileActivity extends Activity {
 
     public static boolean isLoggedInSpotify = false;
     private String PERSONAL = "personal.txt";
+    private String authToken = "";
 
     TextView userName = null;
 
@@ -94,6 +95,7 @@ public class ProfileActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(ProfileActivity.this, ChooseGroupActivity.class);
+                intent.putExtra("authToken", authToken);
                 startActivity(intent);
             }
         });
@@ -107,6 +109,7 @@ public class ProfileActivity extends Activity {
         if(bundle != null) {
             userGenres = (HashMap<String, Float>) bundle.getSerializable("userGenres");
             userName = bundle.getString("userName", "Non connectée");
+            authToken = bundle.getString("authToken", "");
         }
 
         TextView textSpotify = findViewById(R.id.textSpotify);

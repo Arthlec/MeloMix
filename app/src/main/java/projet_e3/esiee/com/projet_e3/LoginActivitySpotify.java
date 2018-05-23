@@ -60,7 +60,7 @@ public class LoginActivitySpotify extends Activity {
         // Check if result comes from the correct activity
         if (requestCode == REQUEST_CODE) {
             final AuthenticationResponse response = AuthenticationClient.getResponse(resultCode, intent);
-            Intent getBackToMainActivity = new Intent(LoginActivitySpotify.this, MainActivity.class);
+            Intent getBackToProfileActivity = new Intent(LoginActivitySpotify.this, ProfileActivity.class);
 
             switch (response.getType()) {
                 // Response was successful and contains auth token
@@ -78,8 +78,9 @@ public class LoginActivitySpotify extends Activity {
                     Bundle extras = new Bundle();
                     extras.putString("userName", LoginActivitySpotify.userName);
                     extras.putSerializable("userGenres",LoginActivitySpotify.userGenres);
-                    getBackToMainActivity.putExtras(extras);
-                    startActivity(getBackToMainActivity);
+                    extras.putString("authToken", LoginActivitySpotify.authToken);
+                    getBackToProfileActivity.putExtras(extras);
+                    startActivity(getBackToProfileActivity);
                     break;
 
                 // Auth flow returned an error
@@ -88,7 +89,7 @@ public class LoginActivitySpotify extends Activity {
                     AuthenticationClient.stopLoginActivity(LoginActivitySpotify.this, REQUEST_CODE);
                     Toast.makeText(LoginActivitySpotify.this,"Erreur de connexion", Toast.LENGTH_LONG).show();
                     Log.i("Connection", "ERROR");
-                    startActivity(getBackToMainActivity);
+                    startActivity(getBackToProfileActivity);
                     break;
 
                 // Most likely auth flow was cancelled
@@ -97,7 +98,7 @@ public class LoginActivitySpotify extends Activity {
                     AuthenticationClient.stopLoginActivity(LoginActivitySpotify.this, REQUEST_CODE);
                     Toast.makeText(LoginActivitySpotify.this,"Connexion annulée", Toast.LENGTH_LONG).show();
                     Log.i("Connection", "Cancelled");
-                    startActivity(getBackToMainActivity);
+                    startActivity(getBackToProfileActivity);
             }
         }
     }
