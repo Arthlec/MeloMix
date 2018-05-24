@@ -10,6 +10,7 @@ import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 
 import com.fasterxml.jackson.jr.ob.JSON;
@@ -34,6 +35,7 @@ public class HostActivity extends Activity {
 
     ListView userList = null;
     private static Bitmap bmp;
+    private static String trackName;
     private static String authToken = "";
 
 
@@ -46,6 +48,8 @@ public class HostActivity extends Activity {
         requestData();
         ImageView trackCover = findViewById(R.id.trackCover);
         trackCover.setImageBitmap(bmp);
+        TextView trackNameField = findViewById(R.id.trackName);
+        trackNameField.setText(trackName);
     }
 
     public void requestData() {
@@ -53,8 +57,9 @@ public class HostActivity extends Activity {
             @Override
             public void run() {
                 try {
-                    URL trackURL = new URL(getTrackImage());
+                    URL trackURL = new URL(getTrackInfo()[0]);
                     bmp = BitmapFactory.decodeStream(trackURL.openConnection().getInputStream());
+                    trackName = getTrackInfo()[1];
                     new Thread(new Runnable() {
                         public void run() {
                             runOnUiThread(new Runnable() {
@@ -62,6 +67,8 @@ public class HostActivity extends Activity {
                                 public void run() {
                                     ImageView trackCover = findViewById(R.id.trackCover);
                                     trackCover.setImageBitmap(bmp);
+                                    TextView trackNameField = findViewById(R.id.trackName);
+                                    trackNameField.setText(trackName);
                                 }
                             });
                         }
@@ -72,7 +79,8 @@ public class HostActivity extends Activity {
                 }
             }
 
-            private String getTrackImage() throws IOException {
+            private String[] getTrackInfo() throws IOException {
+                String[] trackInfo = new String[2];
                 // Create URL
                 URL spotifyEndpoint = new URL("https://api.spotify.com/v1/tracks/11dFghVXANMlKmJXsNCbNl");
 
@@ -102,9 +110,12 @@ public class HostActivity extends Activity {
                     TreeNode root = json.treeFrom(responseBody);
                     assertTrue(root.isObject());
                     JrsString imageURL = (JrsString) root.get("album").get("images").get(0).get("url");
+                    JrsString trackName = (JrsString) root.get("album").get("name");
+                    trackInfo[0] = imageURL.asText();
+                    trackInfo[1] = trackName.asText();
 
                     myConnection.disconnect();
-                    return imageURL.asText();
+                    return trackInfo;
                 } else {
                     Log.i("responseCode", "" + myConnection.getResponseCode());
                     return null;
