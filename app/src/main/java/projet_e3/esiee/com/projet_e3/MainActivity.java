@@ -12,15 +12,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Scanner;
 
 public class MainActivity extends Activity {
 
@@ -28,7 +32,7 @@ public class MainActivity extends Activity {
     private String PERSONAL = "personal.txt";
     private Button mEnter = null;
     private boolean condition = false;
-    private String[] mStrings = {"J'accepte","Je refuse"};
+    private String[] mStrings = {"J'accepte", "Je refuse"};
 
 
     EditText pseudo = null;
@@ -54,7 +58,7 @@ public class MainActivity extends Activity {
             }
             if (input != null) {
                 input.close();
-                condition=true;
+                condition = true;
                 Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
                 startActivity(intent);
             }
@@ -131,24 +135,28 @@ public class MainActivity extends Activity {
          * S'ouvre seulement au permier lancement de l'application
          */
         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean agreed = sharedPreferences.getBoolean("agreed",false);
+        boolean agreed = sharedPreferences.getBoolean("agreed", false);
         if (!agreed) {
-            new AlertDialog.Builder(this)
-                    .setTitle("License agreement")
-                    // Specify the list array, the items to be selected by default (null for none),
-                    // and the listener through which to receive callbacks when items are selected
-                   .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            SharedPreferences.Editor editor = sharedPreferences.edit();
-                            editor.putBoolean("agreed", true);
-                            editor.commit();
-                            condition = true;
-                        }
-                    })
-                    .setNegativeButton("No", null)
-                    .setMessage("Le fichier.txt des conditions")
-                    .show();
+            try {
+                new AlertDialog.Builder(this)
+                        .setTitle("Conditions d'utilisation")
+                        // Specify the list array, the items to be selected by default (null for none),
+                        // and the listener through which to receive callbacks when items are selected
+                        .setPositiveButton("J'accepete", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                editor.putBoolean("agreed", true);
+                                editor.commit();
+                                condition = true;
+                            }
+                        })
+                        .setNegativeButton("Je refuse", null)
+                        .setMessage(readFile())
+                        .show();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
 
@@ -175,5 +183,25 @@ public class MainActivity extends Activity {
                 })
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();*/
+    }
+
+    private String readFile() throws IOException {
+        Scanner scanner = null;
+        String text = "";
+        InputStream inputStream = this.getAssets().open("LicenseAgreement.txt");
+        try {
+            scanner = new Scanner(inputStream);
+        } catch (Exception e) {
+            //Send error message.
+        }
+        if (scanner != null) {
+            while (scanner.hasNext()) {
+                String[] lines = scanner.nextLine().split("\t");
+                for (String line:lines) {
+                    text += line +"\n";
+                }
+            }
+        }
+        return text;
     }
 }
