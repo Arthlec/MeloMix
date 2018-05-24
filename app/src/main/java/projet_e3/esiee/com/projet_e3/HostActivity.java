@@ -44,20 +44,28 @@ public class HostActivity extends Activity {
         authToken = getIntent().getStringExtra("authToken");
         Log.i("authToken", authToken);
         requestData();
-        ImageView trackImage = findViewById(R.id.trackCover);
-        while(bmp == null) {
-            //Log.i("Statut", "L'image n'est pas chargée");
-        }
-        trackImage.setImageBitmap(bmp);
+        ImageView trackCover = findViewById(R.id.trackCover);
+        trackCover.setImageBitmap(bmp);
     }
 
-    public static void requestData() {
+    public void requestData() {
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
                 try {
                     URL trackURL = new URL(getTrackImage());
                     bmp = BitmapFactory.decodeStream(trackURL.openConnection().getInputStream());
+                    new Thread(new Runnable() {
+                        public void run() {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    ImageView trackCover = findViewById(R.id.trackCover);
+                                    trackCover.setImageBitmap(bmp);
+                                }
+                            });
+                        }
+                    }).start();
                 }
                 catch (Exception e) {
                     throw new RuntimeException(e);
