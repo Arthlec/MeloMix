@@ -1,7 +1,11 @@
 package projet_e3.esiee.com.projet_e3;
 
+import android.app.IntentService;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WpsInfo;
@@ -12,8 +16,12 @@ import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.AsyncTask;
 
+import android.os.Build;
+import android.os.Environment;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -27,14 +35,19 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 import java.lang.System;
+import java.util.Random;
+
+import static java.lang.Math.random;
 
 public class HostActivity extends AppCompatActivity {
 
@@ -264,13 +277,24 @@ public class HostActivity extends AppCompatActivity {
 
             }
         });
+        aManager.cancelConnect(aChannel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onFailure(int i) {
+
+            }
+        });
     }
 
     public TextView getTxtState() {
         return TxtState;
     }
 
-    public static class FileServerAsyncTask extends AsyncTask<Void,Void,String> {
+    /*public static class FileServerAsyncTask extends AsyncTask<Void,Void,String> {
 
         private Context context;
         private  Socket client;
@@ -288,7 +312,9 @@ public class HostActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(Void... params) {
             try {
+                if(serverSocket.isClosed()){
 
+                }
                 final File f = new File(context.getFilesDir(),theFile+".xml");
 
                 File dirs = new File(f.getParent());
@@ -302,6 +328,7 @@ public class HostActivity extends AppCompatActivity {
 
                 InputStream inputstream = client.getInputStream();
                 copyFile(inputstream, new FileOutputStream(f));
+                client.close();
                 serverSocket.close();
 
                 return f.getAbsolutePath();
@@ -319,6 +346,86 @@ public class HostActivity extends AppCompatActivity {
             if (result != null) {
                 Toast.makeText(context,"File copied - " + result,Toast.LENGTH_SHORT).show();
             }
+        }*/
+    public static class FileServerAsyncTask extends AsyncTask<String, String, String> {
+
+        //        private TextView statusText;
+        private Context mFilecontext;
+        private String Extension, Key;
+        private File EncryptedFile;
+        private long ReceivedFileLength;
+        private int PORT;
+
+        /**
+         * @param context
+         * @param port
+         */
+        public FileServerAsyncTask(Context context, int port) {
+            this.mFilecontext = context;
+            this.PORT = port;
+        }
+
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                ServerSocket serverSocket = new ServerSocket();
+                serverSocket.setReuseAddress(true);
+                serverSocket.bind(new InetSocketAddress(PORT));
+
+                Socket client = serverSocket.accept();
+                InputStream ois = client.getInputStream();
+                try {
+                    final File f = new File(mFilecontext.getFilesDir(), System.currentTimeMillis()+".xml");
+
+                    File dirs = new File(f.getParent());
+                    if (!dirs.exists())
+                        dirs.mkdirs();
+                    f.createNewFile();
+
+                    InputStream inputstream = client.getInputStream();
+
+                    copyFile(inputstream, new FileOutputStream(f));
+                    ois.close();
+                    serverSocket.close();
+                    this.EncryptedFile = f;
+                    return f.getAbsolutePath();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            } catch (IOException e) {
+                return null;
+            }
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+         */
+        @Override
+        protected void onPostExecute(String result) {
+            if (result != null) {
+
+                    Toast.makeText(mFilecontext,"File transmis"+result,Toast.LENGTH_SHORT).show();
+                    // /openFile(result, mFilecontext);
+                if (!TextUtils.isEmpty(result)) {
+                    /*
+                     * To initiate socket again we are intiating async task
+                     * in this condition.
+                     */
+                    FileServerAsyncTask FileServerobj = new
+                            FileServerAsyncTask(mFilecontext, FileTransferService.PORT);
+                    if (FileServerobj != null) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                            FileServerobj.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new String[]{null});
+
+                        } else FileServerobj.execute();
+                    }
+                }
+            }
+
         }
 
 
@@ -339,6 +446,42 @@ public class HostActivity extends AppCompatActivity {
 
             } catch (IOException e) {
                 Log.d("exp", e.toString());
+                return false;
+            }
+            return true;
+        }
+
+        public static boolean copyRecievedFile(InputStream inputStream,
+                                               OutputStream out, Long length) {
+
+            byte buf[] = new byte[FileTransferService.ByteSize];
+            byte Decryptedbuf[] = new byte[FileTransferService.ByteSize];
+            String Decrypted;
+            int len;
+            long total = 0;
+            int progresspercentage = 0;
+            try {
+                while ((len = inputStream.read(buf)) != -1) {
+                    try {
+                        out.write(buf, 0, len);
+                    } catch (Exception e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                    }
+                    try {
+                        total += len;
+                        if (length > 0) {
+                            progresspercentage = (int) ((total * 100) / length);
+                        }
+                    } catch (Exception e) {
+                        // TODO: handle exception
+                        e.printStackTrace();
+                    }
+                }
+                // dismiss progress after sending
+                out.close();
+                inputStream.close();
+            } catch (IOException e) {
                 return false;
             }
             return true;

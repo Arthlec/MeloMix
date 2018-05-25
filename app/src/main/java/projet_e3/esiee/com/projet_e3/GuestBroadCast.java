@@ -51,6 +51,7 @@ public class GuestBroadCast extends BroadcastReceiver {
             }
             else {
                 guestActivity.getTxtState().setText("Disconnected");
+               //manager.cancelConnect(channel, null);
             }
         }
         else if(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)){

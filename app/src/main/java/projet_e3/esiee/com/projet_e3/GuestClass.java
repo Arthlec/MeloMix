@@ -3,7 +3,13 @@ package projet_e3.esiee.com.projet_e3;
 import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Parcelable;
+import android.text.TextUtils;
+import android.util.Log;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,6 +17,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -29,36 +36,23 @@ public class GuestClass extends Thread {
     @SuppressLint("ResourceType")
     @Override
     public void run() {
-        byte[] buffer = new byte[8500];
-        try {
-            socket.bind(null);
-            socket.connect(new InetSocketAddress(HostAdd, 8988), 50000);
-            OutputStream outputStream = socket.getOutputStream();
-            outputStream.flush();
-            InputStream inputStream = null;
-            inputStream = context.getResources().openRawResource(R.drawable.ic_launcher_background);
 
-            int len;
-            assert inputStream != null;
-            while ((len = inputStream.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, len);
-            }
-            outputStream.flush();
-            outputStream.close();
-            inputStream.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (socket != null) {
-                if (socket.isConnected()) {
-                    try {
-                        socket.close();
-                    } catch (IOException e) {
-                        //catch logic
-                    }
-                }
+        Intent serviceIntent = new Intent(context, FileTransferService.class);
+        serviceIntent.setAction(FileTransferService.ACTION_SEND_FILE);
+        if (!TextUtils.isEmpty(HostAdd) && HostAdd.length() > 0) {
+            String host = null;
+            int sub_port = -1;
+            FileTransferService.PORT = 8988;
+            host = HostAdd;
+            sub_port = FileTransferService.PORT;
+            serviceIntent.putExtra(
+                        FileTransferService.EXTRAS_GROUP_OWNER_ADDRESS,
+                        HostAdd);
+
+            serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_PORT, FileTransferService.PORT);
+
+            if (host != null && sub_port != -1) {
+                context.startService(serviceIntent);
             }
         }
     }

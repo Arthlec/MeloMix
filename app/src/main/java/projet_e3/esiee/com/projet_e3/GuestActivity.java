@@ -13,6 +13,7 @@ import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -21,6 +22,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.util.ArrayList;
@@ -237,7 +241,41 @@ public class GuestActivity extends AppCompatActivity {
         unregisterReceiver(mReceiver);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        aManager.cancelConnect(aChannel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onFailure(int i) {
+
+            }
+        });
+    }
+
     public TextView getTxtState() {
         return TxtState;
+    }
+
+    public static boolean copyFile(InputStream inputStream, OutputStream out) {
+
+        byte[] buf = new byte[8500];
+
+        int len;
+        try {
+            while ((len = inputStream.read(buf)) != -1) {
+                out.write(buf, 0, len);
+            }
+            out.flush();
+            out.close();
+            inputStream.close();
+        } catch (IOException e) {
+            return false;
+        }
+        return true;
     }
 }

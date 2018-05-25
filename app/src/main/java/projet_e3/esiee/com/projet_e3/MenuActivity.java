@@ -1,5 +1,6 @@
 package projet_e3.esiee.com.projet_e3;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -8,11 +9,18 @@ import android.widget.Button;
 
 public class MenuActivity extends AppCompatActivity {
     Button Hbtn, Gbtn;
+    private static Context context;
+    public static synchronized Context getGlobalContext() {
+        return context;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
+        if (MenuActivity.context == null) {
+            MenuActivity.context = getApplicationContext();
+        }
         setWork();
         exqBtn();
 
