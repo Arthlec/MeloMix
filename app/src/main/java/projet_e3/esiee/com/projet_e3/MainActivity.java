@@ -12,13 +12,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -32,7 +30,6 @@ public class MainActivity extends Activity {
     private String PERSONAL = "personal.txt";
     private Button mEnter = null;
     private boolean condition = false;
-    private String[] mStrings = {"J'accepte", "Je refuse"};
 
 
     EditText pseudo = null;
@@ -158,31 +155,6 @@ public class MainActivity extends Activity {
                 e.printStackTrace();
             }
         }
-
-
-        /*AlertDialog.Builder builder;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);
-        } else {
-            builder = new AlertDialog.Builder(this);
-        }
-        builder.setTitle("Conditions d'utilisation")
-                .setMessage("Plein de conditions.txt")
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // L'utilisateur accepte les conditions
-                        condition = true;
-                    }
-                })
-                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // L'utilisateur n'accepte pas les conditions
-                        Toast.makeText(MainActivity.this, "Vous ne pouvez utilisé l'application Smooth-i si vous n'accepetez les conditions d'utilisations", Toast.LENGTH_LONG).show();
-                        condition = false;
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();*/
     }
 
     private String readFile() throws IOException {

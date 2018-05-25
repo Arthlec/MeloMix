@@ -4,8 +4,10 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
 import android.widget.Toast;
 
 import com.fasterxml.jackson.jr.ob.JSON;
@@ -45,6 +47,7 @@ public class LoginActivitySpotify extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.login_spotify_activity);
 
         AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID, AuthenticationResponse.Type.TOKEN, REDIRECT_URI).setShowDialog(true);
         builder.setScopes(new String[]{"user-top-read", "user-library-read", "playlist-read-private"});
@@ -69,15 +72,18 @@ public class LoginActivitySpotify extends Activity {
                     authToken = response.getAccessToken();
                     requestData();
                     ProfileActivity.isLoggedInSpotify = true;
-                    while(!asyncTaskIsDone){
-                        try { Thread.sleep(100); }
-                        catch (InterruptedException e) { e.printStackTrace(); }
+                    while (!asyncTaskIsDone) {
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
-                    Toast.makeText(LoginActivitySpotify.this,"Connexion réussie", Toast.LENGTH_LONG).show();
+                    Toast.makeText(LoginActivitySpotify.this, "Connexion réussie", Toast.LENGTH_LONG).show();
 
                     Bundle extras = new Bundle();
                     extras.putString("userName", LoginActivitySpotify.userName);
-                    extras.putSerializable("userGenres",LoginActivitySpotify.userGenres);
+                    extras.putSerializable("userGenres", LoginActivitySpotify.userGenres);
                     getBackToMainActivity.putExtras(extras);
                     startActivity(getBackToMainActivity);
                     break;
@@ -86,7 +92,7 @@ public class LoginActivitySpotify extends Activity {
                 case ERROR:
                     // Handle error response
                     AuthenticationClient.stopLoginActivity(LoginActivitySpotify.this, REQUEST_CODE);
-                    Toast.makeText(LoginActivitySpotify.this,"Erreur de connexion", Toast.LENGTH_LONG).show();
+                    Toast.makeText(LoginActivitySpotify.this, "Erreur de connexion", Toast.LENGTH_LONG).show();
                     Log.i("Connection", "ERROR");
                     startActivity(getBackToMainActivity);
                     break;
@@ -95,7 +101,7 @@ public class LoginActivitySpotify extends Activity {
                 default:
                     // Handle other cases
                     AuthenticationClient.stopLoginActivity(LoginActivitySpotify.this, REQUEST_CODE);
-                    Toast.makeText(LoginActivitySpotify.this,"Connexion annulée", Toast.LENGTH_LONG).show();
+                    Toast.makeText(LoginActivitySpotify.this, "Connexion annulée", Toast.LENGTH_LONG).show();
                     Log.i("Connection", "Cancelled");
                     startActivity(getBackToMainActivity);
             }
@@ -118,18 +124,18 @@ public class LoginActivitySpotify extends Activity {
 
                     getArtistsStack("https://api.spotify.com/v1/me/tracks?limit=50&offset=0");
 
-                    for(int i=0; i<playlistsURLs.length; i++) {
-                        if(playlistsURLs[i] != null) {
+                    for (int i = 0; i < playlistsURLs.length; i++) {
+                        if (playlistsURLs[i] != null) {
                             getArtistsStack(playlistsURLs[i]);
                         }
                     }
 
-                    if(!artistsIDStack.isEmpty()){
-                        int requestsNumber = artistsIDStack.size()/50;
-                        for (int j=0; j<=requestsNumber; j++) {
+                    if (!artistsIDStack.isEmpty()) {
+                        int requestsNumber = artistsIDStack.size() / 50;
+                        for (int j = 0; j <= requestsNumber; j++) {
                             String severalIDS = artistsIDStack.pop().toString();
-                            for (int artistsCounter=0; artistsCounter<49; artistsCounter++) {
-                                if(artistsIDStack.size() == 0) break;
+                            for (int artistsCounter = 0; artistsCounter < 49; artistsCounter++) {
+                                if (artistsIDStack.size() == 0) break;
                                 severalIDS = severalIDS + "%2C" + artistsIDStack.pop().toString();
                             }
                             getMusicGenreList(severalIDS);
@@ -156,11 +162,11 @@ public class LoginActivitySpotify extends Activity {
                 // Create connection
                 HttpsURLConnection myConnection;
                 String waitTime;
-                do{
+                do {
                     myConnection = (HttpsURLConnection) spotifyEndpoint.openConnection();
                     myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
                     waitTime = myConnection.getHeaderField("Retry-After");
-                    if(waitTime != null){
+                    if (waitTime != null) {
                         int waitTimeSeconds = Integer.parseInt(waitTime);
                         try {
                             Thread.sleep(waitTimeSeconds * 1000);
@@ -169,7 +175,7 @@ public class LoginActivitySpotify extends Activity {
                         }
                         Log.i("WaitTime", waitTime);
                     }
-                }while(waitTime != null);
+                } while (waitTime != null);
 
                 if (myConnection.getResponseCode() == 200) {
                     // Success
@@ -194,11 +200,11 @@ public class LoginActivitySpotify extends Activity {
                 // Create connection
                 HttpsURLConnection myConnection;
                 String waitTime;
-                do{
+                do {
                     myConnection = (HttpsURLConnection) spotifyEndpoint.openConnection();
                     myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
                     waitTime = myConnection.getHeaderField("Retry-After");
-                    if(waitTime != null){
+                    if (waitTime != null) {
                         int waitTimeSeconds = Integer.parseInt(waitTime);
                         try {
                             Thread.sleep(waitTimeSeconds * 1000);
@@ -207,7 +213,7 @@ public class LoginActivitySpotify extends Activity {
                         }
                         Log.i("WaitTime", waitTime);
                     }
-                }while(waitTime != null);
+                } while (waitTime != null);
 
                 if (myConnection.getResponseCode() == 200) {
                     // Success
@@ -219,9 +225,9 @@ public class LoginActivitySpotify extends Activity {
                     int playlistNumber = root.get("items").size();
                     String[] playlistURLsList = new String[playlistNumber];
                     String regex = "\\S+" + userName + "\\S+";
-                    for (int i=0; i<playlistNumber; i++) {
+                    for (int i = 0; i < playlistNumber; i++) {
                         JrsString playlistURL = (JrsString) root.get("items").get(i).get("tracks").get("href");
-                        if(playlistURL.asText().matches(regex)) {
+                        if (playlistURL.asText().matches(regex)) {
                             Log.i("Playlist_URL", playlistURL.asText());
                             JrsNumber totalPlaylistTracks = (JrsNumber) root.get("items").get(i).get("tracks").get("total");
                             Log.i("Nombre de musiques", totalPlaylistTracks.asText());
@@ -236,6 +242,7 @@ public class LoginActivitySpotify extends Activity {
                     return null;
                 }
             }
+
             private Stack getArtistsStack(String tracksURL) throws IOException {
                 // Create URL
                 URL spotifyEndpoint = new URL(tracksURL);
@@ -243,11 +250,11 @@ public class LoginActivitySpotify extends Activity {
                 // Create connection
                 HttpsURLConnection myConnection;
                 String waitTime;
-                do{
+                do {
                     myConnection = (HttpsURLConnection) spotifyEndpoint.openConnection();
                     myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
                     waitTime = myConnection.getHeaderField("Retry-After");
-                    if(waitTime != null){
+                    if (waitTime != null) {
                         int waitTimeSeconds = Integer.parseInt(waitTime);
                         try {
                             Thread.sleep(waitTimeSeconds * 1000);
@@ -256,7 +263,7 @@ public class LoginActivitySpotify extends Activity {
                         }
                         Log.i("WaitTime", waitTime);
                     }
-                }while(waitTime != null);
+                } while (waitTime != null);
 
                 if (myConnection.getResponseCode() == 200) {
                     // Success
@@ -265,18 +272,18 @@ public class LoginActivitySpotify extends Activity {
                     TreeNode root = json.treeFrom(responseBody);
                     assertTrue(root.isObject());
                     int tracksNumber = root.get("items").size();
-                    for (int i=0; i<tracksNumber; i++) {
+                    for (int i = 0; i < tracksNumber; i++) {
                         int artistsNumber = root.get("items").get(i).get("track").get("artists").size();
-                        for (int j=0; j<artistsNumber; j++) {
+                        for (int j = 0; j < artistsNumber; j++) {
                             JrsString artistID = (JrsString) root.get("items").get(i).get("track").get("artists").get(j).get("id");
-                            if(artistID != null) {
+                            if (artistID != null) {
                                 artistsIDStack.push(artistID.asText());
                             }
                         }
                     }
                     myConnection.disconnect();
                     JrsString nextTracksID = (JrsString) root.get("next");
-                    if(nextTracksID != null) {
+                    if (nextTracksID != null) {
                         getArtistsStack(nextTracksID.asText());
                         Log.i("nextTracksID", nextTracksID.asText());
                     }
@@ -286,6 +293,7 @@ public class LoginActivitySpotify extends Activity {
                     return null;
                 }
             }
+
             private void getMusicGenreList(String artistID) throws IOException {
                 // Create URL
                 URL spotifyEndpoint = new URL("https://api.spotify.com/v1/artists?ids=" + artistID);
@@ -293,11 +301,11 @@ public class LoginActivitySpotify extends Activity {
                 // Create connection
                 HttpsURLConnection myConnection;
                 String waitTime;
-                do{
+                do {
                     myConnection = (HttpsURLConnection) spotifyEndpoint.openConnection();
                     myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
                     waitTime = myConnection.getHeaderField("Retry-After");
-                    if(waitTime != null){
+                    if (waitTime != null) {
                         int waitTimeSeconds = Integer.parseInt(waitTime);
                         try {
                             Thread.sleep(waitTimeSeconds * 1000);
@@ -306,7 +314,7 @@ public class LoginActivitySpotify extends Activity {
                         }
                         Log.i("WaitTime", waitTime);
                     }
-                }while(waitTime != null);
+                } while (waitTime != null);
 
                 if (myConnection.getResponseCode() == 200) {
                     // Success
@@ -315,10 +323,10 @@ public class LoginActivitySpotify extends Activity {
                     TreeNode root = json.treeFrom(responseBody);
                     assertTrue(root.isObject());
                     int artistsNumber = root.get("artists").size();
-                    for (int i=0; i<artistsNumber; i++) {
+                    for (int i = 0; i < artistsNumber; i++) {
                         int genresNumber = root.get("artists").get(i).get("genres").size();
                         if (genresNumber != 0) {
-                            for (int j=0; j<genresNumber; j++) {
+                            for (int j = 0; j < genresNumber; j++) {
                                 JrsString genre = (JrsString) root.get("artists").get(i).get("genres").get(j);
                                 genresStack.push(genre.asText());
                             }
@@ -338,11 +346,11 @@ public class LoginActivitySpotify extends Activity {
                 // Create connection
                 HttpsURLConnection myConnection;
                 String waitTime;
-                do{
+                do {
                     myConnection = (HttpsURLConnection) spotifyEndpoint.openConnection();
                     myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
                     waitTime = myConnection.getHeaderField("Retry-After");
-                    if(waitTime != null){
+                    if (waitTime != null) {
                         int waitTimeSeconds = Integer.parseInt(waitTime);
                         try {
                             Thread.sleep(waitTimeSeconds * 1000);
@@ -351,7 +359,7 @@ public class LoginActivitySpotify extends Activity {
                         }
                         Log.i("WaitTime", waitTime);
                     }
-                }while(waitTime != null);
+                } while (waitTime != null);
 
                 if (myConnection.getResponseCode() == 200) {
                     // Success
@@ -362,11 +370,11 @@ public class LoginActivitySpotify extends Activity {
                     assertTrue(root.isObject());
                     int artistsNumber = root.get("items").size();
                     Log.i("Top_Artists_Number", "" + artistsNumber);
-                    for (int i=0; i<artistsNumber; i++) {
+                    for (int i = 0; i < artistsNumber; i++) {
                         int topGenresNumber = root.get("items").get(i).get("genres").size();
                         Log.i("Top_Genres_Number", "" + topGenresNumber);
                         if (topGenresNumber != 0) {
-                            for (int j=0; j<topGenresNumber; j++) {
+                            for (int j = 0; j < topGenresNumber; j++) {
                                 JrsString genre = (JrsString) root.get("items").get(i).get("genres").get(j);
                                 Log.i("Genre", genre.asText());
                                 topGenresStack.push(genre.asText());
@@ -387,30 +395,28 @@ public class LoginActivitySpotify extends Activity {
                 float topGenresPercentage = 40;
                 float classicGenresWeight = (totalGenresNumber * (100 - topGenresPercentage) / 100) / genresStack.size();
                 float topGenresWeight = (totalGenresNumber * topGenresPercentage / 100) / topGenresStack.size();
-                for (int i=0; i<genresNumber; i++) {
+                for (int i = 0; i < genresNumber; i++) {
                     String selectedGenre = genresStack.pop().toString();
                     if (genresHashMap.containsKey(selectedGenre)) {
                         float selectedGenreNumber = genresHashMap.get(selectedGenre);
                         genresHashMap.put(selectedGenre, selectedGenreNumber + classicGenresWeight);
-                    }
-                    else {
+                    } else {
                         genresHashMap.put(selectedGenre, classicGenresWeight);
                     }
                 }
-                for (int j=0; j<topGenresNumber; j++) {
+                for (int j = 0; j < topGenresNumber; j++) {
                     String selectedTopGenre = topGenresStack.pop().toString();
                     if (genresHashMap.containsKey(selectedTopGenre)) {
                         float selectedGenreNumber = genresHashMap.get(selectedTopGenre);
-                        genresHashMap.put(selectedTopGenre,selectedGenreNumber + topGenresWeight);
-                    }
-                    else {
+                        genresHashMap.put(selectedTopGenre, selectedGenreNumber + topGenresWeight);
+                    } else {
                         genresHashMap.put(selectedTopGenre, topGenresWeight);
                     }
                 }
                 Set keys = genresHashMap.keySet();
                 Object[] keysArray = keys.toArray();
                 float genresSum = 0;
-                for (int i=0; i<keysArray.length; i++) {
+                for (int i = 0; i < keysArray.length; i++) {
                     float selectedGenreNumber = genresHashMap.get(keysArray[i].toString());
                     genresHashMap.put(keysArray[i].toString(), selectedGenreNumber / totalGenresNumber);
                     genresSum = genresSum + selectedGenreNumber / totalGenresNumber;
@@ -423,11 +429,11 @@ public class LoginActivitySpotify extends Activity {
         });
     }
 
-    private static void setUserName(String userName){
+    private static void setUserName(String userName) {
         LoginActivitySpotify.userName = userName;
     }
 
-    private static void setGenres(HashMap<String, Float> userGenres){
+    private static void setGenres(HashMap<String, Float> userGenres) {
         LoginActivitySpotify.userGenres = userGenres;
     }
 }
