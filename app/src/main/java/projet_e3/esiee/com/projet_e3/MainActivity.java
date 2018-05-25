@@ -8,7 +8,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -160,7 +159,7 @@ public class MainActivity extends Activity {
     private String readFile() throws IOException {
         Scanner scanner = null;
         String text = "";
-        InputStream inputStream = this.getAssets().open("LicenseAgreement.txt");
+        InputStream inputStream = this.getResources().openRawResource(R.raw.license_agreement);
         try {
             scanner = new Scanner(inputStream);
         } catch (Exception e) {
