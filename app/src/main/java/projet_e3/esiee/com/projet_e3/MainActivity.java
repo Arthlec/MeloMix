@@ -138,7 +138,7 @@ public class MainActivity extends Activity {
                         .setTitle("Conditions d'utilisation")
                         // Specify the list array, the items to be selected by default (null for none),
                         // and the listener through which to receive callbacks when items are selected
-                        .setPositiveButton("J'accepete", new DialogInterface.OnClickListener() {
+                        .setPositiveButton("J'accepte", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 SharedPreferences.Editor editor = sharedPreferences.edit();
