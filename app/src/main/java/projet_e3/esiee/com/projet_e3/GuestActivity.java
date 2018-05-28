@@ -8,16 +8,13 @@ import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
-import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,9 +28,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GuestActivity extends AppCompatActivity {
-    private Button buttonOnOff, buttonDisco, btnSend;
+
     private ListView listView;
-    private TextView TxtState, TxtMsg, TxtKiKi;
+    private TextView TxtKiKi;
 
     private WifiManager wifiManager;
     private WifiP2pManager aManager;
@@ -48,7 +45,6 @@ public class GuestActivity extends AppCompatActivity {
 
     private final WifiP2pConfig config = new WifiP2pConfig();
 
-    private HostClass hostClass;
     private GuestClass guestClass;
 
     @Override
@@ -60,39 +56,6 @@ public class GuestActivity extends AppCompatActivity {
     }
 
     private void exqWork(){
-        buttonOnOff.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(wifiManager.isWifiEnabled()){
-                    wifiManager.setWifiEnabled(false);
-                    buttonOnOff.setText("TURN ON");
-                    TxtKiKi.setText(" ");
-                }
-                else {
-                    wifiManager.setWifiEnabled(true);
-                    buttonOnOff.setText("TURN OFF");
-                    TxtKiKi.setText(" ");
-                }
-            }
-        });
-
-        buttonDisco.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                aManager.discoverPeers(aChannel, new WifiP2pManager.ActionListener() {
-                    @Override
-                    public void onSuccess() {
-                        TxtState.setText("Discovery Started");
-                    }
-
-                    @Override
-                    public void onFailure(int reason) {
-                        TxtState.setText("Discovery Failed");
-                    }
-                });
-            }
-        });
-
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int i, long id) {
@@ -120,11 +83,11 @@ public class GuestActivity extends AppCompatActivity {
     private void deletePersistentGroup(){
         try {
             Method[] methods = WifiP2pManager.class.getMethods();
-            for (int i = 0; i < methods.length; i++) {
-                if (methods[i].getName().equals("deletePersistentGroup")) {
+            for (Method method : methods) {
+                if (method.getName().equals("deletePersistentGroup")) {
                     // Delete any persistent group
                     for (int netid = 0; netid < 32; netid++) {
-                        methods[i].invoke(aManager, aChannel, netid, null);
+                        method.invoke(aManager, aChannel, netid, null);
                     }
                 }
             }
@@ -134,45 +97,35 @@ public class GuestActivity extends AppCompatActivity {
     }
 
     private void work() {
-        buttonOnOff =(Button) findViewById(R.id.onOff);
-        buttonDisco = findViewById(R.id.button2);
-        listView = findViewById(R.id.ListTamere);
-        TxtMsg = findViewById(R.id.msg_b);
-        TxtState = findViewById(R.id.status_b);
-        TxtKiKi = findViewById(R.id.KieKi);
-        btnSend = findViewById(R.id.send);
-        btnSend.setText("SHARE TASTE");
-        btnSend.setEnabled(false);
-
-        buttonDisco.setText("DISCOVER");
 
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         aManager = (WifiP2pManager) getApplicationContext().getSystemService(Context.WIFI_P2P_SERVICE);
         aChannel = aManager.initialize(this,getMainLooper(),null);
+
         deletePersistentGroup();
         aManager.removeGroup(aChannel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
-
+                Toast.makeText(getApplicationContext(), "success suppro", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFailure(int i) {
-
+                Toast.makeText(getApplicationContext(), "fail suppr", Toast.LENGTH_SHORT).show();
             }
         });
+
         config.groupOwnerIntent = 0;
 
-        if (wifiManager.isWifiEnabled()){
-            buttonOnOff.setText("WIFI is ON");
-        }
-        else    {
-            buttonOnOff.setText("WIFI is OFF");
-        }
-
-        mReceiver = new GuestBroadCast(aManager,aChannel,this);
+        mReceiver = new BroadCast(aManager,aChannel,this,null,wifiManager);
         mIntent = new IntentFilter();
         setAction();
+        this.discover();
+
+        listView = findViewById(R.id.HostList);
+        TxtKiKi = findViewById(R.id.KieKi);
+
+
     }
 
     public void setAction(){
@@ -193,12 +146,12 @@ public class GuestActivity extends AppCompatActivity {
                 int index =0;
                 for(WifiP2pDevice device : peersDevice.getDeviceList())
                 {
-                   // if(device.isGroupOwner())
+                   //if(device.isGroupOwner())
                    // {
                     deviceName[index] = device.deviceName;
                     deviceArray[index] = device;
-                  //  }
                     index++;
+                   // }
                 }
                 if(deviceName.length != 0) {
                     hAdapter = new ArrayAdapter<String>(listView.getContext(), android.R.layout.simple_list_item_1, deviceName);
@@ -206,8 +159,7 @@ public class GuestActivity extends AppCompatActivity {
                 }
             }
             if (peers.isEmpty()) {
-                Toast.makeText(getApplicationContext(), "No devices found", Toast.LENGTH_SHORT).show();
-                return;
+                Toast.makeText(getApplicationContext(), "Aucun appareil à proximité", Toast.LENGTH_SHORT).show();
             }
         }
     };
@@ -219,16 +171,41 @@ public class GuestActivity extends AppCompatActivity {
             if (info.groupFormed && !info.isGroupOwner) {
                 TxtKiKi.setText("Guest");
                 guestClass = new GuestClass(groupOwnerAdress, getApplicationContext());
-                btnSend.setEnabled(true);
-                btnSend.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        guestClass.start();
-                    }
-                });
+                guestClass.start();
             }
         }
     };
+    public void discover(){
+        aManager.discoverPeers(aChannel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(getApplicationContext(), "success disco", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(int reason){
+                Toast.makeText(getApplicationContext(), "fail disco", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    public static boolean copyFile(InputStream inputStream, OutputStream out) {
+
+        byte[] buf = new byte[8500];
+
+        int len;
+        try {
+            while ((len = inputStream.read(buf)) != -1) {
+                out.write(buf, 0, len);
+            }
+            out.flush();
+            out.close();
+            inputStream.close();
+        } catch (IOException e) {
+            return false;
+        }
+        return true;
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -257,25 +234,4 @@ public class GuestActivity extends AppCompatActivity {
         });
     }
 
-    public TextView getTxtState() {
-        return TxtState;
-    }
-
-    public static boolean copyFile(InputStream inputStream, OutputStream out) {
-
-        byte[] buf = new byte[8500];
-
-        int len;
-        try {
-            while ((len = inputStream.read(buf)) != -1) {
-                out.write(buf, 0, len);
-            }
-            out.flush();
-            out.close();
-            inputStream.close();
-        } catch (IOException e) {
-            return false;
-        }
-        return true;
-    }
 }

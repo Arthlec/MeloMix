@@ -1,11 +1,7 @@
 package projet_e3.esiee.com.projet_e3;
 
-import android.app.IntentService;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WpsInfo;
@@ -17,16 +13,12 @@ import android.net.wifi.p2p.WifiP2pManager;
 import android.os.AsyncTask;
 
 import android.os.Build;
-import android.os.Environment;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,25 +27,20 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 import java.lang.System;
 import java.util.Random;
 
-import static java.lang.Math.random;
-
 public class HostActivity extends AppCompatActivity {
 
-    private Button buttonOnOff, buttonDisco;
     private ListView listView;
-    private TextView TxtState, TxtMsg, TxtKiKi;
+    private TextView TxtStatus;
 
     private WifiManager wifiManager;
     private WifiP2pManager aManager;
@@ -61,16 +48,13 @@ public class HostActivity extends AppCompatActivity {
     private BroadcastReceiver mReceiver;
     private IntentFilter mIntent;
 
-    private List<WifiP2pDevice> peers = new ArrayList<WifiP2pDevice>();
+    private List<WifiP2pDevice> peers = new ArrayList<>();
     private ArrayAdapter<String> hAdapter;
     private String[] deviceName;
     private WifiP2pDevice[] deviceArray;
     private final WifiP2pConfig config = new WifiP2pConfig();
 
     private HostClass hostClass;
-    private GuestClass guestClass;
-
-    private String FileName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,36 +65,6 @@ public class HostActivity extends AppCompatActivity {
     }
 
     private void exqWork() {
-        buttonOnOff.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(wifiManager.isWifiEnabled()){
-                    wifiManager.setWifiEnabled(false);
-                    buttonOnOff.setText("TURN ON");
-                }
-                else {
-                    wifiManager.setWifiEnabled(true);
-                    buttonOnOff.setText("TURN OFF");
-                }
-            }
-        });
-
-        buttonDisco.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                aManager.discoverPeers(aChannel, new WifiP2pManager.ActionListener() {
-                    @Override
-                    public void onSuccess() {
-                        TxtState.setText("Discovery Started");
-                    }
-
-                    @Override
-                    public void onFailure(int reason) {
-                        TxtState.setText("Discovery Failed");
-                    }
-                });
-            }
-        });
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -137,11 +91,10 @@ public class HostActivity extends AppCompatActivity {
     private void deletePersistentGroup(){
         try {
             Method[] methods = WifiP2pManager.class.getMethods();
-            for (int i = 0; i < methods.length; i++) {
-                if (methods[i].getName().equals("deletePersistentGroup")) {
-                    // Delete any persistent group
+            for (Method method : methods) {
+                if (method.getName().equals("deletePersistentGroup")) {
                     for (int netid = 0; netid < 32; netid++) {
-                        methods[i].invoke(aManager, aChannel, netid, null);
+                        method.invoke(aManager, aChannel, netid, null);
                     }
                 }
             }
@@ -151,57 +104,40 @@ public class HostActivity extends AppCompatActivity {
     }
 
     private void work() {
-        buttonOnOff =(Button) findViewById(R.id.onOff);
-        buttonDisco = findViewById(R.id.button2);
-        listView = findViewById(R.id.ListTamere);
-        TxtMsg = findViewById(R.id.msg_b);
-        TxtState = findViewById(R.id.status_b);
-        TxtKiKi = findViewById(R.id.KieKi);
 
-        buttonDisco.setText("DISCOVER");
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        assert wifiManager != null;
+        if(!wifiManager.isWifiEnabled()){
+            wifiManager.setWifiEnabled(true);
+        }
         aManager = (WifiP2pManager) getApplicationContext().getSystemService(Context.WIFI_P2P_SERVICE);
         aChannel = aManager.initialize(this,getMainLooper(),null);
+
         deletePersistentGroup();
         aManager.removeGroup(aChannel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
-
+                Toast.makeText(getApplicationContext(),"Remove S",Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFailure(int i) {
-
+                Toast.makeText(getApplicationContext(),"Remove F "+ i,Toast.LENGTH_SHORT).show();
             }
         });
 
         config.groupOwnerIntent = 15;
 
-
-        if (wifiManager.isWifiEnabled()){
-            buttonOnOff.setText("WIFI is ON");
-            TxtKiKi.setText(" ");
-        }
-        else    {
-            buttonOnOff.setText("WIFI is OFF");
-            TxtKiKi.setText(" ");
-        }
-
-        mReceiver = new HostBroadCast(aManager,aChannel,this);
+        mReceiver = new BroadCast(aManager,aChannel,null,this,wifiManager);
         mIntent = new IntentFilter();
         setAction();
 
-        aManager.createGroup(aChannel, new WifiP2pManager.ActionListener() {
-            @Override
-            public void onSuccess() {
-                Toast.makeText(getApplicationContext(),"Group create ", Toast.LENGTH_SHORT).show();
-            }
+        this.createGrp();
 
-            @Override
-            public void onFailure(int i) {
-                Toast.makeText(getApplicationContext(),"Fail create group ", Toast.LENGTH_SHORT).show();
-            }
-        });
+        listView = findViewById(R.id.HostList);
+        TxtStatus = findViewById(R.id.KieKi);
+
+        //this.discover();
 
     }
 
@@ -226,15 +162,15 @@ public class HostActivity extends AppCompatActivity {
                     //if(!device.isGroupOwner()) {
                         deviceName[index] = device.deviceName;
                         deviceArray[index] = device;
+                        index++;
                     //}
-                    index++;
+
                 }
-                hAdapter = new ArrayAdapter<String>(listView.getContext(),android.R.layout.simple_list_item_1,deviceName);
+                hAdapter = new ArrayAdapter<>(listView.getContext(), android.R.layout.simple_list_item_1, deviceName);
                 listView.setAdapter(hAdapter);
             }
             if (peers.isEmpty()) {
                 Toast.makeText(getApplicationContext(), "No devices found", Toast.LENGTH_SHORT).show();
-                return;
             }
         }
     };
@@ -243,13 +179,35 @@ public class HostActivity extends AppCompatActivity {
         @Override
         public void onConnectionInfoAvailable(WifiP2pInfo info) {
             if(info.groupFormed && info.isGroupOwner){
-                TxtKiKi.setText("Host");
-                FileName = String.valueOf(System.currentTimeMillis());
-                hostClass = new HostClass(getApplicationContext(), FileName);
+                TxtStatus.setText("Host");
+                hostClass = new HostClass(getApplicationContext());
                 hostClass.start();
             }
         }
     };
+
+    public void discover(){
+        aManager.discoverPeers(aChannel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(getApplicationContext(), "Succeed disco", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(int reason){
+                Toast.makeText(getApplicationContext(), "Fail disco", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    public void createGrp(){
+        aManager.createGroup(aChannel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {Toast.makeText(getApplicationContext(), "Succeed create", Toast.LENGTH_SHORT).show(); }
+
+            @Override
+            public void onFailure(int i) {Toast.makeText(getApplicationContext(), "fail creat", Toast.LENGTH_SHORT).show(); }
+        });
+    }
 
     @Override
     protected void onResume() {
@@ -290,76 +248,12 @@ public class HostActivity extends AppCompatActivity {
         });
     }
 
-    public TextView getTxtState() {
-        return TxtState;
-    }
-
-    /*public static class FileServerAsyncTask extends AsyncTask<Void,Void,String> {
-
-        private Context context;
-        private  Socket client;
-        private ServerSocket serverSocket;
-        private  String theFile;
-        private HostClass host;
-
-        public FileServerAsyncTask(Context context, Socket soc,ServerSocket serv, String file) {
-            this.context = context;
-            this.client = soc;
-            this.serverSocket = serv;
-            this.theFile = file;
-        }
-
-        @Override
-        protected String doInBackground(Void... params) {
-            try {
-                if(serverSocket.isClosed()){
-
-                }
-                final File f = new File(context.getFilesDir(),theFile+".xml");
-
-                File dirs = new File(f.getParent());
-                if (!dirs.exists()){
-                    dirs.mkdirs();
-                }
-                f.createNewFile();
-
-                f.setReadable(true,true);
-                f.setWritable(true,true);
-
-                InputStream inputstream = client.getInputStream();
-                copyFile(inputstream, new FileOutputStream(f));
-                client.close();
-                serverSocket.close();
-
-                return f.getAbsolutePath();
-            } catch (SocketException e){
-                e.getMessage();
-                return  null;
-            } catch (IOException e) {
-                e.getMessage();
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            if (result != null) {
-                Toast.makeText(context,"File copied - " + result,Toast.LENGTH_SHORT).show();
-            }
-        }*/
     public static class FileServerAsyncTask extends AsyncTask<String, String, String> {
 
-        //        private TextView statusText;
+
         private Context mFilecontext;
-        private String Extension, Key;
-        private File EncryptedFile;
-        private long ReceivedFileLength;
         private int PORT;
 
-        /**
-         * @param context
-         * @param port
-         */
         public FileServerAsyncTask(Context context, int port) {
             this.mFilecontext = context;
             this.PORT = port;
@@ -374,9 +268,10 @@ public class HostActivity extends AppCompatActivity {
                 serverSocket.bind(new InetSocketAddress(PORT));
 
                 Socket client = serverSocket.accept();
-                InputStream ois = client.getInputStream();
+
                 try {
-                    final File f = new File(mFilecontext.getFilesDir(), System.currentTimeMillis()+".xml");
+                    Random random = new Random();
+                    final File f = new File(mFilecontext.getFilesDir(), String.valueOf(random.nextInt(100))+String.valueOf(System.currentTimeMillis())+String.valueOf(random.nextInt(100))+".json");
 
                     File dirs = new File(f.getParent());
                     if (!dirs.exists())
@@ -386,9 +281,8 @@ public class HostActivity extends AppCompatActivity {
                     InputStream inputstream = client.getInputStream();
 
                     copyFile(inputstream, new FileOutputStream(f));
-                    ois.close();
+
                     serverSocket.close();
-                    this.EncryptedFile = f;
                     return f.getAbsolutePath();
 
                 } catch (Exception e) {
@@ -400,29 +294,19 @@ public class HostActivity extends AppCompatActivity {
             }
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-         */
         @Override
         protected void onPostExecute(String result) {
             if (result != null) {
 
                     Toast.makeText(mFilecontext,"File transmis"+result,Toast.LENGTH_SHORT).show();
-                    // /openFile(result, mFilecontext);
+
                 if (!TextUtils.isEmpty(result)) {
-                    /*
-                     * To initiate socket again we are intiating async task
-                     * in this condition.
-                     */
+
                     FileServerAsyncTask FileServerobj = new
                             FileServerAsyncTask(mFilecontext, FileTransferService.PORT);
-                    if (FileServerobj != null) {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                            FileServerobj.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new String[]{null});
-
-                        } else FileServerobj.execute();
-                    }
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                        FileServerobj.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new String[]{null});
+                    } else FileServerobj.execute();
                 }
             }
 
@@ -433,52 +317,10 @@ public class HostActivity extends AppCompatActivity {
 
             byte buf[] = new byte[8500];
             int len;
-            long startTime=System.currentTimeMillis();
-
             try {
                 while ((len = inputStream.read(buf)) != -1) {
                     out.write(buf, 0, len);
                 }
-                out.close();
-                inputStream.close();
-                long endTime=System.currentTimeMillis()-startTime;
-                Log.v("","Time taken to transfer all bytes is : "+endTime);
-
-            } catch (IOException e) {
-                Log.d("exp", e.toString());
-                return false;
-            }
-            return true;
-        }
-
-        public static boolean copyRecievedFile(InputStream inputStream,
-                                               OutputStream out, Long length) {
-
-            byte buf[] = new byte[FileTransferService.ByteSize];
-            byte Decryptedbuf[] = new byte[FileTransferService.ByteSize];
-            String Decrypted;
-            int len;
-            long total = 0;
-            int progresspercentage = 0;
-            try {
-                while ((len = inputStream.read(buf)) != -1) {
-                    try {
-                        out.write(buf, 0, len);
-                    } catch (Exception e1) {
-                        // TODO Auto-generated catch block
-                        e1.printStackTrace();
-                    }
-                    try {
-                        total += len;
-                        if (length > 0) {
-                            progresspercentage = (int) ((total * 100) / length);
-                        }
-                    } catch (Exception e) {
-                        // TODO: handle exception
-                        e.printStackTrace();
-                    }
-                }
-                // dismiss progress after sending
                 out.close();
                 inputStream.close();
             } catch (IOException e) {
