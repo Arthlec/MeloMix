@@ -2,6 +2,7 @@ package projet_e3.esiee.com.projet_e3;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -10,7 +11,7 @@ import android.widget.Toast;
 
 
 
-public class GuestActivity extends Activity {
+public class GuestActivity extends AppCompatActivity {
 
     ListView hostList = null;
 

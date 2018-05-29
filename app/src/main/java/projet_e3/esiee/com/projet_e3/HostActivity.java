@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.media.Image;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -31,7 +32,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 import static junit.framework.Assert.assertTrue;
 
-public class HostActivity extends Activity {
+public class HostActivity extends AppCompatActivity {
 
     ListView userList = null;
     private static Bitmap bmp;

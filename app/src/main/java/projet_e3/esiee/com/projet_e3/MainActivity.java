@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -23,7 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Scanner;
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
 
     private String defaut = "Veuillez entrer un pseudo valide";
     private String PERSONAL = "personal.txt";
@@ -138,7 +139,7 @@ public class MainActivity extends Activity {
                         .setTitle("Conditions d'utilisation")
                         // Specify the list array, the items to be selected by default (null for none),
                         // and the listener through which to receive callbacks when items are selected
-                        .setPositiveButton("J'accepete", new DialogInterface.OnClickListener() {
+                        .setPositiveButton("J'accepte", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 SharedPreferences.Editor editor = sharedPreferences.edit();

@@ -23,7 +23,7 @@ import com.fasterxml.jackson.jr.stree.JacksonJrsTreeCodec;
 import java.io.File;
 import java.util.HashMap;
 
-public class ProfileActivity extends Activity {
+public class ProfileActivity extends AppCompatActivity {
 
     public static boolean isLoggedInSpotify = false;
     private String PERSONAL = "personal.txt";
@@ -74,7 +74,7 @@ public class ProfileActivity extends Activity {
             }
         });
 
-        Button buttonDisconnect = findViewById(R.id.buttonDisconnect);
+        ImageButton buttonDisconnect = findViewById(R.id.disconnectButton);
         buttonDisconnect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

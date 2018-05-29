@@ -5,4 +5,9 @@
     <string name="je_cr_e_mon_groupe">Je crée mon groupe</string>
     <string name="je_rejoins_un_groupe">Je rejoins un groupe</string>
     <string name="confirmer">Confirmer</string>
+    <string name="non_connect">Non connecté</string>
+    <string name="valider_mon_profil">Valider mon profil</string>
+    <string name="bouton_actualiser">Bouton actualiser</string>
+    <string name="bouton_d_connecter">Bouton déconnecter</string>
+    <string name="bouton_spotify">Bouton Spotify</string>
 </resources>

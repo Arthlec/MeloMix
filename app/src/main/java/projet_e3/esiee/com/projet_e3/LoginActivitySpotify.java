@@ -28,7 +28,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 import static junit.framework.Assert.assertTrue;
 
-public class LoginActivitySpotify extends Activity {
+public class LoginActivitySpotify extends AppCompatActivity {
 
 
     private static final String CLIENT_ID = "1aee09c9f4504604b379f867207fd238";
