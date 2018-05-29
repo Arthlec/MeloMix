@@ -5,53 +5,42 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
-        android:allowBackup="true"
         android:fullBackupContent="true"
+        android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:screenOrientation="portrait"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme.Green">
-        <activity
-            android:name=".MainActivity"
-            android:noHistory="true">
+        android:theme="@style/AppTheme.Green"
+        android:screenOrientation="portrait">
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
                 <category android:name="android.intent.category.BROWSABLE" />
-
-                <data android:scheme="smooth-i" />
             </intent-filter>
         </activity>
 
-        <activity android:name=".ProfileActivity" />
-
+        <activity
+            android:name=".ProfileActivity"
+            android:theme="@android:style/Theme.Light.NoTitleBar">
+        </activity>
         <activity
             android:name=".LoginActivitySpotify"
-            android:label="Connexion Spotify"
-            android:parentActivityName=".ProfileActivity">
-            <!-- The meta-data element is needed for versions lower than 4.1 -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ProfileActivity" />
+            android:label="Connexion Spotify">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.BROWSABLE" />
-                <category android:name="com.spotify.sdk.android.authentication.LoginActivity" />
-
-                <data android:scheme="smooth-i" />
+                <data android:scheme="smooth-i" android:host="logincallback"/>
             </intent-filter>
         </activity>
 
         <activity
             android:name="com.spotify.sdk.android.authentication.LoginActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-        <activity android:name=".HostActivity" />
+        <activity android:name=".HostActivity"/>
         <activity android:name=".ChooseGroupActivity" />
-        <activity android:name=".GuestActivity" />
+        <activity android:name=".GuestActivity"/>
     </application>
 </manifest>
