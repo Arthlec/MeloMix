@@ -70,6 +70,10 @@ public class HostActivity extends AppCompatActivity {
                                     trackCover.setImageBitmap(bmp);
                                     TextView trackNameField = findViewById(R.id.trackName);
                                     trackNameField.setText(trackName);
+                                    ImageView nextTrackCover = findViewById(R.id.nextTrackCover);
+                                    nextTrackCover.setImageBitmap(bmp);
+                                    TextView nextTrackNameField = findViewById(R.id.nextTrackName);
+                                    nextTrackNameField.setText(trackName);
                                 }
                             });
                         }
