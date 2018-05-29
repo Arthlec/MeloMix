@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -23,7 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Scanner;
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
 
     private String defaut = "Veuillez entrer un pseudo valide";
     private String PERSONAL = "personal.txt";
