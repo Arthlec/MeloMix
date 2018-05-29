@@ -96,8 +96,7 @@ public class LogActivity extends AppCompatActivity {
 
             Log.i("prettyPrintEnabled", "" + json.isEnabled(JSON.Feature.PRETTY_PRINT_OUTPUT));
 
-            if(file.canWrite())
-                json.write(userGenres, file);
+            json.write(userGenres, file);
 
             Log.i("FileLength", "" + file.length());
             Log.i("MainActivity", "Fichier créé !");

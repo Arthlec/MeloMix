@@ -11,7 +11,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity"
+        <activity android:name=".LogActivity"
             android:allowBackup="true"
             android:launchMode="singleTask"
             android:screenOrientation="portrait">
@@ -26,11 +26,11 @@
         </activity>
         <activity android:name=".LoginActivitySpotify"
             android:label="Connection Spotify"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".LogActivity">
             <!-- The meta-data element is needed for versions lower than 4.1 -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value=".LoginActivitySpotify" />
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
