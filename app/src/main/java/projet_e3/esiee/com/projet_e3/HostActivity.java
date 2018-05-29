@@ -1,14 +1,14 @@
 package projet_e3.esiee.com.projet_e3;
 
-import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.widget.ArrayAdapter;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -17,16 +17,11 @@ import android.widget.TextView;
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.private_.TreeNode;
 import com.fasterxml.jackson.jr.stree.JacksonJrsTreeCodec;
-import com.fasterxml.jackson.jr.stree.JrsNumber;
 import com.fasterxml.jackson.jr.stree.JrsString;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Stack;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -44,6 +39,9 @@ public class HostActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.host_activity);
+
+
+        int host = getIntent().getIntExtra("host", 0);
         authToken = getIntent().getStringExtra("authToken");
         Log.i("authToken", authToken);
         requestData();
@@ -51,6 +49,55 @@ public class HostActivity extends AppCompatActivity {
         trackCover.setImageBitmap(bmp);
         TextView trackNameField = findViewById(R.id.trackName);
         trackNameField.setText(trackName);
+
+        Button buttonAdd = findViewById(R.id.moreButton);
+        buttonAdd.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                //ajoute la musique actuelle aux musiques personnel
+            }
+        });
+
+        Button buttonDislike = findViewById(R.id.dislikeButton);
+        buttonDislike.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                //dislike la musique actuelle
+            }
+        });
+
+        Button buttonLike = findViewById(R.id.likeButton);
+        buttonLike.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                //like la musique actuelle
+            }
+        });
+
+
+        Button buttonNext = findViewById(R.id.buttonNext);
+        Button buttonBack = findViewById(R.id.buttonBack);
+        if (/*Si c'est un guest*/ host == 0) {
+            buttonNext.setVisibility(View.GONE);
+            buttonNext.setActivated(false);
+            buttonBack.setVisibility(View.GONE);
+            buttonBack.setActivated(false);
+
+        } else if (/*Si c'est un host*/host == 1) {
+            buttonNext.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v) {
+                    //passe a la musique suivante
+                }
+            });
+
+            buttonBack.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v) {
+                    //revient a la musique precedente
+                }
+            });
+        }
     }
 
     public void requestData() {
@@ -78,8 +125,7 @@ public class HostActivity extends AppCompatActivity {
                             });
                         }
                     }).start();
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -92,11 +138,11 @@ public class HostActivity extends AppCompatActivity {
                 // Create connection
                 HttpsURLConnection myConnection;
                 String waitTime;
-                do{
+                do {
                     myConnection = (HttpsURLConnection) spotifyEndpoint.openConnection();
                     myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
                     waitTime = myConnection.getHeaderField("Retry-After");
-                    if(waitTime != null){
+                    if (waitTime != null) {
                         int waitTimeSeconds = Integer.parseInt(waitTime);
                         try {
                             Thread.sleep(waitTimeSeconds * 1000);
@@ -105,7 +151,7 @@ public class HostActivity extends AppCompatActivity {
                         }
                         Log.i("WaitTime", waitTime);
                     }
-                }while(waitTime != null);
+                } while (waitTime != null);
 
                 if (myConnection.getResponseCode() == 200) {
                     // Success

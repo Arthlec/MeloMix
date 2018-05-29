@@ -21,6 +21,7 @@ public class ChooseGroupActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(ChooseGroupActivity.this, HostActivity.class);
                 intent.putExtra("authToken", getIntent().getStringExtra("authToken"));
+                intent.putExtra("host",1);
                 startActivity(intent);
             }
         });
@@ -29,8 +30,9 @@ public class ChooseGroupActivity extends AppCompatActivity {
         buttonSearchForGroup.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ChooseGroupActivity.this, GuestActivity.class);
+                Intent intent = new Intent(ChooseGroupActivity.this, HostActivity.class);
                 intent.putExtra("authToken", getIntent().getStringExtra("authToken"));
+                intent.putExtra("host",0);
                 startActivity(intent);
             }
         });

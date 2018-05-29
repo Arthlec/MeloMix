@@ -1,6 +1,5 @@
 package projet_e3.esiee.com.projet_e3;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -23,7 +22,7 @@ public class GuestActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.guest_activity);
+        setContentView(R.layout.choosehost_activity);
 
         hostList = findViewById(R.id.DJ_list);
         mSend = findViewById(R.id.send_button);
