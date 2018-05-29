@@ -68,7 +68,7 @@ public class ProfileActivity extends Activity {
             public void onClick(View view) {
                 if (!ProfileActivity.isLoggedInSpotify){
                     Intent intent = new Intent(ProfileActivity.this, LoginActivitySpotify.class);
-                    startActivity(intent);
+                    startActivityForResult(intent, 1);
                 }else
                     Toast.makeText(ProfileActivity.this,"Compte déjà connecté", Toast.LENGTH_LONG).show();
             }
@@ -102,26 +102,28 @@ public class ProfileActivity extends Activity {
     }
 
     @Override
-    protected void onNewIntent(Intent intent){
-        Bundle bundle = intent.getExtras();
-        HashMap<String, Float> userGenres = null;
-        String userName = null;
-        if(bundle != null) {
-            userGenres = (HashMap<String, Float>) bundle.getSerializable("userGenres");
-            userName = bundle.getString("userName", "Non connectée");
-            authToken = bundle.getString("authToken", "");
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent){
+        if(resultCode == 1){
+            Bundle bundle = intent.getExtras();
+            HashMap<String, Float> userGenres = null;
+            String userName = null;
+            if(bundle != null) {
+                userGenres = (HashMap<String, Float>) bundle.getSerializable("userGenres");
+                userName = bundle.getString("userName", "Non connectée");
+                authToken = bundle.getString("authToken", "");
+            }
+
+            TextView textSpotify = findViewById(R.id.textSpotify);
+            //String userName = this.getIntent().getStringExtra("userName");
+            //String userName = LoginActivitySpotify.userName;
+            if(userName != null)
+                textSpotify.setText("Connecté avec le compte : " + userName);
+
+            //HashMap<String, Float> userGenres = this.getIntent().getSerializableExtra("genres");
+            //HashMap<String, Float> userGenres = LoginActivitySpotify.userGenres;
+            if(userGenres != null)
+                this.writeJSONfile(userGenres);
         }
-
-        TextView textSpotify = findViewById(R.id.textSpotify);
-        //String userName = this.getIntent().getStringExtra("userName");
-        //String userName = LoginActivitySpotify.userName;
-        if(userName != null)
-            textSpotify.setText("Connecté avec le compte : " + userName);
-
-        //HashMap<String, Float> userGenres = this.getIntent().getSerializableExtra("genres");
-        //HashMap<String, Float> userGenres = LoginActivitySpotify.userGenres;
-        if(userGenres != null)
-            this.writeJSONfile(userGenres);
     }
 
     private void writeJSONfile(HashMap<String, Float> userGenres){
@@ -138,8 +140,7 @@ public class ProfileActivity extends Activity {
 
             Log.i("prettyPrintEnabled", "" + json.isEnabled(JSON.Feature.PRETTY_PRINT_OUTPUT));
 
-            if(file.canWrite())
-                json.write(userGenres, file);
+            json.write(userGenres, file);
 
             Log.i("FileLength", "" + file.length());
             Log.i("MainActivity", "Fichier créé !");

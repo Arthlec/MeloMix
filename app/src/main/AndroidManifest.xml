@@ -14,34 +14,25 @@
         android:theme="@android:style/Theme.Light.NoTitleBar"
         android:screenOrientation="portrait">
         <activity android:name=".MainActivity">
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
-            <category android:name="android.intent.category.DEFAULT" />
-            <category android:name="android.intent.category.LAUNCHER" />
-            <category android:name="android.intent.category.BROWSABLE" />
-            <data android:scheme="smooth-i" />
-        </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
         </activity>
 
         <activity
             android:name=".ProfileActivity"
-            android:theme="@android:style/Theme.Light.NoTitleBar"
-            android:parentActivityName=".MainActivity"
-            android:launchMode="singleTask">
+            android:theme="@android:style/Theme.Light.NoTitleBar">
         </activity>
         <activity
             android:name=".LoginActivitySpotify"
-            android:label="Connexion Spotify"
-            android:parentActivityName=".ProfileActivity">
-            <!-- The meta-data element is needed for versions lower than 4.1 -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ProfileActivity" />
+            android:label="Connexion Spotify">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <category android:name="com.spotify.sdk.android.authentication.LoginActivity" />
-                <data android:scheme="smooth-i" />
+                <data android:scheme="smooth-i" android:host="logincallback"/>
             </intent-filter>
         </activity>
 
