@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
-        android:text="Non connecté"
+        android:text="@string/non_connect"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -46,7 +46,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.418"
         app:srcCompat="@drawable/logo_spotify"
-        tools:background="#f9f9f9" />
+        tools:background="#f9f9f9"
+        android:contentDescription="@string/bouton_spotify" />
 
     <ImageButton
         android:id="@+id/actualizeButton"
@@ -58,7 +59,8 @@
         app:layout_constraintStart_toEndOf="@+id/imageButton"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.436"
-        app:srcCompat="@drawable/actualize"/>
+        app:srcCompat="@drawable/actualize"
+        android:contentDescription="@string/bouton_actualiser" />
 
     <ImageButton
         android:id="@+id/disconnectButton"
@@ -70,13 +72,14 @@
         app:layout_constraintStart_toEndOf="@+id/imageButton"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.436"
-        app:srcCompat="@drawable/disconnect"/>
+        app:srcCompat="@drawable/disconnect"
+        android:contentDescription="@string/bouton_d_connecter" />
 
     <Button
         android:id="@+id/buttonNext"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Valider mon profil"
+        android:text="@string/valider_mon_profil"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
