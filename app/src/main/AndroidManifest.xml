@@ -2,45 +2,62 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="projet_e3.esiee.com.projet_e3">
 
+    <!-- Permissions obligatoires pour le P2P -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- Fin des permissions du P2P -->
 
     <application
-        android:fullBackupContent="true"
         android:allowBackup="true"
+        android:fullBackupContent="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
+        android:screenOrientation="portrait"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme.Green"
-        android:screenOrientation="portrait">
+        android:theme="@style/AppTheme.Green">
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
                 <category android:name="android.intent.category.BROWSABLE" />
             </intent-filter>
         </activity>
-
         <activity
-            android:name=".ProfileActivity"
-            android:theme="@android:style/Theme.Light.NoTitleBar">
-        </activity>
+            android:name=".ProfileActivity"/>
+            <!--android:theme="@android:style/Theme.Light.NoTitleBar"-->
+
         <activity
             android:name=".LoginActivitySpotify"
             android:label="Connexion Spotify">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="smooth-i" android:host="logincallback"/>
+
+                <data
+                    android:host="logincallback"
+                    android:scheme="smooth-i" />
             </intent-filter>
         </activity>
-
         <activity
             android:name="com.spotify.sdk.android.authentication.LoginActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-        <activity android:name=".HostActivity"/>
+        <activity android:name=".HostActivity" />
         <activity android:name=".ChooseGroupActivity" />
-        <activity android:name=".GuestActivity"/>
+        <activity android:name=".GuestActivity" />
+        <activity android:name=".LoadingHostActivity"/>
+
+        <service android:name=".FileTransferService"/>
     </application>
+
 </manifest>
