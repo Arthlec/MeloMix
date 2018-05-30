@@ -11,14 +11,10 @@ import android.widget.Button;
 
 public class ChooseGroupActivity extends AppCompatActivity {
     private WifiManager wifiManager;
-    private static Context context;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.choosegroup_activity);
-        if (ChooseGroupActivity.context == null) {
-            ChooseGroupActivity.context = getApplicationContext();
-        }
 
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
@@ -26,11 +22,12 @@ public class ChooseGroupActivity extends AppCompatActivity {
         buttonDJ.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                if(!isWifi()) {
+                if(isWifi()) {
                     enablewifi();
                 }
                 Intent intent = new Intent(ChooseGroupActivity.this, LoadingHostActivity.class);
                 intent.putExtra("authToken", getIntent().getStringExtra("authToken"));
+                intent.putExtra("host",1);
                 startActivity(intent);
             }
         });
@@ -39,11 +36,12 @@ public class ChooseGroupActivity extends AppCompatActivity {
         buttonSearchForGroup.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                if(!isWifi()) {
+                if(isWifi()) {
                     enablewifi();
                 }
                 Intent intent = new Intent(ChooseGroupActivity.this, GuestActivity.class);
                 intent.putExtra("authToken", getIntent().getStringExtra("authToken"));
+                intent.putExtra("host",0);
                 startActivity(intent);
             }
         });
@@ -51,13 +49,13 @@ public class ChooseGroupActivity extends AppCompatActivity {
 
     public boolean isWifi() {
         assert wifiManager != null;
-        return wifiManager.isWifiEnabled();
+        return !wifiManager.isWifiEnabled();
     }
 
     public void enablewifi(){
             wifiManager.setWifiEnabled(true);
-            while (wifiManager.getWifiState()!=wifiManager.WIFI_STATE_ENABLED){
-                Log.i("tag",wifiManager.getWifiState()+" "+wifiManager.WIFI_STATE_ENABLED);
+            while (wifiManager.getWifiState()!= WifiManager.WIFI_STATE_ENABLED){
+                Log.i("tag",wifiManager.getWifiState()+" "+ WifiManager.WIFI_STATE_ENABLED);
             }
     }
 }

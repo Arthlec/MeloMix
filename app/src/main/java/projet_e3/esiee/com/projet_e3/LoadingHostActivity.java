@@ -13,8 +13,6 @@ import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.AsyncTask;
 
-import android.os.Build;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -39,15 +37,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.lang.System;
 import java.util.Random;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadFactory;
 
 public class LoadingHostActivity extends AppCompatActivity {
     private ListView listView;
     private TextView TxtStatus;
     private Button NextBtn;
-    private WifiManager wifiManager;
     private WifiP2pManager aManager;
     private WifiP2pManager.Channel aChannel;
     private BroadcastReceiver mReceiver;
@@ -59,8 +53,6 @@ public class LoadingHostActivity extends AppCompatActivity {
     private WifiP2pDevice[] deviceArray;
     private final WifiP2pConfig config = new WifiP2pConfig();
 
-    private HostClass hostClass;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,7 +63,7 @@ public class LoadingHostActivity extends AppCompatActivity {
 
     private void work() {
 
-        wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         assert wifiManager != null;
         if(!wifiManager.isWifiEnabled()){
             wifiManager.setWifiEnabled(true);
@@ -84,7 +76,7 @@ public class LoadingHostActivity extends AppCompatActivity {
 
         config.groupOwnerIntent = 15;
 
-        mReceiver = new BroadCast(aManager,aChannel,null,this,wifiManager);
+        mReceiver = new BroadCast(aManager,aChannel,null,this, wifiManager);
         mIntent = new IntentFilter();
         setAction();
 
@@ -131,6 +123,7 @@ public class LoadingHostActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(LoadingHostActivity.this, HostActivity.class);
                 intent.putExtra("authToken", getIntent().getStringExtra("authToken"));
+                intent.putExtra("host",1);
                 startActivity(intent);
             }
         });
@@ -184,7 +177,7 @@ public class LoadingHostActivity extends AppCompatActivity {
         public void onConnectionInfoAvailable(WifiP2pInfo info) {
             if(info.groupFormed && info.isGroupOwner){
                 TxtStatus.setText("Host");
-                hostClass = new HostClass(getApplicationContext());
+                HostClass hostClass = new HostClass(getApplicationContext());
                 hostClass.start();
             }
         }
@@ -262,7 +255,7 @@ public class LoadingHostActivity extends AppCompatActivity {
         private Context mFilecontext;
         private int PORT;
 
-        public FileServerAsyncTask(Context context, int port) {
+        FileServerAsyncTask(Context context, int port) {
             this.mFilecontext = context;
             this.PORT = port;
         }
@@ -312,16 +305,14 @@ public class LoadingHostActivity extends AppCompatActivity {
 
                     FileServerAsyncTask FileServerobj = new
                             FileServerAsyncTask(mFilecontext, FileTransferService.PORT);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                        FileServerobj.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new String[]{null});
-                    } else FileServerobj.execute();
+                    FileServerobj.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new String[]{null});
                 }
             }
 
         }
 
 
-        public static boolean copyFile(InputStream inputStream, OutputStream out) {
+        static void copyFile(InputStream inputStream, OutputStream out) {
 
             byte buf[] = new byte[8500];
             int len;
@@ -332,9 +323,8 @@ public class LoadingHostActivity extends AppCompatActivity {
                 out.close();
                 inputStream.close();
             } catch (IOException e) {
-                return false;
+                e.getMessage();
             }
-            return true;
         }
     }
 }

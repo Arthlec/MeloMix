@@ -15,14 +15,14 @@
     <!-- Fin des permissions du P2P -->
 
     <application
-        android:allowBackup="true"
         android:fullBackupContent="true"
+        android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:screenOrientation="portrait"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme.Green">
+        android:theme="@style/AppTheme.Green"
+        android:screenOrientation="portrait">
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -32,10 +32,9 @@
                 <category android:name="android.intent.category.BROWSABLE" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".ProfileActivity"/>
-            <!--android:theme="@android:style/Theme.Light.NoTitleBar"-->
-
         <activity
             android:name=".LoginActivitySpotify"
             android:label="Connexion Spotify">
@@ -43,21 +42,18 @@
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="logincallback"
-                    android:scheme="smooth-i" />
+                <data android:scheme="smooth-i" android:host="logincallback"/>
             </intent-filter>
         </activity>
+
         <activity
             android:name="com.spotify.sdk.android.authentication.LoginActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-        <activity android:name=".HostActivity" />
+        <activity android:name=".HostActivity"/>
         <activity android:name=".ChooseGroupActivity" />
         <activity android:name=".GuestActivity" />
         <activity android:name=".LoadingHostActivity"/>
 
         <service android:name=".FileTransferService"/>
     </application>
-
 </manifest>

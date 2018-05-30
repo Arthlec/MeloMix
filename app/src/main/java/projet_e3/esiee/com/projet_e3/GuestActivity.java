@@ -32,7 +32,6 @@ public class GuestActivity extends AppCompatActivity {
     private ListView listView;
     private TextView TxtKiKi;
 
-    private WifiManager wifiManager;
     private WifiP2pManager aManager;
     private WifiP2pManager.Channel aChannel;
     private BroadcastReceiver mReceiver;
@@ -45,12 +44,10 @@ public class GuestActivity extends AppCompatActivity {
 
     private final WifiP2pConfig config = new WifiP2pConfig();
 
-    private GuestClass guestClass;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.guest_activity);
+        setContentView(R.layout.choosehost_activity);
         work();
         exqWork();
     }
@@ -98,7 +95,7 @@ public class GuestActivity extends AppCompatActivity {
 
     private void work() {
 
-        wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         aManager = (WifiP2pManager) getApplicationContext().getSystemService(Context.WIFI_P2P_SERVICE);
         aChannel = aManager.initialize(this,getMainLooper(),null);
 
@@ -117,7 +114,7 @@ public class GuestActivity extends AppCompatActivity {
 
         config.groupOwnerIntent = 0;
 
-        mReceiver = new BroadCast(aManager,aChannel,this,null,wifiManager);
+        mReceiver = new BroadCast(aManager,aChannel,this,null, wifiManager);
         mIntent = new IntentFilter();
         setAction();
         this.discover();
@@ -154,7 +151,7 @@ public class GuestActivity extends AppCompatActivity {
                     // }
                 }
                 if(deviceName.length != 0) {
-                    hAdapter = new ArrayAdapter<String>(listView.getContext(), android.R.layout.simple_list_item_1, deviceName);
+                    hAdapter = new ArrayAdapter<>(listView.getContext(), android.R.layout.simple_list_item_1, deviceName);
                     listView.setAdapter(hAdapter);
                 }
             }
@@ -170,7 +167,7 @@ public class GuestActivity extends AppCompatActivity {
             final InetAddress groupOwnerAdress = info.groupOwnerAddress;
             if (info.groupFormed && !info.isGroupOwner) {
                 TxtKiKi.setText("Guest");
-                guestClass = new GuestClass(groupOwnerAdress, getApplicationContext());
+                GuestClass guestClass = new GuestClass(groupOwnerAdress, getApplicationContext());
                 guestClass.start();
             }
         }
@@ -188,7 +185,7 @@ public class GuestActivity extends AppCompatActivity {
             }
         });
     }
-    public static boolean copyFile(InputStream inputStream, OutputStream out) {
+    public static void copyFile(InputStream inputStream, OutputStream out) {
 
         byte[] buf = new byte[8500];
 
@@ -201,9 +198,8 @@ public class GuestActivity extends AppCompatActivity {
             out.close();
             inputStream.close();
         } catch (IOException e) {
-            return false;
+            e.getMessage();
         }
-        return true;
     }
 
     @Override
@@ -233,5 +229,4 @@ public class GuestActivity extends AppCompatActivity {
             }
         });
     }
-
 }

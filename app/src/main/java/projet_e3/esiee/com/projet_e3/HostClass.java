@@ -7,7 +7,7 @@ public class HostClass extends Thread{
 
     private Context context;
 
-    public HostClass(Context pCo){
+    HostClass(Context pCo){
         context = pCo;
     }
     @Override

@@ -11,7 +11,7 @@ import java.util.Objects;
 
 import android.annotation.SuppressLint;
 import android.app.IntentService;
-import android.content.Context;
+//import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.widget.Toast;
@@ -44,7 +44,7 @@ public class FileTransferService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
 
-        Context context = getApplicationContext();
+        //Context context = getApplicationContext();
         if (Objects.equals(intent.getAction(), ACTION_SEND_FILE)) {
 
             String host = Objects.requireNonNull(intent.getExtras()).getString(EXTRAS_GROUP_OWNER_ADDRESS);
@@ -57,11 +57,10 @@ public class FileTransferService extends IntentService {
                 OutputStream outputStream = socket.getOutputStream();
                 outputStream.flush();
 
-                //File JsonFile = new File(this.getFilesDir(),"userGenres.json");
-                //InputStream inputStream = new FileInputStream(JsonFile);
-                InputStream inputStream = context.getResources().openRawResource(R.drawable.ic_launcher_background);
+                File JsonFile = new File(this.getFilesDir(),"userGenres.json");
+                InputStream inputStream = new FileInputStream(JsonFile);
+               //InputStream inputStream = context.getResources().openRawResource(R.drawable.ic_launcher_background);
 
-                assert inputStream != null;
                 GuestActivity.copyFile(inputStream, outputStream);
             } catch (IOException e) {
                 e.printStackTrace();

@@ -10,7 +10,7 @@ public class GuestClass extends Thread {
     private String HostAdd;
     private Context context;
 
-    public GuestClass(InetAddress hostAdd, Context app) {
+    GuestClass(InetAddress hostAdd, Context app) {
         HostAdd = hostAdd.getHostAddress();
         context = app;
     }
