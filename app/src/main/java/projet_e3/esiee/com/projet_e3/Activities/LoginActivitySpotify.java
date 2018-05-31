@@ -1,6 +1,5 @@
-package projet_e3.esiee.com.projet_e3;
+package projet_e3.esiee.com.projet_e3.Activities;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;

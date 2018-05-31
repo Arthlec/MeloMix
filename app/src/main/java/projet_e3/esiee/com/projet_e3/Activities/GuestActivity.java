@@ -1,4 +1,4 @@
-package projet_e3.esiee.com.projet_e3;
+package projet_e3.esiee.com.projet_e3.Activities;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import projet_e3.esiee.com.projet_e3.R;
 
 
 public class GuestActivity extends AppCompatActivity {

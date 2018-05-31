@@ -1,12 +1,12 @@
-package projet_e3.esiee.com.projet_e3;
+package projet_e3.esiee.com.projet_e3.Activities;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+
+import projet_e3.esiee.com.projet_e3.R;
 
 public class ChooseGroupActivity extends AppCompatActivity {
 

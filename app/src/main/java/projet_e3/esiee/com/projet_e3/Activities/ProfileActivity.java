@@ -1,6 +1,5 @@
-package projet_e3.esiee.com.projet_e3;
+package projet_e3.esiee.com.projet_e3.Activities;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -22,6 +21,8 @@ import com.fasterxml.jackson.jr.stree.JacksonJrsTreeCodec;
 
 import java.io.File;
 import java.util.HashMap;
+
+import projet_e3.esiee.com.projet_e3.R;
 
 public class ProfileActivity extends AppCompatActivity {
 
