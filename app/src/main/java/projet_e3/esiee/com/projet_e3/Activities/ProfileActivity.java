@@ -54,7 +54,7 @@ public class ProfileActivity extends AppCompatActivity {
                 // On écrit dans le fichier le caractère lu
                 lu.append((char) value);
             }
-            userName.setText("Wesh " + lu.toString());
+            userName.setText("Bonjour " + lu.toString()+".");
             if (input != null)
                 input.close();
         } catch (FileNotFoundException e) {
