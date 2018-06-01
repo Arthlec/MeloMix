@@ -16,6 +16,7 @@ import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -38,6 +39,8 @@ import java.util.List;
 import java.lang.System;
 import java.util.Random;
 
+import weka.core.converters.ConverterUtils;
+
 public class LoadingHostActivity extends AppCompatActivity {
     private ListView listView;
     private TextView TxtStatus;
@@ -57,8 +60,19 @@ public class LoadingHostActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loading_host);
+        analyseData();
         work();
         exqWork();
+    }
+
+    private void analyseData(){
+        File rootDataDir = this.getFilesDir();
+        Log.i("dataFile", rootDataDir.toString());
+        try {
+            ConverterUtils.DataSource source = new ConverterUtils.DataSource(rootDataDir.toString() + "/userGenres.json");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void work() {
