@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Objects;
 import java.util.Set;
 import java.util.Stack;
 
@@ -123,9 +122,9 @@ public class LoginActivitySpotify extends AppCompatActivity {
 
                     getArtistsStack("https://api.spotify.com/v1/me/tracks?limit=50&offset=0");
 
-                    for (String playlistsURL : Objects.requireNonNull(playlistsURLs)) {
-                        if (playlistsURL != null) {
-                            getArtistsStack(playlistsURL);
+                    for(int i=0; i<playlistsURLs.length; i++) {
+                        if(playlistsURLs[i] != null) {
+                            getArtistsStack(playlistsURLs[i]);
                         }
                     }
 

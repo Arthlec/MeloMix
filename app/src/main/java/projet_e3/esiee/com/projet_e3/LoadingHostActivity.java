@@ -9,6 +9,7 @@ import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
+import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.AsyncTask;
@@ -16,6 +17,7 @@ import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -24,21 +26,28 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.lang.System;
 import java.util.Random;
+import java.util.Stack;
 
 public class LoadingHostActivity extends AppCompatActivity {
+
     private ListView listView;
     private TextView TxtStatus;
     private Button NextBtn;
@@ -57,11 +66,11 @@ public class LoadingHostActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loading_host);
-        work();
-        exqWork();
+        InitAttribut();
+        InitOnClick();
     }
 
-    private void work() {
+    private void InitAttribut() {
 
         WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         assert wifiManager != null;
@@ -72,7 +81,6 @@ public class LoadingHostActivity extends AppCompatActivity {
         aChannel = aManager.initialize(this,getMainLooper(),null);
 
         deletePersistentGroup();
-        //disconnect();
 
         config.groupOwnerIntent = 15;
 
@@ -86,7 +94,6 @@ public class LoadingHostActivity extends AppCompatActivity {
         TxtStatus = findViewById(R.id.KieKi);
         NextBtn = findViewById(R.id.NextBtn);
         //this.discover();
-
     }
 
     public void setAction(){
@@ -96,7 +103,7 @@ public class LoadingHostActivity extends AppCompatActivity {
         mIntent.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
     }
 
-    private void exqWork() {
+    private void InitOnClick() {
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -156,12 +163,9 @@ public class LoadingHostActivity extends AppCompatActivity {
                 int index =0;
                 for(WifiP2pDevice device : peersDevice.getDeviceList())
                 {
-                    //if(!device.isGroupOwner()) {
-                    deviceName[index] = device.deviceName;
+                    deviceName[index] = device.deviceAddress;
                     deviceArray[index] = device;
                     index++;
-                    //}
-
                 }
                 hAdapter = new ArrayAdapter<>(listView.getContext(), android.R.layout.simple_list_item_1, deviceName);
                 listView.setAdapter(hAdapter);
@@ -183,20 +187,6 @@ public class LoadingHostActivity extends AppCompatActivity {
         }
     };
 
-    public void discover(){
-        aManager.discoverPeers(aChannel, new WifiP2pManager.ActionListener() {
-            @Override
-            public void onSuccess() {
-                Toast.makeText(getApplicationContext(), "Succeed disco", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onFailure(int reason){
-                Toast.makeText(getApplicationContext(), "Fail disco", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
     public void createGrp(){
         aManager.createGroup(aChannel, new WifiP2pManager.ActionListener() {
             @Override
@@ -205,6 +195,24 @@ public class LoadingHostActivity extends AppCompatActivity {
             @Override
             public void onFailure(int i) {Toast.makeText(getApplicationContext(), "fail creat", Toast.LENGTH_SHORT).show(); }
         });
+    }
+
+    /**
+     * Retourne les devices deconnectés
+     * @return
+     */
+    public Stack<String> getAwayDevices(){
+        Stack<String> AwayDevices = new Stack<>();
+        WifiP2pGroup wifiP2pGroup = new WifiP2pGroup();
+        Collection<WifiP2pDevice> clientList = wifiP2pGroup.getClientList();
+        for (WifiP2pDevice device : clientList){
+            if (!peers.isEmpty()){
+                if(!peers.contains(device)) {
+                    AwayDevices.push(device.deviceAddress);
+                }
+            }
+        }
+        return AwayDevices;
     }
 
     public void disconnect(){
@@ -271,8 +279,8 @@ public class LoadingHostActivity extends AppCompatActivity {
                 Socket client = serverSocket.accept();
 
                 try {
-                    Random random = new Random();
-                    final File f = new File(mFilecontext.getFilesDir(), String.valueOf(random.nextInt(100))+String.valueOf(System.currentTimeMillis())+String.valueOf(random.nextInt(100))+".json");
+                    String IpClient = client.getInetAddress().getHostAddress();
+                   final File f = new File(mFilecontext.getFilesDir(), IpClient+".json");
 
                     File dirs = new File(f.getParent());
                     if (!dirs.exists())
@@ -285,7 +293,6 @@ public class LoadingHostActivity extends AppCompatActivity {
 
                     serverSocket.close();
                     return f.getAbsolutePath();
-
                 } catch (Exception e) {
                     e.printStackTrace();
                     return null;

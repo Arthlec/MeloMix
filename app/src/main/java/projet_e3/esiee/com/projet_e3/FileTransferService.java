@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -12,6 +13,7 @@ import java.util.Objects;
 import android.annotation.SuppressLint;
 import android.app.IntentService;
 //import android.content.Context;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.widget.Toast;
@@ -27,6 +29,7 @@ public class FileTransferService extends IntentService {
     public static final String ACTION_SEND_FILE = "com.example.android.wifidirect.SEND_FILE";
     public static final String EXTRAS_GROUP_OWNER_ADDRESS = "go_host";
     public static final String EXTRAS_GROUP_OWNER_PORT = "go_port";
+    public static final String inetaddress = "inetaddress";
 
     public static int PORT = 8988;
 
@@ -44,7 +47,7 @@ public class FileTransferService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
 
-        //Context context = getApplicationContext();
+        Context context = getApplicationContext();
         if (Objects.equals(intent.getAction(), ACTION_SEND_FILE)) {
 
             String host = Objects.requireNonNull(intent.getExtras()).getString(EXTRAS_GROUP_OWNER_ADDRESS);
@@ -62,6 +65,7 @@ public class FileTransferService extends IntentService {
                //InputStream inputStream = context.getResources().openRawResource(R.drawable.ic_launcher_background);
 
                 GuestActivity.copyFile(inputStream, outputStream);
+
             } catch (IOException e) {
                 e.printStackTrace();
                 mHandler.post(new Runnable() {

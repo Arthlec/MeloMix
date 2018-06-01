@@ -50,7 +50,7 @@ public class BroadCast extends BroadcastReceiver {
             }
         }
         else if(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)){
-            //Detection d'une connexion
+            //Detection d'une connexion et déco
             if(manager== null){
                 return;
             }

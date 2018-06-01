@@ -12,9 +12,11 @@ import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.format.Formatter;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,8 +33,9 @@ public class GuestActivity extends AppCompatActivity {
 
     private ListView listView;
     private TextView TxtKiKi;
-
+    private Button btnTry;
     private WifiP2pManager aManager;
+    private WifiManager wifiManager;
     private WifiP2pManager.Channel aChannel;
     private BroadcastReceiver mReceiver;
     private IntentFilter mIntent;
@@ -72,8 +75,12 @@ public class GuestActivity extends AppCompatActivity {
                 });
             }
         });
-
-
+        btnTry.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                discover();
+            }
+        });
 
     }
 
@@ -95,7 +102,7 @@ public class GuestActivity extends AppCompatActivity {
 
     private void work() {
 
-        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         aManager = (WifiP2pManager) getApplicationContext().getSystemService(Context.WIFI_P2P_SERVICE);
         aChannel = aManager.initialize(this,getMainLooper(),null);
 
@@ -121,6 +128,8 @@ public class GuestActivity extends AppCompatActivity {
 
         listView = findViewById(R.id.HostList);
         TxtKiKi = findViewById(R.id.KieKi);
+        btnTry = findViewById(R.id.TryBtn);
+        btnTry.setText("Relancer la recherche de groupe");
 
 
     }
@@ -167,7 +176,8 @@ public class GuestActivity extends AppCompatActivity {
             final InetAddress groupOwnerAdress = info.groupOwnerAddress;
             if (info.groupFormed && !info.isGroupOwner) {
                 TxtKiKi.setText("Guest");
-                GuestClass guestClass = new GuestClass(groupOwnerAdress, getApplicationContext());
+                final String ipGuest = String.valueOf(wifiManager.getConnectionInfo().getIpAddress());
+                GuestClass guestClass = new GuestClass(groupOwnerAdress, getApplicationContext(),ipGuest);
                 guestClass.start();
             }
         }
