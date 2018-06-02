@@ -1,11 +1,13 @@
 package projet_e3.esiee.com.projet_e3.Fragments;
 
 import android.app.AlertDialog;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import projet_e3.esiee.com.projet_e3.R;
 
@@ -47,16 +49,16 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
-        private final TextView name;
-        private final TextView description;
+        private final ImageView savedTrackCover;
+        private final TextView savedTrackName;
 
         private Pair<String, String> currentPair;
 
         public MyViewHolder(final View itemView) {
             super(itemView);
 
-            name = ((TextView) itemView.findViewById(R.id.name));
-            description = ((TextView) itemView.findViewById(R.id.description));
+            savedTrackCover = itemView.findViewById(R.id.savedTrackCover);
+            savedTrackName = itemView.findViewById(R.id.savedTrackName);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -71,9 +73,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
         public void display(Pair<String, String> pair) {
             currentPair = pair;
-            name.setText(pair.first);
-            description.setText(pair.second);
+            savedTrackCover.setBackgroundColor(Color.CYAN);
+            savedTrackName.setText(pair.second);
         }
     }
-
 }
