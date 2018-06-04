@@ -12,9 +12,8 @@ import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.AsyncTask;
-
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -24,6 +23,8 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.fasterxml.jackson.jr.ob.JSON;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -36,10 +37,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.lang.System;
+import java.util.Map;
 import java.util.Random;
-
-import weka.core.converters.ConverterUtils;
 
 public class LoadingHostActivity extends AppCompatActivity {
     private ListView listView;
@@ -69,14 +68,16 @@ public class LoadingHostActivity extends AppCompatActivity {
         File rootDataDir = this.getFilesDir();
         Log.i("dataFile", rootDataDir.toString());
         try {
-            ConverterUtils.DataSource source = new ConverterUtils.DataSource(rootDataDir.toString() + "/userGenres.json");
+            //ConverterUtils.DataSource source = new ConverterUtils.DataSource(rootDataDir.toString() + "/userGenresCorentin.csv");
+            Map<Object,Object> map = JSON.std.mapFrom(new File(rootDataDir.toString() + "/userGenres.json"));
+            //JrsObject userGenres =
+            //Log.i("source", source.getDataSet().toString());
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     private void work() {
-
         WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         assert wifiManager != null;
         if(!wifiManager.isWifiEnabled()){
