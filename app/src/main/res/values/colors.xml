@@ -3,7 +3,7 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#ff4081</color>
-    <color name="colorBackgroundFloating">#993997</color>
-    <color name="colorForeground">#350d34</color>
-    <color name="background_material_light">#52d66f</color>
+    <color name="colorBackgroundFloating">#6b81fc</color>
+    <color name="colorForeground">#0f1d63</color>
+    <color name="background_material_light">#a9a5db</color>
 </resources>

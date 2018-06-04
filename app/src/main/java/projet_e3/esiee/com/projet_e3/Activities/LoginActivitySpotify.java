@@ -25,6 +25,8 @@ import java.util.Stack;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import projet_e3.esiee.com.projet_e3.R;
+
 import static junit.framework.Assert.assertTrue;
 
 public class LoginActivitySpotify extends AppCompatActivity {
@@ -44,6 +46,7 @@ public class LoginActivitySpotify extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.login_spotify_activity);
 
         AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID, AuthenticationResponse.Type.TOKEN, REDIRECT_URI).setShowDialog(true);
         builder.setScopes(new String[]{"user-top-read", "user-library-read", "playlist-read-private"});
