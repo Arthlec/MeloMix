@@ -34,7 +34,7 @@ import projet_e3.esiee.com.projet_e3.R;
 
 import static junit.framework.Assert.assertTrue;
 
-public class HostActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class HostActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MainFragment.OnSavedMusicSelectedListener {
 
     ListView userList = null;
     private static Bitmap bmp;
@@ -107,6 +107,12 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
         this.mDrawerLayout.closeDrawer(GravityCompat.START);
 
         return true;
+    }
+
+    @Override
+    public void onSavedMusicSelected() {
+        SavedMusicsFragment.trackCoverList.add(bmp);
+        SavedMusicsFragment.trackNameList.add(trackName);
     }
 
     private void showFragment(int fragmentIdentifier){
