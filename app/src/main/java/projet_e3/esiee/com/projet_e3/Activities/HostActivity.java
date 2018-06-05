@@ -1,5 +1,7 @@
 package projet_e3.esiee.com.projet_e3.Activities;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.support.v4.app.Fragment;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,7 +14,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.ListView;
 
 
 import com.fasterxml.jackson.jr.ob.JSON;
@@ -36,7 +37,6 @@ import static junit.framework.Assert.assertTrue;
 
 public class HostActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MainFragment.OnSavedMusicSelectedListener {
 
-    ListView userList = null;
     private static Bitmap bmp;
     private static String trackName;
     private static String authToken = "";
@@ -111,8 +111,27 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onSavedMusicSelected() {
-        SavedMusicsFragment.trackCoverList.add(bmp);
-        SavedMusicsFragment.trackNameList.add(trackName);
+        if (SavedMusicsFragment.trackNameList.contains(trackName) && SavedMusicsFragment.trackCoverList.contains(bmp)) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Ajouter à mes musiques")
+                    .setMessage("Vous avez déjà enregistré cette musique, voulez-vous l'enregistrer à nouveau ?")
+                    .setPositiveButton("Ajouter", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            SavedMusicsFragment.trackCoverList.add(bmp);
+                            SavedMusicsFragment.trackNameList.add(trackName);
+                        }
+                    })
+                    .setNegativeButton("Annuler", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // do nothing
+                        }
+                    })
+                    .show();
+        }
+        else {
+            SavedMusicsFragment.trackCoverList.add(bmp);
+            SavedMusicsFragment.trackNameList.add(trackName);
+        }
     }
 
     private void showFragment(int fragmentIdentifier){
