@@ -320,6 +320,7 @@ public class FPGrowth extends AbstractAssociator implements AssociationRulesProd
     }
 
     protected FPTreeRoot buildFPTree(ArrayList<BinaryItem> singletons,Instances data, int minSupport){
+        double minWeight = 0.4;
         FPTreeRoot tree = new FPTreeRoot();
         for(int a=0; a<data.numAttributes();a++){
             //data.attribute(a).setWeight(Math.random());
@@ -329,7 +330,7 @@ public class FPGrowth extends AbstractAssociator implements AssociationRulesProd
                 if (current instanceof SparseInstance){
                     for (int j = 0; j < current.numValues(); j++) {
                         int attIndex = current.index(j);
-                        if (singletons.get(attIndex).getFrequency() >= minSupport && data.attribute(a).weight()>=0.4) {
+                        if (singletons.get(attIndex).getFrequency() >= minSupport && data.attribute(a).weight()>=minWeight) {
                             transaction.add(singletons.get(attIndex));
                         }
                     }
@@ -339,7 +340,7 @@ public class FPGrowth extends AbstractAssociator implements AssociationRulesProd
                     for (int j = 0; j < data.numAttributes(); j++) {
                         if (!current.isMissing(j)) {
                             if (current.attribute(j).numValues() == 1 || current.value(j) == m_positiveIndex - 1) {
-                                if (singletons.get(j).getFrequency() >= minSupport && data.attribute(a).weight()>=0.4) {
+                                if (singletons.get(j).getFrequency() >= minSupport && data.attribute(a).weight()>=minWeight) {
                                     transaction.add(singletons.get(j));
                                 }
                             }

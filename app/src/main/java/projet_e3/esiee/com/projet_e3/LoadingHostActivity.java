@@ -28,6 +28,7 @@ import com.fasterxml.jackson.jr.ob.JSON;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -45,6 +46,7 @@ import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.SparseInstance;
 
 public class LoadingHostActivity extends AppCompatActivity {
     private ListView listView;
@@ -72,18 +74,33 @@ public class LoadingHostActivity extends AppCompatActivity {
 
     private void analyseData(){
         File rootDataDir = this.getFilesDir();
-        //Log.i("dataFile", rootDataDir.toString());
-        try {
-            Map<Object,Object> map = JSON.std.mapFrom(new File(rootDataDir.toString() + "/userGenres.json"));
-            //ArrayList<BinaryItem> listOfGenres = new ArrayList<BinaryItem>(map.keySet().toArray());
+        FilenameFilter jsonFilter = new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                String lowercaseName = name.toLowerCase();
+                return lowercaseName.endsWith(".json");
+            }
+        };
+        File[] files = rootDataDir.listFiles(jsonFilter);
+
+        int numberOfUsers = files.length;
+        ArrayList<Attribute> attributeArrayList = new ArrayList<Attribute>();
+        Instances dataBase = new Instances("userGenres", attributeArrayList, numberOfUsers);
+
+        for (int i = 0; i < numberOfUsers; i++) {
+            Log.d("Files", "FileName:" + files[i].getName());
+            Map<Object,Object> map = null;
+            try {
+                map = JSON.std.mapFrom(files[i]);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
             //Log.i("mapKeyset", map.keySet().toString());
             //Log.i("mapValues", map.values().toString());
-            int numberOfUsers = 1;
             int numberOfGenres = map.size();
-
-            ArrayList<Attribute> attributeArrayList = new ArrayList<Attribute>();
-            Instance user = new DenseInstance(numberOfGenres);
+            Instance user = new SparseInstance(numberOfGenres);
             int index = 0;
+
             for(Map.Entry<Object, Object> entry : map.entrySet()){
                 Attribute genre = new Attribute((String)entry.getKey(), index);
                 //genre.setWeight((double)map.get(genre));
@@ -94,19 +111,20 @@ public class LoadingHostActivity extends AppCompatActivity {
                 index++;
             }
 
-            Instances instances = new Instances("data", attributeArrayList, numberOfUsers);
-            instances.add(user);
+            dataBase.add(user);
+        }
 
-            FPGrowth algo = new FPGrowth();
-            algo.buildFPTree(null,instances,numberOfUsers);
-
-            int sizeItemsets = algo.m_largeItemSets.size();
-            Log.i("frequentItemsetsSize", "" + sizeItemsets);
-            for(int i = 0; i <sizeItemsets; i++){
-                Log.i("frequentItemset", "" + algo.m_largeItemSets.toString(i));
-            }
+        FPGrowth algo = new FPGrowth();
+        try {
+            algo.buildAssociations(dataBase);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+
+        int sizeItemsets = algo.m_largeItemSets.size();
+        Log.i("frequentItemsetsSize", "" + sizeItemsets);
+        for(int i = 0; i <sizeItemsets; i++){
+            Log.i("frequentItemset", "" + algo.m_largeItemSets.toString(i));
         }
     }
 
