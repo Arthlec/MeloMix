@@ -2,6 +2,7 @@ package projet_e3.esiee.com.projet_e3.Activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -29,7 +30,7 @@ public class ProfileActivity extends AppCompatActivity {
     public static boolean isLoggedInSpotify = false;
     private String PERSONAL = "personal.txt";
     private String authToken = "";
-
+    private String MY_PREFS = "my_prefs";
     TextView userName = null;
 
     @Override
@@ -43,25 +44,9 @@ public class ProfileActivity extends AppCompatActivity {
 
         userName = findViewById(R.id.userName);
 
-        /* Lecture du pseudo */
-        try {
-            FileInputStream input = openFileInput(PERSONAL);
-            int value;
-            // On utilise un StringBuffer pour construire la chaîne au fur et à mesure
-            StringBuffer lu = new StringBuffer();
-            // On lit les caractères les uns après les autres
-            while ((value = input.read()) != -1) {
-                // On écrit dans le fichier le caractère lu
-                lu.append((char) value);
-            }
-            userName.setText("Bonjour " + lu.toString()+".");
-            if (input != null)
-                input.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
+        userName.setText("Bonjour " +myprefs_name()+ ".");
+
 
         ImageButton logoSpotify = findViewById(R.id.imageButton);
         logoSpotify.setOnClickListener(new View.OnClickListener() {
@@ -154,5 +139,11 @@ public class ProfileActivity extends AppCompatActivity {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
         return netInfo != null && netInfo.isConnectedOrConnecting();
+    }
+
+    public String myprefs_name() {
+        SharedPreferences pref = getApplicationContext().getSharedPreferences(MY_PREFS, MODE_PRIVATE);
+        String pseudo = pref.getString("user_name", null);//null is the default value.
+        return pseudo;
     }
 }

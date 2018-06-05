@@ -3,6 +3,7 @@ package projet_e3.esiee.com.projet_e3.Activities;
 
 import android.app.AlertDialog;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,6 +12,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -28,9 +30,10 @@ import projet_e3.esiee.com.projet_e3.R;
 public class MainActivity extends AppCompatActivity {
 
     private String defaut = "Veuillez entrer un pseudo valide";
-    private String PERSONAL = "personal.txt";
     private Button mEnter = null;
-    private boolean condition = false;
+    private String MY_PREFS = "my_prefs";
+    private String userName = null;
+    private boolean agreed = false;
 
 
     EditText pseudo = null;
@@ -44,32 +47,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        /* On verfie si le fichier interne est nul
-         * Si le fichier est nul l'utilisateur n'a pas de pseudo enregistré
-         * Sinon il a deja un pseudo et passe à l'activité suivante*/
-        try {
-            FileInputStream input = openFileInput(PERSONAL);
-            int value;
-            // On utilise un StringBuffer pour construire la chaîne au fur et à mesure
-            StringBuffer lu = new StringBuffer();
-            // On lit les caractères les uns après les autres
-            while ((value = input.read()) != -1) {
-                // On écrit dans le fichier le caractère lu
-                lu.append((char) value);
-            }
-            if (input != null) {
-                input.close();
-                condition = true;
-                Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-                startActivity(intent);
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+
+        if (myprefs_name() != null && myprefs_license()) {
+            Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+            startActivity(intent);
         }
 
-        showDialogue();
+        if (!myprefs_license())
+            showDialogue();
 
         //Récupération des vues
         pseudo = findViewById(R.id.pseudo);
@@ -81,24 +66,14 @@ public class MainActivity extends AppCompatActivity {
         mEnter.setEnabled(false);
         mEnter.setOnClickListener(new View.OnClickListener() {
             public void onClick(View pView) {
-                if (condition) {
-                    try {
-                        /* Ecrit dans un fichier interne le pseudo de l'utilisateur */
-                        // Flux interne
-                        FileOutputStream output = openFileOutput(PERSONAL, MODE_PRIVATE);
-                        // On écrit dans le flux interne
-                        output.write(pseudo.getText().toString().getBytes());
-
-                        if (output != null)
-                            output.close();
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                SharedPreferences pref = getApplicationContext().getSharedPreferences(MY_PREFS, MODE_PRIVATE);
+                SharedPreferences.Editor editor = pref.edit();
+                editor.putString("user_name", pseudo.getText().toString());
+                editor.apply();
+                if (myprefs_name() != null && myprefs_license()/*les conditions sont respectées*/) {
                     Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
                     startActivity(intent);
-                } else {
+                } else if (!myprefs_license()) {
                     showDialogue();
                 }
             }
@@ -135,29 +110,25 @@ public class MainActivity extends AppCompatActivity {
         /* Boite de dialogue
          * S'ouvre seulement au permier lancement de l'application
          */
-        final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean agreed = sharedPreferences.getBoolean("agreed", false);
-        if (!agreed) {
-            try {
-                new AlertDialog.Builder(this)
-                        .setTitle("Conditions d'utilisation")
-                        // Specify the list array, the items to be selected by default (null for none),
-                        // and the listener through which to receive callbacks when items are selected
-                        .setPositiveButton("J'accepte", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                SharedPreferences.Editor editor = sharedPreferences.edit();
-                                editor.putBoolean("agreed", true);
-                                editor.commit();
-                                condition = true;
-                            }
-                        })
-                        .setNegativeButton("Je refuse", null)
-                        .setMessage(readFile())
-                        .show();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        try {
+            new AlertDialog.Builder(this)
+                    .setTitle("Conditions d'utilisation")
+                    // Specify the list array, the items to be selected by default (null for none),
+                    // and the listener through which to receive callbacks when items are selected
+                    .setPositiveButton("J'accepte", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            SharedPreferences pref = getApplicationContext().getSharedPreferences(MY_PREFS, MODE_PRIVATE);
+                            SharedPreferences.Editor editor = pref.edit();
+                            editor.putBoolean("agreed", true);
+                            editor.apply();
+                        }
+                    })
+                    .setNegativeButton("Je refuse", null)
+                    .setMessage(readFile())
+                    .show();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -173,11 +144,25 @@ public class MainActivity extends AppCompatActivity {
         if (scanner != null) {
             while (scanner.hasNext()) {
                 String[] lines = scanner.nextLine().split("\t");
-                for (String line:lines) {
-                    text += line +"\n";
+                for (String line : lines) {
+                    text += line + "\n";
                 }
             }
         }
         return text;
     }
+
+    public String myprefs_name() {
+        SharedPreferences pref = getApplicationContext().getSharedPreferences(MY_PREFS, MODE_PRIVATE);
+        userName = pref.getString("user_name", null);//null is the default value.
+        return userName;
+    }
+
+    private boolean myprefs_license() {
+        SharedPreferences pref = getApplicationContext().getSharedPreferences(MY_PREFS, MODE_PRIVATE);
+        agreed = pref.getBoolean("agreed", false);//false is the default value.
+        return agreed;
+    }
+
+
 }
