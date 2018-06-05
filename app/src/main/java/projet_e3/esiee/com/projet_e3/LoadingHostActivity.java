@@ -40,6 +40,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import weka.associations.BinaryItem;
+import weka.core.Attribute;
+import weka.core.DenseInstance;
+import weka.core.Instance;
+import weka.core.Instances;
+
 public class LoadingHostActivity extends AppCompatActivity {
     private ListView listView;
     private TextView TxtStatus;
@@ -66,24 +72,39 @@ public class LoadingHostActivity extends AppCompatActivity {
 
     private void analyseData(){
         File rootDataDir = this.getFilesDir();
-        Log.i("dataFile", rootDataDir.toString());
+        //Log.i("dataFile", rootDataDir.toString());
         try {
-            //ConverterUtils.DataSource source = new ConverterUtils.DataSource(rootDataDir.toString() + "/userGenresCorentin.csv");
             Map<Object,Object> map = JSON.std.mapFrom(new File(rootDataDir.toString() + "/userGenres.json"));
-            //JrsObject userGenres =
-            Log.i("mapKeyset", map.keySet().toString());
-            Log.i("mapValues", map.values().toString());
+            //ArrayList<BinaryItem> listOfGenres = new ArrayList<BinaryItem>(map.keySet().toArray());
+            //Log.i("mapKeyset", map.keySet().toString());
+            //Log.i("mapValues", map.values().toString());
+            int numberOfUsers = 1;
+            int numberOfGenres = map.size();
 
-            /*for(char element : array) {
-                System.out.println(element);
-            }*/
-
-            for(Object genre : map.keySet()){
-
+            ArrayList<Attribute> attributeArrayList = new ArrayList<Attribute>();
+            Instance user = new DenseInstance(numberOfGenres);
+            int index = 0;
+            for(Map.Entry<Object, Object> entry : map.entrySet()){
+                Attribute genre = new Attribute((String)entry.getKey(), index);
+                //genre.setWeight((double)map.get(genre));
+                /*Log.i("genre", (String)entry.getKey());
+                Log.i("getGenre", "" + entry.getValue());*/
+                attributeArrayList.add(genre);
+                user.setValue(genre, (double)entry.getValue());
+                index++;
             }
 
-            //ItemSet data = new ItemSet();
-            //FPGrowth algo = new FPGrowth((ItemSet) map);
+            Instances instances = new Instances("data", attributeArrayList, numberOfUsers);
+            instances.add(user);
+
+            FPGrowth algo = new FPGrowth();
+            algo.buildFPTree(null,instances,numberOfUsers);
+
+            int sizeItemsets = algo.m_largeItemSets.size();
+            Log.i("frequentItemsetsSize", "" + sizeItemsets);
+            for(int i = 0; i <sizeItemsets; i++){
+                Log.i("frequentItemset", "" + algo.m_largeItemSets.toString(i));
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

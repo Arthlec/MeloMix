@@ -322,7 +322,7 @@ public class FPGrowth extends AbstractAssociator implements AssociationRulesProd
     protected FPTreeRoot buildFPTree(ArrayList<BinaryItem> singletons,Instances data, int minSupport){
         FPTreeRoot tree = new FPTreeRoot();
         for(int a=0; a<data.numAttributes();a++){
-            data.attribute(a).setWeight(Math.random());
+            //data.attribute(a).setWeight(Math.random());
             for (int i = 0; i < data.numInstances(); i++) {
                 Instance current = data.instance(i);
                 ArrayList<BinaryItem> transaction = new ArrayList<BinaryItem>();
