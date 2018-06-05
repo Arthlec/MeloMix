@@ -11,8 +11,8 @@
             android:id="@+id/nav_musics"
             android:title="Musiques enregistrées" />
         <item
-            android:id="@+id/nav_profile"
-            android:title="Gérer mon profil" />
+            android:id="@+id/nav_history"
+            android:title="Historique des musiques" />
         <item
             android:id="@+id/nav_guests"
             android:title="Liste des invités" />

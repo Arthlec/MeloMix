@@ -28,6 +28,7 @@ import java.net.URL;
 import javax.net.ssl.HttpsURLConnection;
 
 import projet_e3.esiee.com.projet_e3.Fragments.GuestsListFragment;
+import projet_e3.esiee.com.projet_e3.Fragments.HistoryFragment;
 import projet_e3.esiee.com.projet_e3.Fragments.SavedMusicsFragment;
 import projet_e3.esiee.com.projet_e3.Fragments.MainFragment;
 import projet_e3.esiee.com.projet_e3.Fragments.StatsFragment;
@@ -47,6 +48,7 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
     private MainFragment fragmentMain;
     private Fragment fragmentStats;
     private Fragment fragmentSavedMusics;
+    private Fragment fragmentHistory;
     private Fragment fragmentGuestsList;
 
     //FOR DATAS
@@ -54,7 +56,8 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
     private static final int FRAGMENT_MAIN = 0;
     private static final int FRAGMENT_STATS = 1;
     private static final int FRAGMENT_SAVED_MUSICS = 2;
-    private static final int FRAGMENT_GUESTS_LIST = 3;
+    private static final int FRAGMENT_HISTORY = 3;
+    private static final int FRAGMENT_GUESTS_LIST = 4;
 
 
     @Override
@@ -95,8 +98,8 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
             case R.id.nav_musics:
                 this.showFragment(FRAGMENT_SAVED_MUSICS);
                 break;
-            case R.id.nav_profile:
-                //this.showFragment(FRAGMENT_PROFILE);
+            case R.id.nav_history:
+                this.showFragment(FRAGMENT_HISTORY);
                 break;
             case R.id.nav_guests:
                 this.showFragment(FRAGMENT_GUESTS_LIST);
@@ -145,6 +148,9 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
             case FRAGMENT_SAVED_MUSICS:
                 this.showSavedMusicsFragment();
                 break;
+            case FRAGMENT_HISTORY:
+                this.showHistoryFragment();
+                break;
             case FRAGMENT_GUESTS_LIST:
                 this.showGuestsListFragment();
                 break;
@@ -168,6 +174,11 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
     private void showSavedMusicsFragment(){
         if (this.fragmentSavedMusics == null) this.fragmentSavedMusics = SavedMusicsFragment.newInstance();
         this.startTransactionFragment(this.fragmentSavedMusics);
+    }
+
+    private void showHistoryFragment(){
+        if (this.fragmentHistory == null) this.fragmentHistory = HistoryFragment.newInstance();
+        this.startTransactionFragment(this.fragmentHistory);
     }
 
     private void showGuestsListFragment(){
