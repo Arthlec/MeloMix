@@ -24,6 +24,7 @@ import com.fasterxml.jackson.jr.stree.JrsString;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Stack;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -36,12 +37,16 @@ import projet_e3.esiee.com.projet_e3.R;
 
 import static junit.framework.Assert.assertTrue;
 
-public class HostActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MainFragment.OnSavedMusicSelectedListener {
+public class HostActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MainFragment.OnSavedMusicSelectedListener, MainFragment.OnArrowListener {
 
     private static Bitmap bmp;
     private static String trackName;
+    private static Bitmap nextBmp;
+    private static String nextTrackName;
     private static String authToken = "";
     private DrawerLayout mDrawerLayout;
+    private Stack<Bitmap> tracksCovers = new Stack<>();
+    private Stack<String> tracksNames = new Stack<>();
 
     //FOR FRAGMENTS
     // 1 - Declare fragment handled by Navigation Drawer
@@ -110,6 +115,27 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
         this.mDrawerLayout.closeDrawer(GravityCompat.START);
 
         return true;
+    }
+
+    @Override
+    public void onArrowSelected(String direction) {
+        if(direction.equals("next")) {
+            tracksCovers.push(bmp);
+            tracksNames.push(trackName);
+            bmp = nextBmp;
+            trackName = nextTrackName;
+            nextBmp = null;
+            nextTrackName = null;
+        }
+        else {
+            if(!tracksCovers.isEmpty()) {
+                nextBmp = bmp;
+                nextTrackName = trackName;
+                bmp = tracksCovers.pop();
+                trackName = tracksNames.pop();
+            }
+        }
+        MainFragment.updateCovers(bmp, trackName, nextBmp, nextTrackName);
     }
 
     @Override
@@ -224,12 +250,15 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
                     URL trackURL = new URL(getTrackInfo()[0]);
                     bmp = BitmapFactory.decodeStream(trackURL.openConnection().getInputStream());
                     trackName = getTrackInfo()[1];
+                    URL nextTrackURL = new URL("https://www.theedgesusu.co.uk/wp-content/uploads/2017/10/post-malone-e1508708621268.jpg");
+                    nextBmp = BitmapFactory.decodeStream(nextTrackURL.openConnection().getInputStream());
+                    nextTrackName = "Rockstar - Post Malone";
                     new Thread(new Runnable() {
                         public void run() {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    MainFragment.updateCovers(bmp, trackName, bmp, trackName);
+                                    MainFragment.updateCovers(bmp, trackName, nextBmp, nextTrackName);
                                 }
                             });
                         }
