@@ -71,7 +71,19 @@ public class LoadingHostActivity extends AppCompatActivity {
             //ConverterUtils.DataSource source = new ConverterUtils.DataSource(rootDataDir.toString() + "/userGenresCorentin.csv");
             Map<Object,Object> map = JSON.std.mapFrom(new File(rootDataDir.toString() + "/userGenres.json"));
             //JrsObject userGenres =
-            //Log.i("source", source.getDataSet().toString());
+            Log.i("mapKeyset", map.keySet().toString());
+            Log.i("mapValues", map.values().toString());
+
+            /*for(char element : array) {
+                System.out.println(element);
+            }*/
+
+            for(Object genre : map.keySet()){
+
+            }
+
+            //ItemSet data = new ItemSet();
+            //FPGrowth algo = new FPGrowth((ItemSet) map);
         } catch (Exception e) {
             e.printStackTrace();
         }
