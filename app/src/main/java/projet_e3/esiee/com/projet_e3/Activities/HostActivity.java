@@ -126,6 +126,8 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
             trackName = nextTrackName;
             nextBmp = null;
             nextTrackName = null;
+            HistoryFragment.trackCoverList.add(bmp);
+            HistoryFragment.trackNameList.add(trackName);
         }
         else {
             if(!tracksCovers.isEmpty()) {
@@ -133,6 +135,8 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
                 nextTrackName = trackName;
                 bmp = tracksCovers.pop();
                 trackName = tracksNames.pop();
+                HistoryFragment.trackCoverList.add(bmp);
+                HistoryFragment.trackNameList.add(trackName);
             }
         }
         MainFragment.updateCovers(bmp, trackName, nextBmp, nextTrackName);
@@ -250,6 +254,12 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
                     URL trackURL = new URL(getTrackInfo()[0]);
                     bmp = BitmapFactory.decodeStream(trackURL.openConnection().getInputStream());
                     trackName = getTrackInfo()[1];
+
+                    // Might cause a issue if requestData isn't used only during the initialisation
+                    HistoryFragment.trackCoverList.add(bmp);
+                    HistoryFragment.trackNameList.add(trackName);
+                    // Might cause a issue if requestData isn't used only during the initialisation
+
                     URL nextTrackURL = new URL("https://www.theedgesusu.co.uk/wp-content/uploads/2017/10/post-malone-e1508708621268.jpg");
                     nextBmp = BitmapFactory.decodeStream(nextTrackURL.openConnection().getInputStream());
                     nextTrackName = "Rockstar - Post Malone";
