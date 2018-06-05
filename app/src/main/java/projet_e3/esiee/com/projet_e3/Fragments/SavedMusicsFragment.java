@@ -36,7 +36,7 @@ public class SavedMusicsFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_saved_musics, container, false);
 
-        RecyclerView rv = view.findViewById(R.id.list);
+        RecyclerView rv = view.findViewById(R.id.saved_music_list);
 
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
         rv.setAdapter(new MyAdapter(trackCoverList, trackNameList));

@@ -27,6 +27,7 @@ public class MainFragment extends Fragment {
     private static String name;
     private static String nextName;
     private OnSavedMusicSelectedListener mSavedMusicListener;
+    private OnArrowListener mArrowListener;
 
     public static MainFragment newInstance() {
         return (new MainFragment());
@@ -34,6 +35,10 @@ public class MainFragment extends Fragment {
 
     public interface OnSavedMusicSelectedListener {
         void onSavedMusicSelected();
+    }
+
+    public interface OnArrowListener {
+        void onArrowSelected(String direction);
     }
 
     @Override
@@ -92,6 +97,7 @@ public class MainFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     //passe a la musique suivante
+                    mArrowListener.onArrowSelected("next");
                 }
             });
 
@@ -99,6 +105,7 @@ public class MainFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     //revient a la musique precedente
+                    mArrowListener.onArrowSelected("back");
                 }
             });
         }
@@ -111,6 +118,7 @@ public class MainFragment extends Fragment {
         super.onAttach(context);
         try {
             mSavedMusicListener = (OnSavedMusicSelectedListener) context;
+            mArrowListener = (OnArrowListener) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString() + e.getMessage());
         }
