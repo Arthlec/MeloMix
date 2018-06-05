@@ -1,6 +1,8 @@
 package projet_e3.esiee.com.projet_e3.Fragments;
 
 
+import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -13,6 +15,7 @@ import android.widget.TextView;
 
 import projet_e3.esiee.com.projet_e3.R;
 
+
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -23,9 +26,19 @@ public class MainFragment extends Fragment {
     private static Bitmap bmpNextCover;
     private static String name;
     private static String nextName;
+    private OnSavedMusicSelectedListener mSavedMusicListener;
+    private OnArrowListener mArrowListener;
 
     public static MainFragment newInstance() {
         return (new MainFragment());
+    }
+
+    public interface OnSavedMusicSelectedListener {
+        void onSavedMusicSelected();
+    }
+
+    public interface OnArrowListener {
+        void onArrowSelected(String direction);
     }
 
     @Override
@@ -49,7 +62,8 @@ public class MainFragment extends Fragment {
         buttonAdd.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                //ajoute la musique actuelle aux musiques personnel
+                //ajoute la musique actuelle aux musiques personnelles
+                mSavedMusicListener.onSavedMusicSelected();
             }
         });
 
@@ -83,6 +97,7 @@ public class MainFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     //passe a la musique suivante
+                    mArrowListener.onArrowSelected("next");
                 }
             });
 
@@ -90,11 +105,23 @@ public class MainFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     //revient a la musique precedente
+                    mArrowListener.onArrowSelected("back");
                 }
             });
         }
 
         return view;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            mSavedMusicListener = (OnSavedMusicSelectedListener) context;
+            mArrowListener = (OnArrowListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString() + e.getMessage());
+        }
     }
 
     public static void updateCovers(Bitmap bmpTrackCover, String trackName, Bitmap bmpNextTrackCover, String nextTrackName) {

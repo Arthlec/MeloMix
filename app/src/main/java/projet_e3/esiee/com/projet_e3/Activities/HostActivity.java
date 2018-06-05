@@ -1,5 +1,7 @@
 package projet_e3.esiee.com.projet_e3.Activities;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.support.v4.app.Fragment;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,7 +14,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.ListView;
 
 
 import com.fasterxml.jackson.jr.ob.JSON;
@@ -23,10 +24,12 @@ import com.fasterxml.jackson.jr.stree.JrsString;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Stack;
 
 import javax.net.ssl.HttpsURLConnection;
 
 import projet_e3.esiee.com.projet_e3.Fragments.GuestsListFragment;
+import projet_e3.esiee.com.projet_e3.Fragments.HistoryFragment;
 import projet_e3.esiee.com.projet_e3.Fragments.SavedMusicsFragment;
 import projet_e3.esiee.com.projet_e3.Fragments.MainFragment;
 import projet_e3.esiee.com.projet_e3.Fragments.StatsFragment;
@@ -34,19 +37,23 @@ import projet_e3.esiee.com.projet_e3.R;
 
 import static junit.framework.Assert.assertTrue;
 
-public class HostActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class HostActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MainFragment.OnSavedMusicSelectedListener, MainFragment.OnArrowListener {
 
-    ListView userList = null;
     private static Bitmap bmp;
     private static String trackName;
+    private static Bitmap nextBmp;
+    private static String nextTrackName;
     private static String authToken = "";
     private DrawerLayout mDrawerLayout;
+    private Stack<Bitmap> tracksCovers = new Stack<>();
+    private Stack<String> tracksNames = new Stack<>();
 
     //FOR FRAGMENTS
     // 1 - Declare fragment handled by Navigation Drawer
     private MainFragment fragmentMain;
     private Fragment fragmentStats;
     private Fragment fragmentSavedMusics;
+    private Fragment fragmentHistory;
     private Fragment fragmentGuestsList;
 
     //FOR DATAS
@@ -54,7 +61,8 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
     private static final int FRAGMENT_MAIN = 0;
     private static final int FRAGMENT_STATS = 1;
     private static final int FRAGMENT_SAVED_MUSICS = 2;
-    private static final int FRAGMENT_GUESTS_LIST = 3;
+    private static final int FRAGMENT_HISTORY = 3;
+    private static final int FRAGMENT_GUESTS_LIST = 4;
 
 
     @Override
@@ -95,8 +103,8 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
             case R.id.nav_musics:
                 this.showFragment(FRAGMENT_SAVED_MUSICS);
                 break;
-            case R.id.nav_profile:
-                //this.showFragment(FRAGMENT_PROFILE);
+            case R.id.nav_history:
+                this.showFragment(FRAGMENT_HISTORY);
                 break;
             case R.id.nav_guests:
                 this.showFragment(FRAGMENT_GUESTS_LIST);
@@ -109,6 +117,56 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
+    @Override
+    public void onArrowSelected(String direction) {
+        if(direction.equals("next")) {
+            tracksCovers.push(bmp);
+            tracksNames.push(trackName);
+            bmp = nextBmp;
+            trackName = nextTrackName;
+            nextBmp = null;
+            nextTrackName = null;
+            HistoryFragment.trackCoverList.add(bmp);
+            HistoryFragment.trackNameList.add(trackName);
+        }
+        else {
+            if(!tracksCovers.isEmpty()) {
+                nextBmp = bmp;
+                nextTrackName = trackName;
+                bmp = tracksCovers.pop();
+                trackName = tracksNames.pop();
+                HistoryFragment.trackCoverList.add(bmp);
+                HistoryFragment.trackNameList.add(trackName);
+            }
+        }
+        MainFragment.updateCovers(bmp, trackName, nextBmp, nextTrackName);
+    }
+
+    @Override
+    public void onSavedMusicSelected() {
+        if (SavedMusicsFragment.trackNameList.contains(trackName) && SavedMusicsFragment.trackCoverList.contains(bmp)) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Ajouter à mes musiques")
+                    .setMessage("Vous avez déjà enregistré cette musique, voulez-vous l'enregistrer à nouveau ?")
+                    .setPositiveButton("Ajouter", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            SavedMusicsFragment.trackCoverList.add(bmp);
+                            SavedMusicsFragment.trackNameList.add(trackName);
+                        }
+                    })
+                    .setNegativeButton("Annuler", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // do nothing
+                        }
+                    })
+                    .show();
+        }
+        else {
+            SavedMusicsFragment.trackCoverList.add(bmp);
+            SavedMusicsFragment.trackNameList.add(trackName);
+        }
+    }
+
     private void showFragment(int fragmentIdentifier){
         switch (fragmentIdentifier){
             case FRAGMENT_MAIN :
@@ -119,6 +177,9 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case FRAGMENT_SAVED_MUSICS:
                 this.showSavedMusicsFragment();
+                break;
+            case FRAGMENT_HISTORY:
+                this.showHistoryFragment();
                 break;
             case FRAGMENT_GUESTS_LIST:
                 this.showGuestsListFragment();
@@ -143,6 +204,11 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
     private void showSavedMusicsFragment(){
         if (this.fragmentSavedMusics == null) this.fragmentSavedMusics = SavedMusicsFragment.newInstance();
         this.startTransactionFragment(this.fragmentSavedMusics);
+    }
+
+    private void showHistoryFragment(){
+        if (this.fragmentHistory == null) this.fragmentHistory = HistoryFragment.newInstance();
+        this.startTransactionFragment(this.fragmentHistory);
     }
 
     private void showGuestsListFragment(){
@@ -188,12 +254,21 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
                     URL trackURL = new URL(getTrackInfo()[0]);
                     bmp = BitmapFactory.decodeStream(trackURL.openConnection().getInputStream());
                     trackName = getTrackInfo()[1];
+
+                    // Might cause a issue if requestData isn't used only during the initialisation
+                    HistoryFragment.trackCoverList.add(bmp);
+                    HistoryFragment.trackNameList.add(trackName);
+                    // Might cause a issue if requestData isn't used only during the initialisation
+
+                    URL nextTrackURL = new URL("https://www.theedgesusu.co.uk/wp-content/uploads/2017/10/post-malone-e1508708621268.jpg");
+                    nextBmp = BitmapFactory.decodeStream(nextTrackURL.openConnection().getInputStream());
+                    nextTrackName = "Rockstar - Post Malone";
                     new Thread(new Runnable() {
                         public void run() {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    MainFragment.updateCovers(bmp, trackName, bmp, trackName);
+                                    MainFragment.updateCovers(bmp, trackName, nextBmp, nextTrackName);
                                 }
                             });
                         }
