@@ -320,7 +320,7 @@ public class FPGrowth extends AbstractAssociator implements AssociationRulesProd
     }
 
     protected FPTreeRoot buildFPTree(ArrayList<BinaryItem> singletons,Instances data, int minSupport){
-        double minWeight = 0.4;
+        double minWeight = 0.8;
         FPTreeRoot tree = new FPTreeRoot();
         for(int a=0; a<data.numAttributes();a++){
             //data.attribute(a).setWeight(Math.random());

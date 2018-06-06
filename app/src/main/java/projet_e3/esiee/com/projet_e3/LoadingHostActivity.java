@@ -47,6 +47,7 @@ import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.SparseInstance;
+import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.NumericToBinary;
 
 public class LoadingHostActivity extends AppCompatActivity {
@@ -102,15 +103,19 @@ public class LoadingHostActivity extends AppCompatActivity {
                 //genre.setWeight((double)map.get(genre));
                 /*Log.i("genre", (String)entry.getKey());
                 Log.i("getGenre", "" + entry.getValue());*/
-                if(!attributeArrayList.contains(genre))
+                if(!attributeArrayList.contains(genre)){
+                    genre.setWeight((double) entry.getValue());
                     attributeArrayList.add(genre);
+                }else{
+                    Attribute currentGenreInList = attributeArrayList.get(attributeArrayList.indexOf(genre));
+                    currentGenreInList.setWeight(currentGenreInList.weight() + (double) entry.getValue());
+                }
             }
         }
 
         //Log.i("ListOfAttributes", attributeArrayList.toString());
         int numberOfGenres = attributeArrayList.size();
         Instances dataBase = new Instances("usersGenres", attributeArrayList, numberOfUsers);
-        //NumericToBinary filter = new NumericToBinary();
 
         for (int i = 0; i < numberOfUsers; i++) {
             Map<Object,Object> map = null;
@@ -124,12 +129,26 @@ public class LoadingHostActivity extends AppCompatActivity {
                 Attribute currentAttribute = attributeArrayList.get(p);
                 String attributeName = currentAttribute.name();
                 if(map.containsKey(attributeName)){
-                    user.setValue(currentAttribute, (double)map.get(attributeName));
-                }
+                    if(map.get(attributeName) != null)
+                        user.setValue(currentAttribute, 1/*(double) map.get(attributeName)*/);
+                }else
+                    user.setValue(currentAttribute, 0);
             }
             //filter.input(user);
             dataBase.add(user);
         }
+
+        NumericToBinary filter = new NumericToBinary();
+        //Data.setClassIndex(-1);
+
+        try {
+            filter.setInputFormat(dataBase);
+            dataBase = Filter.useFilter(dataBase, filter);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        //Log.i("dataBaseSummary", dataBase.toSummaryString());
+        //Log.i("dataBase", dataBase.toString());
 
         FPGrowth algo = new FPGrowth();
         try {
@@ -138,11 +157,11 @@ public class LoadingHostActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        /*int sizeItemsets = algo.m_largeItemSets.size();
+        int sizeItemsets = algo.m_largeItemSets.size();
         Log.i("frequentItemsetsSize", "" + sizeItemsets);
         for(int i = 0; i <sizeItemsets; i++){
             Log.i("frequentItemset", "" + algo.m_largeItemSets.toString(i));
-        }*/
+        }
     }
 
     private void work() {
