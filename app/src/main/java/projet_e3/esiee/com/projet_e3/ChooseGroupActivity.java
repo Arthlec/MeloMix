@@ -11,19 +11,12 @@ import android.widget.Button;
 
 public class ChooseGroupActivity extends AppCompatActivity {
     private WifiManager wifiManager;
-    private static Context context;
-
-    public static synchronized Context getGlobalContext() {
-        return context;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.choosegroup_activity);
-        if (ChooseGroupActivity.context == null) {
-            ChooseGroupActivity.context = getApplicationContext();
-        }
+
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
         Button buttonDJ = findViewById(R.id.DJ_button);

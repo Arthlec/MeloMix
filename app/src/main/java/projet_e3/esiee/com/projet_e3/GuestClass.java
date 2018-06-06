@@ -1,6 +1,6 @@
 package projet_e3.esiee.com.projet_e3;
 
-import android.annotation.SuppressLint;
+
 import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
@@ -17,10 +17,8 @@ public class GuestClass extends Thread {
         ipGuest = IpG;
     }
 
-    @SuppressLint("ResourceType")
     @Override
     public void run() {
-
         Intent serviceIntent = new Intent(context, FileTransferService.class);
         serviceIntent.setAction(FileTransferService.ACTION_SEND_FILE);
         if (!TextUtils.isEmpty(HostAdd) && HostAdd.length() > 0) {

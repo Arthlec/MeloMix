@@ -6,7 +6,10 @@ import android.os.AsyncTask;
 public class HostClass extends Thread{
 
     private Context context;
-
+    private static int instancecount = -1;
+    {
+        instancecount++;
+    }
     HostClass(Context pCo){
         context = pCo;
     }
@@ -14,6 +17,7 @@ public class HostClass extends Thread{
     public void run() {
         super.run();
         int PORT = 8988;
-        new LoadingHostActivity.FileServerAsyncTask(context,PORT).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);//execute();
+        LoadingHostActivity.FileServerAsyncTask serverAsyncTask = new LoadingHostActivity.FileServerAsyncTask(context,PORT,instancecount);
+        serverAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 }

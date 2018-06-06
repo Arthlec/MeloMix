@@ -3,12 +3,18 @@
     package="projet_e3.esiee.com.projet_e3">
 
     <!-- Permissions obligatoires pour le P2P -->
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"
+                     android:enabled="true"/>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"
+                     android:enabled="true"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"
+                     android:enabled="true"/>
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"
+                     android:enabled="true"/>
+    <uses-permission android:name="android.permission.INTERNET"
+                     android:enabled="true"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"
+                     android:enabled="true"/>
     <!-- Fin des permissions du P2P -->
 
     <application
@@ -51,6 +57,8 @@
         <activity android:name=".GuestActivity" />
         <activity android:name=".LoadingHostActivity"/>
 
-        <service android:name=".FileTransferService"/>
+        <service android:name=".FileTransferService"
+                 android:enabled="true" />
+
     </application>
 </manifest>
