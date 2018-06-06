@@ -29,7 +29,6 @@ public class FileTransferService extends IntentService {
     public static final String ACTION_SEND_FILE = "com.example.android.wifidirect.SEND_FILE";
     public static final String EXTRAS_GROUP_OWNER_ADDRESS = "go_host";
     public static final String EXTRAS_GROUP_OWNER_PORT = "go_port";
-    public static final String inetaddress = "inetaddress";
 
     public static int PORT = 8988;
 
@@ -68,7 +67,7 @@ public class FileTransferService extends IntentService {
                 e.printStackTrace();
                 mHandler.post(new Runnable() {
                     public void run() {
-                        Toast.makeText(FileTransferService.this, "Veuillez patienter votre fichier est en cours de traitement", Toast.LENGTH_LONG).show();
+                        Toast.makeText(FileTransferService.this, "L'hôte n'est pas prêt à recevoir votre fichier", Toast.LENGTH_LONG).show();
                     }
                 });
             } finally {

@@ -52,7 +52,7 @@ public class DisconnectSignal extends IntentService{
                     e.printStackTrace();
                     mHandler.post(new Runnable() {
                         public void run() {
-                            Toast.makeText(DisconnectSignal.this, "Veuillez patienter votre fichier est en cours de traitement", Toast.LENGTH_LONG).show();
+                            Toast.makeText(DisconnectSignal.this, "L'hôte n'a pas été notifié de votre départ...", Toast.LENGTH_LONG).show();
                         }
                     });
                 } finally {

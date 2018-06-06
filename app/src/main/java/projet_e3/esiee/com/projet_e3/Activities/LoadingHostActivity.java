@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pConfig;
+import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
@@ -17,6 +18,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -31,6 +33,8 @@ import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Collection;
+import java.util.List;
 
 import projet_e3.esiee.com.projet_e3.BroadCast;
 import projet_e3.esiee.com.projet_e3.Services.FileTransferService;
@@ -39,7 +43,6 @@ import projet_e3.esiee.com.projet_e3.R;
 
 public class LoadingHostActivity extends AppCompatActivity {
 
-    private ListView listView;
     private TextView TxtStatus;
     private Button NextBtn;
     private WifiP2pManager aManager;
@@ -77,7 +80,6 @@ public class LoadingHostActivity extends AppCompatActivity {
 
         this.createGrp();
 
-        listView = findViewById(R.id.HostList);
         TxtStatus = findViewById(R.id.KieKi);
         NextBtn = findViewById(R.id.NextBtn);
     }
@@ -134,15 +136,8 @@ public class LoadingHostActivity extends AppCompatActivity {
         public void onGroupInfoAvailable(WifiP2pGroup group) {
             if(group!=null)
             {
-                Toast.makeText(getApplicationContext(),group.getPassphrase(),Toast.LENGTH_SHORT).show();
                 Log.i("pass",group.getPassphrase());
                 wifiP2pGroup = group;
-                /*Collection<WifiP2pDevice> wifiP2pDevices=wifiP2pGroup.getClientList();
-                if(wifiP2pDevices!=null) {
-                    ArrayAdapter<WifiP2pDevice> hAdapter;
-                    hAdapter = new ArrayAdapter<WifiP2pDevice>(listView.getContext(), android.R.layout.simple_list_item_1, (List<WifiP2pDevice>) wifiP2pDevices);
-                    listView.setAdapter(hAdapter);
-                }*/
                 aManager.requestConnectionInfo(aChannel,connectionInfoListener);
             }
         }
@@ -151,10 +146,10 @@ public class LoadingHostActivity extends AppCompatActivity {
     public void createGrp(){
         aManager.createGroup(aChannel, new WifiP2pManager.ActionListener() {
             @Override
-            public void onSuccess() {Toast.makeText(getApplicationContext(), "Succeed create", Toast.LENGTH_SHORT).show(); }
+            public void onSuccess() {Toast.makeText(getApplicationContext(), "Groupe crée", Toast.LENGTH_SHORT).show(); }
 
             @Override
-            public void onFailure(int i) {Toast.makeText(getApplicationContext(), "fail creat", Toast.LENGTH_SHORT).show(); }
+            public void onFailure(int i) {Toast.makeText(getApplicationContext(), "Groupe déjà crée", Toast.LENGTH_SHORT).show(); }
         });
     }
 
@@ -162,12 +157,12 @@ public class LoadingHostActivity extends AppCompatActivity {
         aManager.removeGroup(aChannel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
-                Toast.makeText(getApplicationContext(),"Remove S",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),"Groupe fermé",Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFailure(int i) {
-                Toast.makeText(getApplicationContext(),"Remove F "+ i,Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),"Echec de la suppression du groupe",Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -292,8 +287,7 @@ public class LoadingHostActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
             if (result != null) {
-                Toast.makeText(mFilecontext,"File transmis"+result,Toast.LENGTH_SHORT).show();
-
+                Toast.makeText(mFilecontext,"Fichier reçu avec succes",Toast.LENGTH_SHORT).show();
                 if (!TextUtils.isEmpty(result)) {
                     FileServerAsyncTask FileServerobj = new
                             FileServerAsyncTask(mFilecontext, FileTransferService.PORT);

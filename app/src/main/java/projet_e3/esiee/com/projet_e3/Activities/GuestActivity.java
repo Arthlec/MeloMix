@@ -42,14 +42,11 @@ public class GuestActivity extends AppCompatActivity {
     private TextView TxtKiKi;
     private Button btnTry;
     private WifiP2pManager aManager;
-    private WifiManager wifiManager;
     private WifiP2pManager.Channel aChannel;
     private BroadcastReceiver mReceiver;
     private IntentFilter mIntent;
 
     private List<WifiP2pDevice> peers = new ArrayList<>();
-    private ArrayAdapter<String> hAdapter;
-    private ArrayList<String> devicename;
     private ArrayList<WifiP2pDevice> deviceArray;
     private InetAddress GoAdress;
 
@@ -77,7 +74,7 @@ public class GuestActivity extends AppCompatActivity {
 
                     @Override
                     public void onFailure(int i) {
-                        Toast.makeText(getApplicationContext(),"Fail connected to "+ device.deviceName, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(),"Fail connection to "+ device.deviceName, Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -109,7 +106,7 @@ public class GuestActivity extends AppCompatActivity {
 
     private void work() {
 
-        wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         aManager = (WifiP2pManager) getApplicationContext().getSystemService(Context.WIFI_P2P_SERVICE);
         aChannel = aManager.initialize(this,getMainLooper(),null);
 
@@ -117,12 +114,12 @@ public class GuestActivity extends AppCompatActivity {
         aManager.removeGroup(aChannel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
-                Toast.makeText(getApplicationContext(), "success suppro", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Deconnected", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFailure(int i) {
-                Toast.makeText(getApplicationContext(), "fail suppr", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Fail deconnection", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -152,8 +149,8 @@ public class GuestActivity extends AppCompatActivity {
             if (!peersDevice.getDeviceList().equals(peers)){
                 peers.clear();
                 peers.addAll(peersDevice.getDeviceList());
-                devicename = new ArrayList<String>();
-                deviceArray = new ArrayList<WifiP2pDevice>();
+                ArrayList<String> devicename = new ArrayList<>();
+                deviceArray = new ArrayList<>();
                 for(WifiP2pDevice device : peersDevice.getDeviceList())
                 {
                     if(device.isGroupOwner())
@@ -162,10 +159,8 @@ public class GuestActivity extends AppCompatActivity {
                     deviceArray.add(device);
                     }
                 }
-                if(devicename!=null) {
-                    hAdapter = new ArrayAdapter<>(listView.getContext(), android.R.layout.simple_list_item_1, devicename);
-                    listView.setAdapter(hAdapter);
-                }
+                ArrayAdapter<String> hAdapter = new ArrayAdapter<>(listView.getContext(), android.R.layout.simple_list_item_1, devicename);
+                listView.setAdapter(hAdapter);
             }
             if (peers.isEmpty()) {
                 Toast.makeText(getApplicationContext(), "Aucun appareil à proximité", Toast.LENGTH_SHORT).show();
@@ -179,8 +174,7 @@ public class GuestActivity extends AppCompatActivity {
             GoAdress = info.groupOwnerAddress;
             if (info.groupFormed && !info.isGroupOwner) {
                 TxtKiKi.setText("Guest");
-                final String ipGuest = String.valueOf(wifiManager.getConnectionInfo().getIpAddress());
-                GuestClass guestClass = new GuestClass(GoAdress, getApplicationContext(),ipGuest);
+                GuestClass guestClass = new GuestClass(GoAdress, getApplicationContext());
                 guestClass.start();
             }
         }
@@ -189,12 +183,12 @@ public class GuestActivity extends AppCompatActivity {
         aManager.discoverPeers(aChannel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
-                Toast.makeText(getApplicationContext(), "success disco", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Découverte de groupe lancée", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFailure(int reason){
-                Toast.makeText(getApplicationContext(), "fail disco", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Echec de la recherche", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -230,8 +224,7 @@ public class GuestActivity extends AppCompatActivity {
                             int sub_port = DisconnectSignal.PORT;
                             serviceIntent.putExtra(DisconnectSignal.EXTRAS_GROUP_OWNER_ADDRESS,HostAdd);
                             serviceIntent.putExtra(DisconnectSignal.EXTRAS_GROUP_OWNER_PORT, DisconnectSignal.PORT);
-
-                            if (HostAdd != null && sub_port != -1) {
+                            if (sub_port != -1) {
                                 getApplication().startService(serviceIntent);
                             }
                         }
@@ -246,12 +239,12 @@ public class GuestActivity extends AppCompatActivity {
             @Override
             public void onSuccess() {
               DeathRattle();
-              Toast.makeText(getApplicationContext(),"Remove S",Toast.LENGTH_SHORT).show();
+              Toast.makeText(getApplicationContext(),"Déconnexion réussi",Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFailure(int i) {
-                Toast.makeText(getApplicationContext(),"Remove F "+ i,Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),"Echec de la deconnexion",Toast.LENGTH_SHORT).show();
             }
         });
     }

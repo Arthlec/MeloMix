@@ -11,12 +11,10 @@ import projet_e3.esiee.com.projet_e3.Services.FileTransferService;
 public class GuestClass extends Thread {
     private String HostAdd;
     private Context context;
-    private String ipGuest;
 
-    public GuestClass(InetAddress hostAdd, Context app,String IpG) {
+    public GuestClass(InetAddress hostAdd, Context app) {
         HostAdd = hostAdd.getHostAddress();
         context = app;
-        ipGuest = IpG;
     }
 
     @Override
@@ -27,8 +25,7 @@ public class GuestClass extends Thread {
             FileTransferService.PORT = 8988;
             int sub_port = FileTransferService.PORT;
             serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_ADDRESS,HostAdd);
-            serviceIntent.putExtra(FileTransferService.inetaddress,ipGuest);
-            serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_PORT, FileTransferService.PORT);
+             serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_PORT, FileTransferService.PORT);
 
             if (HostAdd != null && sub_port != -1) {
                 context.startService(serviceIntent);
