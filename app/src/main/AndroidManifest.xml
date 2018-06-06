@@ -18,6 +18,8 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <!-- Fin des permissions du P2P -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CLEAR_APP_CACHE"/>
 
     <application
         android:fullBackupContent="true"
@@ -28,10 +30,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.Green"
         android:screenOrientation="portrait">
-        <activity android:name=".MainActivity">
+        <activity android:name=".Activities.MainActivity" android:theme="@style/SplashTheme" android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
                 <category android:name="android.intent.category.BROWSABLE" />
@@ -39,13 +40,12 @@
         </activity>
 
         <activity
-            android:name=".ProfileActivity"/>
+            android:name=".Activities.ProfileActivity"/>
         <activity
-            android:name=".LoginActivitySpotify"
+            android:name=".Activities.LoginActivitySpotify"
             android:label="Connexion Spotify">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="smooth-i" android:host="logincallback"/>
             </intent-filter>
@@ -54,15 +54,14 @@
         <activity
             android:name="com.spotify.sdk.android.authentication.LoginActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-        <activity android:name=".HostActivity"/>
-        <activity android:name=".ChooseGroupActivity" />
-        <activity android:name=".GuestActivity" />
+        <activity android:name=".Activities.HostActivity"/>
+        <activity android:name=".Activities.ChooseGroupActivity" />
+        <activity android:name=".Activities.GuestActivity"/>
         <activity android:name=".LoadingHostActivity"/>
 
         <service android:name=".FileTransferService"
-                 android:enabled="true" />
+            android:enabled="true" />
         <service android:name=".DisconnectSignal"
             android:enabled="true" />
-
     </application>
 </manifest>

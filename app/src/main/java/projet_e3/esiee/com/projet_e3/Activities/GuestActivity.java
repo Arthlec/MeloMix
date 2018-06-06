@@ -1,4 +1,4 @@
-package projet_e3.esiee.com.projet_e3;
+package projet_e3.esiee.com.projet_e3.Activities;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -22,6 +22,8 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import projet_e3.esiee.com.projet_e3.R;
 
 import java.io.IOException;
 import java.io.InputStream;

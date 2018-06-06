@@ -52,26 +52,28 @@
         android:id="@+id/actualizeButton"
         android:layout_width="49dp"
         android:layout_height="29dp"
+        android:background="@null"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.178"
         app:layout_constraintStart_toEndOf="@+id/imageButton"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.436"
-        app:srcCompat="@drawable/actualize"
+        app:srcCompat="@drawable/ic_refresh"
         android:contentDescription="@string/bouton_actualiser" />
 
     <ImageButton
         android:id="@+id/disconnectButton"
         android:layout_width="49dp"
         android:layout_height="29dp"
+        android:background="@null"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.888"
         app:layout_constraintStart_toEndOf="@+id/imageButton"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.436"
-        app:srcCompat="@drawable/disconnect"
+        app:srcCompat="@drawable/ic_exit"
         android:contentDescription="@string/bouton_d_connecter" />
 
     <Button

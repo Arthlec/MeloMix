@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Smooth-i</string>
     <string name="pseudo">Pseudo</string>
-    <string name="enter">Enter</string>
+    <string name="enter">Confirmer</string>
     <string name="je_cr_e_mon_groupe">Je crée mon groupe</string>
     <string name="je_rejoins_un_groupe">Je rejoins un groupe</string>
     <string name="confirmer">Confirmer</string>
@@ -10,4 +10,8 @@
     <string name="bouton_actualiser">Bouton actualiser</string>
     <string name="bouton_d_connecter">Bouton déconnecter</string>
     <string name="bouton_spotify">Bouton Spotify</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="app_description">Noozic est une application permettant la récolte des goûts musicaux. L’application peut ainsi, orienter les styles de musiques à choisir.</string>
 </resources>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_main"
+            android:title="Menu principal" />
+        <item
+            android:id="@+id/nav_stats"
+            android:title="Statistiques" />
+        <item
+            android:id="@+id/nav_musics"
+            android:title="Musiques enregistrées" />
+        <item
+            android:id="@+id/nav_history"
+            android:title="Historique des musiques" />
+        <item
+            android:id="@+id/nav_guests"
+            android:title="Liste des invités" />
+        <item
+            android:id="@+id/nav_disconnect"
+            android:title="Se déconnecter" />
+    </group>
+</menu>
