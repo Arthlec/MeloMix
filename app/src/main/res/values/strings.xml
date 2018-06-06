@@ -10,4 +10,6 @@
     <string name="bouton_actualiser">Bouton actualiser</string>
     <string name="bouton_d_connecter">Bouton déconnecter</string>
     <string name="bouton_spotify">Bouton Spotify</string>
+    <string name="ok">ok</string>
+    <string name="cancel">cancel</string>
 </resources>

@@ -2,6 +2,7 @@ package projet_e3.esiee.com.projet_e3;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WpsInfo;
@@ -169,6 +170,10 @@ public class GuestActivity extends AppCompatActivity {
                 TxtKiKi.setText("Guest");
                 GuestClass guestClass = new GuestClass(groupOwnerAdress, getApplicationContext());
                 guestClass.start();
+
+                /*Intent intent = new Intent(GuestActivity.this, HostActivity.class);
+                intent.putExtra("authToken", getIntent().getStringExtra("authToken"));
+                startActivity(intent);*/
             }
         }
     };
@@ -197,6 +202,7 @@ public class GuestActivity extends AppCompatActivity {
             out.flush();
             out.close();
             inputStream.close();
+
         } catch (IOException e) {
             e.getMessage();
         }

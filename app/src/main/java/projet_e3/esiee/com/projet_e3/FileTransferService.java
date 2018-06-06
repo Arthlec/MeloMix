@@ -62,6 +62,7 @@ public class FileTransferService extends IntentService {
                //InputStream inputStream = context.getResources().openRawResource(R.drawable.ic_launcher_background);
 
                 GuestActivity.copyFile(inputStream, outputStream);
+
             } catch (IOException e) {
                 e.printStackTrace();
                 mHandler.post(new Runnable() {
