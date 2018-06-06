@@ -47,6 +47,7 @@ import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.SparseInstance;
+import weka.filters.unsupervised.attribute.NumericToBinary;
 
 public class LoadingHostActivity extends AppCompatActivity {
     private ListView listView;
@@ -84,7 +85,6 @@ public class LoadingHostActivity extends AppCompatActivity {
 
         int numberOfUsers = files.length;
         ArrayList<Attribute> attributeArrayList = new ArrayList<Attribute>();
-        Instances dataBase = new Instances("userGenres", attributeArrayList, numberOfUsers);
 
         for (int i = 0; i < numberOfUsers; i++) {
             Log.d("Files", "FileName:" + files[i].getName());
@@ -97,20 +97,37 @@ public class LoadingHostActivity extends AppCompatActivity {
 
             //Log.i("mapKeyset", map.keySet().toString());
             //Log.i("mapValues", map.values().toString());
-            int numberOfGenres = map.size();
-            Instance user = new SparseInstance(numberOfGenres);
-            int index = 0;
-
             for(Map.Entry<Object, Object> entry : map.entrySet()){
-                Attribute genre = new Attribute((String)entry.getKey(), index);
+                Attribute genre = new Attribute((String)entry.getKey());
                 //genre.setWeight((double)map.get(genre));
                 /*Log.i("genre", (String)entry.getKey());
                 Log.i("getGenre", "" + entry.getValue());*/
-                attributeArrayList.add(genre);
-                user.setValue(genre, (double)entry.getValue());
-                index++;
+                if(!attributeArrayList.contains(genre))
+                    attributeArrayList.add(genre);
             }
+        }
 
+        //Log.i("ListOfAttributes", attributeArrayList.toString());
+        int numberOfGenres = attributeArrayList.size();
+        Instances dataBase = new Instances("usersGenres", attributeArrayList, numberOfUsers);
+        //NumericToBinary filter = new NumericToBinary();
+
+        for (int i = 0; i < numberOfUsers; i++) {
+            Map<Object,Object> map = null;
+            try {
+                map = JSON.std.mapFrom(files[i]);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Instance user = new SparseInstance(numberOfGenres);
+            for(int p = 0; p<attributeArrayList.size(); p++){
+                Attribute currentAttribute = attributeArrayList.get(p);
+                String attributeName = currentAttribute.name();
+                if(map.containsKey(attributeName)){
+                    user.setValue(currentAttribute, (double)map.get(attributeName));
+                }
+            }
+            //filter.input(user);
             dataBase.add(user);
         }
 
@@ -121,11 +138,11 @@ public class LoadingHostActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        int sizeItemsets = algo.m_largeItemSets.size();
+        /*int sizeItemsets = algo.m_largeItemSets.size();
         Log.i("frequentItemsetsSize", "" + sizeItemsets);
         for(int i = 0; i <sizeItemsets; i++){
             Log.i("frequentItemset", "" + algo.m_largeItemSets.toString(i));
-        }
+        }*/
     }
 
     private void work() {

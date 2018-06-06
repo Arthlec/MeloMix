@@ -354,6 +354,36 @@ public class FPGrowth extends AbstractAssociator implements AssociationRulesProd
         return tree;
     }
 
+    /*protected FPGrowth.FPTreeRoot buildFPTree(ArrayList<BinaryItem> singletons, Object dataSource, int minSupport) throws Exception {
+        FPGrowth.FPTreeRoot tree = new FPGrowth.FPTreeRoot();
+        Instances data = null;
+        if (dataSource instanceof Instances) {
+            data = (Instances)dataSource;
+        } else if (dataSource instanceof ArffLoader) {
+            data = ((ArffLoader)dataSource).getStructure();
+        }
+
+        if (dataSource instanceof Instances) {
+            for(int i = 0; i < data.numInstances(); ++i) {
+                this.insertInstance(data.instance(i), singletons, tree, minSupport);
+            }
+        } else if (dataSource instanceof ArffLoader) {
+            ArffLoader loader = (ArffLoader)dataSource;
+            Instance current = null;
+            int count = 0;
+
+            while((current = loader.getNextInstance(data)) != null) {
+                this.insertInstance(current, singletons, tree, minSupport);
+                ++count;
+                if (count % this.m_offDiskReportingFrequency == 0) {
+                    System.err.println("build tree done: " + count);
+                }
+            }
+        }
+
+        return tree;
+    }*/
+
     protected void mineTree(FPGrowth.FPTreeRoot tree, FPGrowth.FrequentItemSets largeItemSets, int recursionLevel, FPGrowth.FrequentBinaryItemSet conditionalItems, int minSupport) {
         if (!tree.isEmpty(recursionLevel)) {
             if (this.m_maxItems <= 0 || recursionLevel < this.m_maxItems) {
