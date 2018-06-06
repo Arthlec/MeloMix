@@ -17,7 +17,8 @@ public class HostClass extends Thread{
     public void run() {
         super.run();
         int PORT = 8988;
-        LoadingHostActivity.FileServerAsyncTask serverAsyncTask = new LoadingHostActivity.FileServerAsyncTask(context,PORT,instancecount);
+        LoadingHostActivity.FileServerAsyncTask serverAsyncTask = new LoadingHostActivity.FileServerAsyncTask(context,PORT);
         serverAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        new LoadingHostActivity.onDecoAsyncTask(context,9899).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 }

@@ -1,9 +1,11 @@
 package projet_e3.esiee.com.projet_e3;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
@@ -55,15 +57,7 @@ public class LoadingHostActivity extends AppCompatActivity {
     private WifiP2pManager.Channel aChannel;
     private BroadcastReceiver mReceiver;
     private IntentFilter mIntent;
-
-    private List<WifiP2pDevice> peers = new ArrayList<>();
-    private List<WifiP2pDevice> PartyPeers = new ArrayList<>();
-    private ArrayAdapter<String> hAdapter;
-    private String[] deviceName;
-    private WifiP2pDevice[] deviceArray;
     private final WifiP2pConfig config = new WifiP2pConfig();
-    private static HashMap<String,String> DeviceDico = new HashMap<>();
-    private static List<String> StackDevice = new ArrayList<>();
     private WifiP2pGroup wifiP2pGroup;
 
     @Override
@@ -108,26 +102,6 @@ public class LoadingHostActivity extends AppCompatActivity {
 
     private void InitOnClick() {
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int i, long id) {
-                 final WifiP2pDevice device = deviceArray[i];
-                config.deviceAddress = device.deviceAddress;
-                config.wps.setup = WpsInfo.PBC;
-                aManager.connect(aChannel, config, new WifiP2pManager.ActionListener() {
-                    @Override
-                    public void onSuccess() {
-                        Toast.makeText(getApplicationContext(),"connected to "+ device.deviceName, Toast.LENGTH_SHORT).show();
-                    }
-                    @Override
-                    public void onFailure(int i) {
-                        Toast.makeText(getApplicationContext(),"Fail connected to "+ device.deviceName, Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-            }
-        });
-
         NextBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -155,18 +129,6 @@ public class LoadingHostActivity extends AppCompatActivity {
         }
     }
 
-    public static HashMap<String, String> getDeviceDico() {
-        return DeviceDico;
-    }
-
-    public static void setDeviceDico(String device,String ip) {
-        DeviceDico.put(device,ip);
-    }
-
-    public static List<String> getStackDevice() {
-        return StackDevice;
-    }
-
     WifiP2pManager.ConnectionInfoListener connectionInfoListener = new WifiP2pManager.ConnectionInfoListener() {
         @Override
         public void onConnectionInfoAvailable(WifiP2pInfo info) {
@@ -186,23 +148,12 @@ public class LoadingHostActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(),group.getPassphrase(),Toast.LENGTH_SHORT).show();
                 Log.i("pass",group.getPassphrase());
                 wifiP2pGroup = group;
-                try {
-                    NetworkInterface networkInterface = NetworkInterface.getByName(wifiP2pGroup.getInterface());
-                    List<InterfaceAddress> id = networkInterface.getInterfaceAddresses();
-                    Log.i("Tg",id+"");
-                } catch (SocketException e) {
-                    e.printStackTrace();
-                }
-                if(!wifiP2pGroup.getClientList().isEmpty())
-                {
-                    WifiP2pDevice device = wifiP2pGroup.getClientList().iterator().next();
-                    Log.i("TT",wifiP2pGroup.getClientList().iterator().next()+"\n"+wifiP2pGroup.getClientList());
-                    if(!PartyPeers.contains(device))
-                    {PartyPeers.add(device);}
-                    if(!StackDevice.contains(device.deviceAddress))
-                    {StackDevice.add(device.deviceAddress);}
-                }
-                SuppressJson();
+                /*Collection<WifiP2pDevice> wifiP2pDevices=wifiP2pGroup.getClientList();
+                if(wifiP2pDevices!=null) {
+                    ArrayAdapter<WifiP2pDevice> hAdapter;
+                    hAdapter = new ArrayAdapter<WifiP2pDevice>(listView.getContext(), android.R.layout.simple_list_item_1, (List<WifiP2pDevice>) wifiP2pDevices);
+                    listView.setAdapter(hAdapter);
+                }*/
                 aManager.requestConnectionInfo(aChannel,connectionInfoListener);
             }
         }
@@ -216,29 +167,6 @@ public class LoadingHostActivity extends AppCompatActivity {
             @Override
             public void onFailure(int i) {Toast.makeText(getApplicationContext(), "fail creat", Toast.LENGTH_SHORT).show(); }
         });
-    }
-
-    public Stack<String> getAwayDevices(){
-        Stack<String> AwayDevices = new Stack<>();
-        Collection<WifiP2pDevice> clientList = wifiP2pGroup.getClientList();
-        Log.i("AwayDevices",clientList+"   n");
-        if(!PartyPeers.isEmpty()){
-            for (WifiP2pDevice device : PartyPeers){
-                if(!clientList.contains(device)) {
-                    AwayDevices.add(device.deviceAddress);
-                }
-            }
-        }
-        return AwayDevices;
-    }
-
-    public void SuppressJson(){
-        for(String device: getAwayDevices()){
-            String Name = getDeviceDico().get(device);
-            Log.i("AwayDevices",getDeviceDico()+"   n");
-            File file =  new File(getApplicationContext().getFilesDir(),Name+".json");
-            file.delete();
-        }
     }
 
     public void disconnect(){
@@ -284,16 +212,14 @@ public class LoadingHostActivity extends AppCompatActivity {
         });
     }
 
-    public static class FileServerAsyncTask extends AsyncTask<String, String, String> {
+    public static class onDecoAsyncTask extends AsyncTask<String, String, String> {
 
+        @SuppressLint("StaticFieldLeak")
         private Context mFilecontext;
         private int PORT;
-        private Socket CurrentClient;
-        private static int instanceCount = 0;
-        FileServerAsyncTask(Context context, int port,int instance) {
+        onDecoAsyncTask(Context context, int port) {
             this.mFilecontext = context;
             this.PORT = port;
-            instanceCount = instance;
         }
 
         @Override
@@ -304,7 +230,52 @@ public class LoadingHostActivity extends AppCompatActivity {
                 serverSocket.bind(new InetSocketAddress(PORT));
 
                 Socket client = serverSocket.accept();
-                CurrentClient = client;
+                try {
+                    String IpClient = client.getInetAddress().getHostAddress();
+                    File file =  new File(mFilecontext.getFilesDir(),IpClient+".json");
+                    file.delete();
+
+                    serverSocket.close();
+                    return IpClient;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            } catch (IOException e) {
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            if (result != null) {
+                if (!TextUtils.isEmpty(result)) {
+                    onDecoAsyncTask decoObj = new
+                            onDecoAsyncTask(mFilecontext, FileTransferService.PORT);
+                    decoObj.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new String[]{null});
+                }
+            }
+        }
+    }
+
+    public static class FileServerAsyncTask extends AsyncTask<String, String, String> {
+
+        @SuppressLint("StaticFieldLeak")
+        private Context mFilecontext;
+        private int PORT;
+        FileServerAsyncTask(Context context, int port) {
+            this.mFilecontext = context;
+            this.PORT = port;
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                ServerSocket serverSocket = new ServerSocket();
+                serverSocket.setReuseAddress(true);
+                serverSocket.bind(new InetSocketAddress(PORT));
+
+                Socket client = serverSocket.accept();
                 try {
                     String IpClient = client.getInetAddress().getHostAddress();
                    final File f = new File(mFilecontext.getFilesDir(), IpClient+".json");
@@ -332,21 +303,11 @@ public class LoadingHostActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
             if (result != null) {
-                if(!getStackDevice().isEmpty()){
-                    String IpClient = CurrentClient.getInetAddress().getHostAddress();
-                    String device = getStackDevice().get(instanceCount);
-                    getStackDevice().remove(instanceCount);
-                    setDeviceDico(device,IpClient);
-                    Log.i("r",getStackDevice()+"");
-                    Log.i("dico",getDeviceDico()+"");
-                    Toast.makeText(mFilecontext,"pas empty",Toast.LENGTH_SHORT).show();
-                }
-                else {Toast.makeText(mFilecontext,"EmptyStack",Toast.LENGTH_SHORT).show();}
                 Toast.makeText(mFilecontext,"File transmis"+result,Toast.LENGTH_SHORT).show();
 
                 if (!TextUtils.isEmpty(result)) {
                     FileServerAsyncTask FileServerobj = new
-                            FileServerAsyncTask(mFilecontext, FileTransferService.PORT,instanceCount+1);
+                            FileServerAsyncTask(mFilecontext, FileTransferService.PORT);
                     FileServerobj.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new String[]{null});
                 }
             }

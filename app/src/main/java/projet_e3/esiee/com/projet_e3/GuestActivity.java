@@ -2,6 +2,7 @@ package projet_e3.esiee.com.projet_e3;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WpsInfo;
@@ -10,8 +11,10 @@ import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -43,6 +46,7 @@ public class GuestActivity extends AppCompatActivity {
     private ArrayAdapter<String> hAdapter;
     private ArrayList<String> devicename;
     private ArrayList<WifiP2pDevice> deviceArray;
+    private InetAddress GoAdress;
 
     private final WifiP2pConfig config = new WifiP2pConfig();
     @Override
@@ -167,11 +171,11 @@ public class GuestActivity extends AppCompatActivity {
     WifiP2pManager.ConnectionInfoListener connectionInfoListener = new WifiP2pManager.ConnectionInfoListener() {
         @Override
         public void onConnectionInfoAvailable(WifiP2pInfo info) {
-            final InetAddress groupOwnerAdress = info.groupOwnerAddress;
+            GoAdress = info.groupOwnerAddress;
             if (info.groupFormed && !info.isGroupOwner) {
                 TxtKiKi.setText("Guest");
                 final String ipGuest = String.valueOf(wifiManager.getConnectionInfo().getIpAddress());
-                GuestClass guestClass = new GuestClass(groupOwnerAdress, getApplicationContext(),ipGuest);
+                GuestClass guestClass = new GuestClass(GoAdress, getApplicationContext(),ipGuest);
                 guestClass.start();
             }
         }
@@ -207,11 +211,37 @@ public class GuestActivity extends AppCompatActivity {
         }
     }
 
+    public void DeathRattle(){
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                new Thread(new Runnable() {
+                    public void run() {
+                        Intent serviceIntent = new Intent(getApplicationContext(), DisconnectSignal.class);
+                        serviceIntent.setAction(DisconnectSignal.ACTION_SEND_DEATH);
+                        String HostAdd = GoAdress.getHostAddress();
+                        if (!TextUtils.isEmpty(HostAdd) && HostAdd.length() > 0) {
+                            DisconnectSignal.PORT = 9899;
+                            int sub_port = DisconnectSignal.PORT;
+                            serviceIntent.putExtra(DisconnectSignal.EXTRAS_GROUP_OWNER_ADDRESS,HostAdd);
+                            serviceIntent.putExtra(DisconnectSignal.EXTRAS_GROUP_OWNER_PORT, DisconnectSignal.PORT);
+
+                            if (HostAdd != null && sub_port != -1) {
+                                getApplication().startService(serviceIntent);
+                            }
+                        }
+                    }
+                }).start();
+            }
+        });
+    }
+
     public void disconnect(){
         aManager.removeGroup(aChannel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
-                Toast.makeText(getApplicationContext(),"Remove S",Toast.LENGTH_SHORT).show();
+              DeathRattle();
+              Toast.makeText(getApplicationContext(),"Remove S",Toast.LENGTH_SHORT).show();
             }
 
             @Override
