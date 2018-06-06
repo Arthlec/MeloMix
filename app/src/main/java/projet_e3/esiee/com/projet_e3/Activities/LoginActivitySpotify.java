@@ -392,6 +392,8 @@ public class LoginActivitySpotify extends AppCompatActivity {
                 int topGenresNumber = topGenresStack.size();
                 int totalGenresNumber = genresNumber + topGenresNumber;
                 float topGenresPercentage = 40;
+                if (topGenresNumber == 0) topGenresPercentage = 0;
+                else if (genresNumber == 0) topGenresPercentage = 100;
                 float classicGenresWeight = (totalGenresNumber * (100 - topGenresPercentage) / 100) / genresStack.size();
                 float topGenresWeight = (totalGenresNumber * topGenresPercentage / 100) / topGenresStack.size();
                 for (int i=0; i<genresNumber; i++) {
