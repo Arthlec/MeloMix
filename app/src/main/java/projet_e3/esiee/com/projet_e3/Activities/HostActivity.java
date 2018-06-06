@@ -1,7 +1,10 @@
 package projet_e3.esiee.com.projet_e3.Activities;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v4.app.Fragment;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -21,6 +24,7 @@ import com.fasterxml.jackson.jr.private_.TreeNode;
 import com.fasterxml.jackson.jr.stree.JacksonJrsTreeCodec;
 import com.fasterxml.jackson.jr.stree.JrsString;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -47,6 +51,7 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
     private DrawerLayout mDrawerLayout;
     private Stack<Bitmap> tracksCovers = new Stack<>();
     private Stack<String> tracksNames = new Stack<>();
+    private String MY_PREFS = "my_prefs";
 
     //FOR FRAGMENTS
     // 1 - Declare fragment handled by Navigation Drawer
@@ -108,6 +113,9 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.nav_guests:
                 this.showFragment(FRAGMENT_GUESTS_LIST);
+                break;
+            case R.id.nav_disconnect:
+                this.disconnect();
                 break;
             default:
                 break;
@@ -321,5 +329,39 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         });
+    }
+
+    private void disconnect() {
+        deleteCache(this);
+        ProfileActivity.isLoggedInSpotify = false; //disconnect from spotify
+        SharedPreferences pref = getApplicationContext().getSharedPreferences(MY_PREFS, MODE_PRIVATE);
+        pref.edit().remove("user_name").apply(); //clear pref pseudo
+        Intent intent = new Intent(HostActivity.this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); //clear stack activity
+        startActivity(intent);
+    }
+
+    public static void deleteCache(Context context) {
+        try {
+            File dir = context.getCacheDir();
+            deleteDir(dir);
+        } catch (Exception e) {}
+    }
+
+    public static boolean deleteDir(File dir) {
+        if (dir != null && dir.isDirectory()) {
+            String[] children = dir.list();
+            for (int i = 0; i < children.length; i++) {
+                boolean success = deleteDir(new File(dir, children[i]));
+                if (!success) {
+                    return false;
+                }
+            }
+            return dir.delete();
+        } else if(dir!= null && dir.isFile()) {
+            return dir.delete();
+        } else {
+            return false;
+        }
     }
 }
