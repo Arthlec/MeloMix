@@ -1,15 +1,12 @@
-package projet_e3.esiee.com.projet_e3;
+package projet_e3.esiee.com.projet_e3.Activities;
 
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
-import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
@@ -20,8 +17,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -33,20 +28,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.InterfaceAddress;
-import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Stack;
+
+import projet_e3.esiee.com.projet_e3.BroadCast;
+import projet_e3.esiee.com.projet_e3.Services.FileTransferService;
+import projet_e3.esiee.com.projet_e3.HostClass;
+import projet_e3.esiee.com.projet_e3.R;
 
 public class LoadingHostActivity extends AppCompatActivity {
 
@@ -140,7 +129,7 @@ public class LoadingHostActivity extends AppCompatActivity {
         }
     };
 
-    WifiP2pManager.GroupInfoListener groupInfoListener = new WifiP2pManager.GroupInfoListener() {
+    public WifiP2pManager.GroupInfoListener groupInfoListener = new WifiP2pManager.GroupInfoListener() {
         @Override
         public void onGroupInfoAvailable(WifiP2pGroup group) {
             if(group!=null)
@@ -217,7 +206,7 @@ public class LoadingHostActivity extends AppCompatActivity {
         @SuppressLint("StaticFieldLeak")
         private Context mFilecontext;
         private int PORT;
-        onDecoAsyncTask(Context context, int port) {
+        public onDecoAsyncTask(Context context, int port) {
             this.mFilecontext = context;
             this.PORT = port;
         }
@@ -263,7 +252,7 @@ public class LoadingHostActivity extends AppCompatActivity {
         @SuppressLint("StaticFieldLeak")
         private Context mFilecontext;
         private int PORT;
-        FileServerAsyncTask(Context context, int port) {
+        public FileServerAsyncTask(Context context, int port) {
             this.mFilecontext = context;
             this.PORT = port;
         }

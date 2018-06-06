@@ -23,6 +23,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import projet_e3.esiee.com.projet_e3.BroadCast;
+import projet_e3.esiee.com.projet_e3.Services.DisconnectSignal;
+import projet_e3.esiee.com.projet_e3.GuestClass;
 import projet_e3.esiee.com.projet_e3.R;
 
 import java.io.IOException;
@@ -143,7 +146,7 @@ public class GuestActivity extends AppCompatActivity {
         mIntent.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
     }
 
-    WifiP2pManager.PeerListListener peerListListener =  new WifiP2pManager.PeerListListener() {
+    public WifiP2pManager.PeerListListener peerListListener =  new WifiP2pManager.PeerListListener() {
         @Override
         public void onPeersAvailable(WifiP2pDeviceList peersDevice) {
             if (!peersDevice.getDeviceList().equals(peers)){
@@ -170,7 +173,7 @@ public class GuestActivity extends AppCompatActivity {
         }
     };
 
-    WifiP2pManager.ConnectionInfoListener connectionInfoListener = new WifiP2pManager.ConnectionInfoListener() {
+    public WifiP2pManager.ConnectionInfoListener connectionInfoListener = new WifiP2pManager.ConnectionInfoListener() {
         @Override
         public void onConnectionInfoAvailable(WifiP2pInfo info) {
             GoAdress = info.groupOwnerAddress;

@@ -9,10 +9,8 @@ import android.net.wifi.p2p.WifiP2pManager;
 import android.util.Log;
 import android.widget.Toast;
 
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.util.Enumeration;
+import projet_e3.esiee.com.projet_e3.Activities.GuestActivity;
+import projet_e3.esiee.com.projet_e3.Activities.LoadingHostActivity;
 
 /**
  * Permet de sonder tous les changements d'états Peer to Peer

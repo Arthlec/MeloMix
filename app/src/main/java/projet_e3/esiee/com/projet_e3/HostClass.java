@@ -3,6 +3,8 @@ package projet_e3.esiee.com.projet_e3;
 import android.content.Context;
 import android.os.AsyncTask;
 
+import projet_e3.esiee.com.projet_e3.Activities.LoadingHostActivity;
+
 public class HostClass extends Thread{
 
     private Context context;
@@ -10,7 +12,7 @@ public class HostClass extends Thread{
     {
         instancecount++;
     }
-    HostClass(Context pCo){
+    public HostClass(Context pCo){
         context = pCo;
     }
     @Override

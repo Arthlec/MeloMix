@@ -1,4 +1,4 @@
-package projet_e3.esiee.com.projet_e3;
+package projet_e3.esiee.com.projet_e3.Services;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,6 +14,9 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.os.Handler;
 import android.widget.Toast;
+
+import projet_e3.esiee.com.projet_e3.Activities.GuestActivity;
+
 /**
  * A service that process each file transfer request i.e Intent by opening a
  * socket connection with the WiFi Direct Group Owner and writing the file

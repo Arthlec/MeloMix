@@ -18,7 +18,6 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <!-- Fin des permissions du P2P -->
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CLEAR_APP_CACHE"/>
 
     <application
@@ -57,11 +56,11 @@
         <activity android:name=".Activities.HostActivity"/>
         <activity android:name=".Activities.ChooseGroupActivity" />
         <activity android:name=".Activities.GuestActivity"/>
-        <activity android:name=".LoadingHostActivity"/>
+        <activity android:name=".Activities.LoadingHostActivity"/>
 
-        <service android:name=".FileTransferService"
+        <service android:name=".Services.FileTransferService"
             android:enabled="true" />
-        <service android:name=".DisconnectSignal"
+        <service android:name=".Services.DisconnectSignal"
             android:enabled="true" />
     </application>
 </manifest>

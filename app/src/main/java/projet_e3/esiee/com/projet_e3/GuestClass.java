@@ -6,12 +6,14 @@ import android.content.Intent;
 import android.text.TextUtils;
 import java.net.InetAddress;
 
+import projet_e3.esiee.com.projet_e3.Services.FileTransferService;
+
 public class GuestClass extends Thread {
     private String HostAdd;
     private Context context;
     private String ipGuest;
 
-    GuestClass(InetAddress hostAdd, Context app,String IpG) {
+    public GuestClass(InetAddress hostAdd, Context app,String IpG) {
         HostAdd = hostAdd.getHostAddress();
         context = app;
         ipGuest = IpG;
