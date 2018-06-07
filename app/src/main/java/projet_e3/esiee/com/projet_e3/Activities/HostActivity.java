@@ -96,6 +96,10 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
     public boolean onNavigationItemSelected(MenuItem menuItem) {
         // set item as selected to persist highlight
         menuItem.setChecked(true);
+        if (menuItem.getItemId() == R.id.nav_disconnect) {
+            this.disconnect();
+            return true;
+        }
         // close drawer when item is tapped
         mDrawerLayout.closeDrawers();
         switch (menuItem.getItemId()) {
@@ -113,9 +117,6 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.nav_guests:
                 this.showFragment(FRAGMENT_GUESTS_LIST);
-                break;
-            case R.id.nav_disconnect:
-                this.disconnect();
                 break;
             default:
                 break;
