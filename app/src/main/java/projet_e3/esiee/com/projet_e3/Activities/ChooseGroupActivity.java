@@ -87,7 +87,7 @@ public class ChooseGroupActivity extends AppCompatActivity implements NumberPick
         public Dialog onCreateDialog(Bundle savedInstanceState) {
 
             final NumberPicker numberPicker = new NumberPicker(getActivity());
-            numberPicker.setMinValue(1);
+            numberPicker.setMinValue(0);
             numberPicker.setMaxValue(10);
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());

@@ -134,8 +134,8 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
             trackName = nextTrackName;
             nextBmp = null;
             nextTrackName = null;
-            HistoryFragment.trackCoverList.add(bmp);
-            HistoryFragment.trackNameList.add(trackName);
+            HistoryFragment.trackCoverList.add(0, bmp);
+            HistoryFragment.trackNameList.add(0, trackName);
         }
         else {
             if(!tracksCovers.isEmpty()) {
@@ -143,8 +143,8 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
                 nextTrackName = trackName;
                 bmp = tracksCovers.pop();
                 trackName = tracksNames.pop();
-                HistoryFragment.trackCoverList.add(bmp);
-                HistoryFragment.trackNameList.add(trackName);
+                HistoryFragment.trackCoverList.add(0, bmp);
+                HistoryFragment.trackNameList.add(0, trackName);
             }
         }
         MainFragment.updateCovers(bmp, trackName, nextBmp, nextTrackName);
@@ -158,8 +158,8 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
                     .setMessage("Vous avez déjà enregistré cette musique, voulez-vous l'enregistrer à nouveau ?")
                     .setPositiveButton("Ajouter", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
-                            SavedMusicsFragment.trackCoverList.add(bmp);
-                            SavedMusicsFragment.trackNameList.add(trackName);
+                            SavedMusicsFragment.trackCoverList.add(0, bmp);
+                            SavedMusicsFragment.trackNameList.add(0, trackName);
                         }
                     })
                     .setNegativeButton("Annuler", new DialogInterface.OnClickListener() {
@@ -170,8 +170,8 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
                     .show();
         }
         else {
-            SavedMusicsFragment.trackCoverList.add(bmp);
-            SavedMusicsFragment.trackNameList.add(trackName);
+            SavedMusicsFragment.trackCoverList.add(0, bmp);
+            SavedMusicsFragment.trackNameList.add(0, trackName);
         }
     }
 
@@ -264,8 +264,8 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
                     trackName = getTrackInfo()[1];
 
                     // Might cause a issue if requestData isn't used only during the initialisation
-                    HistoryFragment.trackCoverList.add(bmp);
-                    HistoryFragment.trackNameList.add(trackName);
+                    HistoryFragment.trackCoverList.add(0, bmp);
+                    HistoryFragment.trackNameList.add(0, trackName);
                     // Might cause a issue if requestData isn't used only during the initialisation
 
                     URL nextTrackURL = new URL("https://www.theedgesusu.co.uk/wp-content/uploads/2017/10/post-malone-e1508708621268.jpg");
