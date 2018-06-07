@@ -1,6 +1,7 @@
 package projet_e3.esiee.com.projet_e3.Fragments;
 
 import android.graphics.Bitmap;
+import android.provider.Telephony;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.Pair;
@@ -8,10 +9,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import projet_e3.esiee.com.projet_e3.R;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
 
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
@@ -41,10 +45,19 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         holder.display(pair);
     }
 
+    public void removeItem(int position) {
+        characters.remove(position);
+        // notify the item removed by position
+        // to perform recycler view delete animations
+        // NOTE: don't call notifyDataSetChanged()
+        notifyItemRemoved(position);
+    }
+
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
         private final ImageView savedTrackCover;
         private final TextView savedTrackName;
+        public RelativeLayout viewBackground, viewForeground;
 
         private Pair<Bitmap, String> currentPair;
 
@@ -53,6 +66,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
             savedTrackCover = itemView.findViewById(R.id.savedTrackCover);
             savedTrackName = itemView.findViewById(R.id.savedTrackName);
+            viewBackground = itemView.findViewById(R.id.view_background);
+            viewForeground = itemView.findViewById(R.id.view_foreground);
         }
 
         public void display(Pair<Bitmap, String> pair) {
