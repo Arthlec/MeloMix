@@ -7,6 +7,12 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.util.Log;
+import android.widget.Toast;
+
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
 
 /**
  * Permet de sonder tous les changements d'états Peer to Peer
@@ -45,13 +51,14 @@ public class BroadCast extends BroadcastReceiver {
                     manager.requestPeers(channel,guestActivity.peerListListener);
                 }
                 else if(host != null && guestActivity == null) {
-                    manager.requestPeers(channel, host.peerListListener);
+                    //manager.requestPeers(channel, host.peerListListener);
                 }
             }
         }
         else if(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)){
-            //Detection d'une connexion
+            //Detection d'une connexion et déco
             if(manager== null){
+                Toast.makeText(context,"Une deconnexion "+action,Toast.LENGTH_SHORT).show();
                 return;
             }
             NetworkInfo networkInfo = intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
@@ -60,12 +67,18 @@ public class BroadCast extends BroadcastReceiver {
                 if(guestActivity != null && host == null) {
                     manager.requestConnectionInfo(channel, guestActivity.connectionInfoListener);
                 }else if(host != null && guestActivity == null) {
-                    manager.requestConnectionInfo(channel, host.connectionInfoListener);
+                    manager.requestGroupInfo(channel,host.groupInfoListener);
+                    //manager.requestConnectionInfo(channel, host.connectionInfoListener);
                 }
             }
         }
         else if(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)){
-            Log.i("DEVICE CHANGES","Devices changed action");
+            if(guestActivity != null && host == null) {
+                Log.i("DEVICE guest","Devices changed "+action);
+            }else if(host != null && guestActivity == null) {
+                Log.i("DEVICE Host","Devices changed host "+action);
+            }
+
         }
     }
 }
