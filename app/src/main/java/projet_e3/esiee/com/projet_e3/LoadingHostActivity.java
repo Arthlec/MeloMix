@@ -37,6 +37,7 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -151,16 +152,19 @@ public class LoadingHostActivity extends AppCompatActivity {
         //Log.i("dataBase", dataBase.toString());
 
         FPGrowth algo = new FPGrowth();
+        algo.setLowerBoundMinSupport(0.5); //on définit le seuil minimum
         try {
             algo.buildAssociations(dataBase);
+            //algo.getFrequentItems(dataBase);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         int sizeItemsets = algo.m_largeItemSets.size();
+        Iterator<FPGrowth.FrequentBinaryItemSet> itemsets = algo.m_largeItemSets.iterator();
         Log.i("frequentItemsetsSize", "" + sizeItemsets);
-        for(int i = 0; i <sizeItemsets; i++){
-            Log.i("frequentItemset", "" + algo.m_largeItemSets.toString(i));
+        while(itemsets.hasNext()){
+            Log.i("itemset", itemsets.next().toString());
         }
     }
 
