@@ -13,6 +13,8 @@ import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.AsyncTask;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -130,6 +132,7 @@ public class LoadingHostActivity extends AppCompatActivity {
                     intent.putExtra("host",1);
                     startActivity(intent);
                 }
+
             }
         }
     };

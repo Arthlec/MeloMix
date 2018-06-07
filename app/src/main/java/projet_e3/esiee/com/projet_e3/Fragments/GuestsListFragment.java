@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import projet_e3.esiee.com.projet_e3.Activities.LoadingHostActivity;
 import projet_e3.esiee.com.projet_e3.R;
 
 /**
@@ -17,8 +18,7 @@ import projet_e3.esiee.com.projet_e3.R;
  */
 public class GuestsListFragment extends Fragment {
 
-    WifiP2pGroup wifiP2pGroup;
-
+    private WifiP2pGroup wifiP2pGroup;
 
     public static GuestsListFragment newInstance() {
         return (new GuestsListFragment());

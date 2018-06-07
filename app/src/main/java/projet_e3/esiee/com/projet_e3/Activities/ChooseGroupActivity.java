@@ -99,11 +99,18 @@ public class ChooseGroupActivity extends AppCompatActivity implements NumberPick
                 public void onClick(DialogInterface dialog, int id) {
                     valueChangeListener.onValueChange(numberPicker,
                             numberPicker.getValue(), numberPicker.getValue());
-                    Intent intent = new Intent(ChooseGroupActivity.this, LoadingHostActivity.class);
-                    intent.putExtra("authToken", getIntent().getStringExtra("authToken"));
-                    intent.putExtra("host", 1);
-                    intent.putExtra("guestNumber", numberPicker.getValue());
-                    startActivity(intent);
+                    if(numberPicker.getValue()==0){
+                        Intent intent = new Intent(ChooseGroupActivity.this, HostActivity.class);
+                        intent.putExtra("authToken", getIntent().getStringExtra("authToken"));
+                        intent.putExtra("host", 1);
+                        startActivity(intent);
+                    } else {
+                        Intent intent = new Intent(ChooseGroupActivity.this, LoadingHostActivity.class);
+                        intent.putExtra("authToken", getIntent().getStringExtra("authToken"));
+                        intent.putExtra("host", 1);
+                        intent.putExtra("guestNumber", numberPicker.getValue());
+                        startActivity(intent);
+                    }
                 }
             });
             builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {

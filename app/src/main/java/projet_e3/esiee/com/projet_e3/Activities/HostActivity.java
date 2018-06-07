@@ -5,6 +5,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.wifi.p2p.WifiP2pGroup;
+import android.net.wifi.p2p.WifiP2pInfo;
+import android.net.wifi.p2p.WifiP2pManager;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -52,6 +56,7 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
     private Stack<Bitmap> tracksCovers = new Stack<>();
     private Stack<String> tracksNames = new Stack<>();
     private String MY_PREFS = "my_prefs";
+    private WifiP2pGroup wifiP2pGroup;
 
     //FOR FRAGMENTS
     // 1 - Declare fragment handled by Navigation Drawer
@@ -90,6 +95,7 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
         authToken = getIntent().getStringExtra("authToken");
         Log.i("authToken", authToken);
         requestData();
+
     }
 
     @Override
@@ -253,6 +259,24 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
         }
         return super.onOptionsItemSelected(item);
     }
+
+    WifiP2pManager.ConnectionInfoListener connectionInfoListener = new WifiP2pManager.ConnectionInfoListener() {
+        @Override
+        public void onConnectionInfoAvailable(WifiP2pInfo info) {
+
+        }
+    };
+
+    public WifiP2pManager.GroupInfoListener groupInfoListener = new WifiP2pManager.GroupInfoListener() {
+        @Override
+        public void onGroupInfoAvailable(WifiP2pGroup group) {
+            if(group!=null)
+            {
+                wifiP2pGroup = group;
+                //aManager.requestConnectionInfo(aChannel,connectionInfoListener);
+            }
+        }
+    };
 
     public void requestData() {
         AsyncTask.execute(new Runnable() {
