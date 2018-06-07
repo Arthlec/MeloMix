@@ -7,22 +7,15 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pConfig;
-import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.AsyncTask;
 
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,12 +28,8 @@ import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Collection;
-import java.util.List;
 
 import projet_e3.esiee.com.projet_e3.BroadCast;
-import projet_e3.esiee.com.projet_e3.Fragments.GuestsListFragment;
-import projet_e3.esiee.com.projet_e3.Fragments.MainFragment;
 import projet_e3.esiee.com.projet_e3.Services.FileTransferService;
 import projet_e3.esiee.com.projet_e3.HostClass;
 import projet_e3.esiee.com.projet_e3.R;
@@ -126,10 +115,12 @@ public class LoadingHostActivity extends AppCompatActivity {
                 hostClass.start();
 
                 Toast.makeText(getApplicationContext(), "ClientList : " + wifiP2pGroup.getClientList().size(), Toast.LENGTH_SHORT).show();
-                if(wifiP2pGroup.getClientList().size()== guestNb){
+                if(wifiP2pGroup.getClientList().size()>= guestNb){
                     Intent intent = new Intent(LoadingHostActivity.this, HostActivity.class);
                     intent.putExtra("authToken", getIntent().getStringExtra("authToken"));
                     intent.putExtra("host",1);
+                    //intent.putExtra("manager", (Parcelable) aManager);
+                    //intent.putExtra("channel", (Parcelable) aChannel);
                     startActivity(intent);
                 }
 

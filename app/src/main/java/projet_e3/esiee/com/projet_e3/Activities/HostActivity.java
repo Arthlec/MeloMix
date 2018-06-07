@@ -57,6 +57,8 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
     private Stack<String> tracksNames = new Stack<>();
     private String MY_PREFS = "my_prefs";
     private WifiP2pGroup wifiP2pGroup;
+    private WifiP2pManager aManager;
+    private WifiP2pManager.Channel aChannel;
 
     //FOR FRAGMENTS
     // 1 - Declare fragment handled by Navigation Drawer
@@ -93,7 +95,12 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
 
         showFirstFragment();
         authToken = getIntent().getStringExtra("authToken");
+        //aManager = getIntent().getParcelableExtra("manager");
+        //aChannel = getIntent().getParcelableExtra("channel");
+
         Log.i("authToken", authToken);
+        Log.i("manager", aManager+"");
+        Log.i("channel", aChannel+"");
         requestData();
 
     }
