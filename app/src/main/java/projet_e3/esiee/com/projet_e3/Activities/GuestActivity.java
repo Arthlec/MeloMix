@@ -176,6 +176,10 @@ public class GuestActivity extends AppCompatActivity {
                 TxtKiKi.setText("Guest");
                 GuestClass guestClass = new GuestClass(GoAdress, getApplicationContext());
                 guestClass.start();
+
+                Intent intent = new Intent(GuestActivity.this, LoadingGuestActivity.class);
+                intent.putExtra("authToken", getIntent().getStringExtra("authToken"));
+                startActivity(intent);
             }
         }
     };
