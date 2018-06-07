@@ -2,6 +2,7 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/list_cell"
     android:layout_width="match_parent"
     android:layout_height="70dp"
     android:orientation="vertical">
@@ -69,6 +70,15 @@
             android:layout_height="2dp"
             android:layout_alignParentBottom="true"
             app:srcCompat="@android:color/black" />
+
+        <Button
+            android:id="@+id/savedMusicMoreButton"
+            android:layout_width="38dp"
+            android:layout_height="30dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="14dp"
+            android:background="@drawable/ic_more_horiz" />
 
     </RelativeLayout>
 
