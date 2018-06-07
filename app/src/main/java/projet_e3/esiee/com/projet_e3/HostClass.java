@@ -5,6 +5,9 @@ import android.os.AsyncTask;
 
 import projet_e3.esiee.com.projet_e3.Activities.LoadingHostActivity;
 
+/**
+ * Execute les asynctask de l'hote en parallèle.
+ */
 public class HostClass extends Thread{
 
     private Context context;

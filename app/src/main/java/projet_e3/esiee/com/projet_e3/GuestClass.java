@@ -8,6 +8,9 @@ import java.net.InetAddress;
 
 import projet_e3.esiee.com.projet_e3.Services.FileTransferService;
 
+/**
+ * Thread permettant de lancer le service d'envoi de fichier à l'hôte
+ */
 public class GuestClass extends Thread {
     private String HostAdd;
     private Context context;
