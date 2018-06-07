@@ -37,27 +37,28 @@ import java.util.Collection;
 import java.util.List;
 
 import projet_e3.esiee.com.projet_e3.BroadCast;
+import projet_e3.esiee.com.projet_e3.Fragments.GuestsListFragment;
+import projet_e3.esiee.com.projet_e3.Fragments.MainFragment;
 import projet_e3.esiee.com.projet_e3.Services.FileTransferService;
 import projet_e3.esiee.com.projet_e3.HostClass;
 import projet_e3.esiee.com.projet_e3.R;
 
 public class LoadingHostActivity extends AppCompatActivity {
 
-    private TextView TxtStatus;
-    private Button NextBtn;
-    private WifiP2pManager aManager;
+    private TextView TxtStatus; //Indique que le groupe est bien formé en donnant le grade dans le groupe (Host ou guest)
+    private WifiP2pManager aManager; //Manager de P2p
     private WifiP2pManager.Channel aChannel;
     private BroadcastReceiver mReceiver;
     private IntentFilter mIntent;
     private final WifiP2pConfig config = new WifiP2pConfig();
     private WifiP2pGroup wifiP2pGroup;
+    private int guestNb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loading_host);
         InitAttribut();
-        InitOnClick();
     }
 
     private void InitAttribut() {
@@ -80,8 +81,12 @@ public class LoadingHostActivity extends AppCompatActivity {
 
         this.createGrp();
 
+        if (getIntent().hasExtra("guestNumber")){
+            guestNb = getIntent().getIntExtra("guestNumber",-1);
+            Toast.makeText(getApplicationContext(), "Guestnumber : " + guestNb, Toast.LENGTH_SHORT).show();
+        }
+
         TxtStatus = findViewById(R.id.KieKi);
-        NextBtn = findViewById(R.id.NextBtn);
     }
 
     public void setAction(){
@@ -91,20 +96,9 @@ public class LoadingHostActivity extends AppCompatActivity {
         mIntent.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
     }
 
-    private void InitOnClick() {
-
-        NextBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(LoadingHostActivity.this, HostActivity.class);
-                intent.putExtra("authToken", getIntent().getStringExtra("authToken"));
-                intent.putExtra("host",1);
-                startActivity(intent);
-            }
-        });
-
-    }
-
+    /**
+     * Supprime les groupes persistants
+     */
     private void deletePersistentGroup(){
         try {
             Method[] methods = WifiP2pManager.class.getMethods();
@@ -120,6 +114,7 @@ public class LoadingHostActivity extends AppCompatActivity {
         }
     }
 
+    //Listener de connexion appelé dans à chaque modification du groupe
     WifiP2pManager.ConnectionInfoListener connectionInfoListener = new WifiP2pManager.ConnectionInfoListener() {
         @Override
         public void onConnectionInfoAvailable(WifiP2pInfo info) {
@@ -127,10 +122,19 @@ public class LoadingHostActivity extends AppCompatActivity {
                 TxtStatus.setText("Host");
                 HostClass hostClass = new HostClass(getApplicationContext());
                 hostClass.start();
+
+                Toast.makeText(getApplicationContext(), "ClientList : " + wifiP2pGroup.getClientList().size(), Toast.LENGTH_SHORT).show();
+                if(wifiP2pGroup.getClientList().size()== guestNb){
+                    Intent intent = new Intent(LoadingHostActivity.this, HostActivity.class);
+                    intent.putExtra("authToken", getIntent().getStringExtra("authToken"));
+                    intent.putExtra("host",1);
+                    startActivity(intent);
+                }
             }
         }
     };
 
+    //Listener du groupP2p appelé dans le broadCast
     public WifiP2pManager.GroupInfoListener groupInfoListener = new WifiP2pManager.GroupInfoListener() {
         @Override
         public void onGroupInfoAvailable(WifiP2pGroup group) {
@@ -143,6 +147,9 @@ public class LoadingHostActivity extends AppCompatActivity {
         }
     };
 
+    /**
+     * Créer le groupe P2P
+     */
     public void createGrp(){
         aManager.createGroup(aChannel, new WifiP2pManager.ActionListener() {
             @Override
@@ -153,6 +160,9 @@ public class LoadingHostActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Supprime le Groupe P2p
+     */
     public void disconnect(){
         aManager.removeGroup(aChannel, new WifiP2pManager.ActionListener() {
             @Override
@@ -196,6 +206,9 @@ public class LoadingHostActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * AsyncTask permettant à l'Host d'attendre l'envoi d'un signal de déconnexion venant d'un guest
+     */
     public static class onDecoAsyncTask extends AsyncTask<String, String, String> {
 
         @SuppressLint("StaticFieldLeak")
@@ -215,6 +228,7 @@ public class LoadingHostActivity extends AppCompatActivity {
 
                 Socket client = serverSocket.accept();
                 try {
+                    //Recupère l'Ip du client connecté à la socket et supprime le JSON correspondant
                     String IpClient = client.getInetAddress().getHostAddress();
                     File file =  new File(mFilecontext.getFilesDir(),IpClient+".json");
                     file.delete();
@@ -233,6 +247,7 @@ public class LoadingHostActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
             if (result != null) {
+                //S'il n'y a eu aucune exception relance une asyncTask parallèle
                 if (!TextUtils.isEmpty(result)) {
                     onDecoAsyncTask decoObj = new
                             onDecoAsyncTask(mFilecontext, FileTransferService.PORT);
@@ -242,6 +257,9 @@ public class LoadingHostActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * AsyncTask permettant à l'hote la reception d'un fichier JSON
+     */
     public static class FileServerAsyncTask extends AsyncTask<String, String, String> {
 
         @SuppressLint("StaticFieldLeak")
