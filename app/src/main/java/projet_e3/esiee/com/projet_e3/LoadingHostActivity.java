@@ -37,10 +37,14 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import weka.associations.BinaryItem;
 import weka.clusterers.SimpleKMeans;
@@ -143,12 +147,47 @@ public class LoadingHostActivity extends AppCompatActivity {
 
         SimpleKMeans simpleKMeans = new SimpleKMeans();
         try {
-            simpleKMeans.setNumClusters((int) Math.sqrt((double)numberOfUsers));
+            if(numberOfUsers == 2)
+                simpleKMeans.setNumClusters(2);
+            else
+                simpleKMeans.setNumClusters((int)Math.round(0.33*numberOfUsers+0.66));
+            //simpleKMeans.setNumClusters(4);
             simpleKMeans.setMaxIterations(10);
+            simpleKMeans.setPreserveInstancesOrder(true);
             simpleKMeans.buildClusterer(dataBase);
+            int[] assignments = simpleKMeans.getAssignments();
+            int i = 0;
+            for(int clusterNum : assignments) {
+                Log.i("Instance " + i, " -> Cluster " + clusterNum + "\n");
+                i++;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        Instances centroidsBase = simpleKMeans.getClusterCentroids();
+        Instances centroidsBaseSimplified = new Instances(centroidsBase, centroidsBase.size());
+        for(int i=0; i<centroidsBase.size(); i++){
+            Instance currentInstance = new SparseInstance(centroidsBase.get(i));
+            Log.i("instanceAvant", currentInstance.toString());
+            int numberAttributes = currentInstance.numAttributes();
+            HashMap<Integer, Double> attributeHashMap = new HashMap<>();
+            for(int p = 0; p<numberAttributes; p++){
+                attributeHashMap.put(p, currentInstance.value(p));
+            }
+            LinkedHashMap<Integer, Double> sortedHashMap = sortHashMapByValues(attributeHashMap);
+            Iterator<Integer> hashIterator = sortedHashMap.keySet().iterator();
+            int j = 0;
+            while (hashIterator.hasNext() && j < (int) (sortedHashMap.size()*0.75)){
+                currentInstance.deleteAttributeAt(hashIterator.next());
+                j++;
+            }
+            Log.i("instanceApres", currentInstance.toString());
+        }
+
+        //Log.i("ClusterCentroids", simpleKMeans.getClusterCentroids().toSummaryString());
+        //Log.i("ClusterDevs", simpleKMeans.getClusterStandardDevs().toSummaryString());
+        //Log.i("cluster", simpleKMeans.toString());
 
         /*NumericToBinary filter = new NumericToBinary();
         //Data.setClassIndex(-1);
@@ -159,8 +198,8 @@ public class LoadingHostActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }*/
-        Log.i("dataBaseSummary", dataBase.toSummaryString());
-        Log.i("dataBase", dataBase.toString());
+        //Log.i("dataBaseSummary", dataBase.toSummaryString());
+        //Log.i("dataBase", dataBase.toString());
 
         /*FPGrowth algo = new FPGrowth();
         algo.setLowerBoundMinSupport(0.9); //on définit le seuil minimum
@@ -178,6 +217,38 @@ public class LoadingHostActivity extends AppCompatActivity {
         while(itemsets.hasNext()){
             Log.i("itemset", itemsets.next().toString());
         }*/
+    }
+
+    public LinkedHashMap<Integer, Double> sortHashMapByValues(
+            HashMap<Integer, Double> passedMap) {
+        List<Integer> mapKeys = new ArrayList<>(passedMap.keySet());
+        List<Double> mapValues = new ArrayList<>(passedMap.values());
+        Collections.sort(mapValues);
+        Collections.sort(mapKeys);
+        //Collections.reverse(mapValues);
+        //Collections.reverse(mapKeys);
+
+        LinkedHashMap<Integer, Double> sortedMap =
+                new LinkedHashMap<>();
+
+        Iterator<Double> valueIt = mapValues.iterator();
+        while (valueIt.hasNext()) {
+            Double val = valueIt.next();
+            Iterator<Integer> keyIt = mapKeys.iterator();
+
+            while (keyIt.hasNext()) {
+                Integer key = keyIt.next();
+                Double comp1 = passedMap.get(key);
+                Double comp2 = val;
+
+                if (comp1.equals(comp2)) {
+                    keyIt.remove();
+                    sortedMap.put(key, val);
+                    break;
+                }
+            }
+        }
+        return sortedMap;
     }
 
     private void work() {
