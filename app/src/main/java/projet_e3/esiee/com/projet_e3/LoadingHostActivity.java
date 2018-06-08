@@ -43,6 +43,7 @@ import java.util.Map;
 import java.util.Random;
 
 import weka.associations.BinaryItem;
+import weka.clusterers.SimpleKMeans;
 import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instance;
@@ -138,6 +139,15 @@ public class LoadingHostActivity extends AppCompatActivity {
                     user.setValue(currentAttribute, 0);*/
             }
             dataBase.add(user);
+        }
+
+        SimpleKMeans simpleKMeans = new SimpleKMeans();
+        try {
+            simpleKMeans.setNumClusters((int) Math.sqrt((double)numberOfUsers));
+            simpleKMeans.setMaxIterations(10);
+            simpleKMeans.buildClusterer(dataBase);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         /*NumericToBinary filter = new NumericToBinary();
