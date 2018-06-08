@@ -5,6 +5,8 @@
 
 package projet_e3.esiee.com.projet_e3;
 
+import android.util.Log;
+
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -300,6 +302,7 @@ public class FPGrowth extends AbstractAssociator implements AssociationRulesProd
             for(j = 0; j < current.numValues(); ++j) {
                 int attIndex = current.index(j);
                 if (((BinaryItem)singletons.get(attIndex)).getFrequency() >= minSupport) {
+                    //Log.i("currentValue", "" + ((BinaryItem)singletons.get(attIndex)).getFrequency());
                     transaction.add(singletons.get(attIndex));
                 }
             }
@@ -316,7 +319,6 @@ public class FPGrowth extends AbstractAssociator implements AssociationRulesProd
             Collections.sort(transaction);
             tree.addItemSet(transaction, 1);
         }
-
     }
 
     /*protected FPTreeRoot buildFPTree(ArrayList<BinaryItem> singletons,Instances data, int minSupport){
@@ -879,27 +881,34 @@ public class FPGrowth extends AbstractAssociator implements AssociationRulesProd
             currentSupport = lowerBoundMinSuppAsFraction;
         }
 
-        if (arffLoader) {
-            ((ArffLoader)source).reset();
-        }
+        do {
+            int currentSupportAsInstances = currentSupport > 1.0D ? (int)currentSupport : (int)Math.ceil(currentSupport * (double)this.m_numInstances);
 
-        int currentSupportAsInstances = currentSupport > 1.0D ? (int)currentSupport : (int)Math.ceil(currentSupport * (double)this.m_numInstances);
-        if (arffLoader) {
-            System.err.println("Building FP-tree...");
-        }
+            FPGrowth.FPTreeRoot tree = this.buildFPTree(singletons,(Instances) source, currentSupportAsInstances);
+            FPGrowth.FrequentItemSets largeItemSets = new FPGrowth.FrequentItemSets(this.m_numInstances);
 
-        FPGrowth.FPTreeRoot tree = this.buildFPTree(singletons,(Instances) source, currentSupportAsInstances);
-        FPGrowth.FrequentItemSets largeItemSets = new FPGrowth.FrequentItemSets(this.m_numInstances);
-        if (arffLoader) {
-            System.err.println("Mining tree for min supp " + currentSupport);
-        }
+            FPGrowth.FrequentBinaryItemSet conditionalItems = new FPGrowth.FrequentBinaryItemSet(new ArrayList(), 0);
+            this.mineTree(tree, largeItemSets, 0, conditionalItems, currentSupportAsInstances);
+            this.m_largeItemSets = largeItemSets;
 
-        FPGrowth.FrequentBinaryItemSet conditionalItems = new FPGrowth.FrequentBinaryItemSet(new ArrayList(), 0);
-        this.mineTree(tree, largeItemSets, 0, conditionalItems, currentSupportAsInstances);
-        this.m_largeItemSets = largeItemSets;
-        if (arffLoader) {
-            System.err.println("Number of large item sets: " + this.m_largeItemSets.size());
-        }
+            this.m_rules = generateRulesBruteForce(this.m_largeItemSets, this.m_metric, this.m_metricThreshold, upperBoundMinSuppAsInstances, lowerBoundMinSuppAsInstances, this.m_numInstances);
+
+            if (this.m_findAllRulesForSupportLevel || breakOnNext) {
+                break;
+            }
+
+            currentSupport -= deltaAsFraction;
+            if (currentSupport < lowerBoundMinSuppAsFraction) {
+                if (currentSupport + deltaAsFraction <= lowerBoundMinSuppAsFraction) {
+                    break;
+                }
+
+                currentSupport = lowerBoundMinSuppAsFraction;
+                breakOnNext = true;
+            }
+        } while(this.m_rules.size() < this.m_numRulesToFind);
+
+        Collections.sort(this.m_rules);
     }
 
     private void buildAssociations(Object source) throws Exception {

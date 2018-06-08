@@ -104,13 +104,15 @@ public class LoadingHostActivity extends AppCompatActivity {
                 //genre.setWeight((double)map.get(genre));
                 /*Log.i("genre", (String)entry.getKey());
                 Log.i("getGenre", "" + entry.getValue());*/
+
                 if(!attributeArrayList.contains(genre)){
-                    genre.setWeight((double) entry.getValue());
+                    //genre.setWeight((double) entry.getValue());
                     attributeArrayList.add(genre);
-                }else{
+                }/*else{
                     Attribute currentGenreInList = attributeArrayList.get(attributeArrayList.indexOf(genre));
                     currentGenreInList.setWeight(currentGenreInList.weight() + (double) entry.getValue());
-                }
+                    //Log.i("AttributeWeight", "" + currentGenreInList.weight());
+                }*/
             }
         }
 
@@ -131,31 +133,31 @@ public class LoadingHostActivity extends AppCompatActivity {
                 String attributeName = currentAttribute.name();
                 if(map.containsKey(attributeName)){
                     if(map.get(attributeName) != null)
-                        user.setValue(currentAttribute, 1/*(double) map.get(attributeName)*/);
-                }else
-                    user.setValue(currentAttribute, 0);
+                        user.setValue(currentAttribute, (double) map.get(attributeName));
+                }/*else
+                    user.setValue(currentAttribute, 0);*/
             }
-            //filter.input(user);
             dataBase.add(user);
         }
 
-        NumericToBinary filter = new NumericToBinary();
+        /*NumericToBinary filter = new NumericToBinary();
         //Data.setClassIndex(-1);
 
         try {
             filter.setInputFormat(dataBase);
-            dataBase = Filter.useFilter(dataBase, filter);
+            //dataBase = Filter.useFilter(dataBase, filter);
         } catch (Exception e) {
             e.printStackTrace();
-        }
-        //Log.i("dataBaseSummary", dataBase.toSummaryString());
-        //Log.i("dataBase", dataBase.toString());
+        }*/
+        Log.i("dataBaseSummary", dataBase.toSummaryString());
+        Log.i("dataBase", dataBase.toString());
 
-        FPGrowth algo = new FPGrowth();
-        algo.setLowerBoundMinSupport(0.5); //on définit le seuil minimum
+        /*FPGrowth algo = new FPGrowth();
+        algo.setLowerBoundMinSupport(0.9); //on définit le seuil minimum
+        algo.setNumRulesToFind(0);
         try {
-            algo.buildAssociations(dataBase);
-            //algo.getFrequentItems(dataBase);
+            //algo.buildAssociations(dataBase);
+            algo.getFrequentItems(dataBase);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -165,7 +167,7 @@ public class LoadingHostActivity extends AppCompatActivity {
         Log.i("frequentItemsetsSize", "" + sizeItemsets);
         while(itemsets.hasNext()){
             Log.i("itemset", itemsets.next().toString());
-        }
+        }*/
     }
 
     private void work() {
