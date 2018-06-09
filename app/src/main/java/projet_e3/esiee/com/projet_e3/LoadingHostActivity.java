@@ -38,6 +38,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -55,6 +56,7 @@ import weka.core.Instances;
 import weka.core.SparseInstance;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.NumericToBinary;
+import weka.filters.unsupervised.attribute.Remove;
 
 public class LoadingHostActivity extends AppCompatActivity {
     private ListView listView;
@@ -151,7 +153,7 @@ public class LoadingHostActivity extends AppCompatActivity {
                 simpleKMeans.setNumClusters(2);
             else
                 simpleKMeans.setNumClusters((int)Math.round(0.33*numberOfUsers+0.66));
-            //simpleKMeans.setNumClusters(4);
+
             simpleKMeans.setMaxIterations(10);
             simpleKMeans.setPreserveInstancesOrder(true);
             simpleKMeans.buildClusterer(dataBase);
@@ -166,10 +168,12 @@ public class LoadingHostActivity extends AppCompatActivity {
         }
 
         Instances centroidsBase = simpleKMeans.getClusterCentroids();
-        Instances centroidsBaseSimplified = new Instances(centroidsBase, centroidsBase.size());
-        for(int i=0; i<centroidsBase.size(); i++){
+        int centroidsBaseSize = centroidsBase.size();
+        Remove removeFilter = new Remove();
+        ArrayList<Integer> indexOfAttributeToKeep = new ArrayList<Integer>();
+        for(int i=0; i<centroidsBaseSize; i++){
             Instance currentInstance = new SparseInstance(centroidsBase.get(i));
-            Log.i("instanceAvant", currentInstance.toString());
+            //Log.i("instanceAvant", currentInstance.toString());
             int numberAttributes = currentInstance.numAttributes();
             HashMap<Integer, Double> attributeHashMap = new HashMap<>();
             for(int p = 0; p<numberAttributes; p++){
@@ -177,15 +181,26 @@ public class LoadingHostActivity extends AppCompatActivity {
             }
             LinkedHashMap<Integer, Double> sortedHashMap = sortHashMapByValues(attributeHashMap);
             Iterator<Integer> hashIterator = sortedHashMap.keySet().iterator();
-            for (int j = 0;hashIterator.hasNext() && j < (int) (sortedHashMap.size()*0.90); j++){
-                currentInstance.deleteAttributeAt(hashIterator.next());
+            for(int j = 0;hashIterator.hasNext() && j < Math.round(sortedHashMap.size()*0.10); j++){
+                Integer currentInt = hashIterator.next();
+                if(!indexOfAttributeToKeep.contains(currentInt))
+                    indexOfAttributeToKeep.add(currentInt);
             }
-            Log.i("instanceApres", currentInstance.toString());
+            //Log.i("instanceApres", currentInstance.toString());
         }
 
-        //Log.i("ClusterCentroids", simpleKMeans.getClusterCentroids().toSummaryString());
-        //Log.i("ClusterDevs", simpleKMeans.getClusterStandardDevs().toSummaryString());
-        //Log.i("cluster", simpleKMeans.toString());
+        int[] indexOfAttributeToKeepArray = convertIntegers(indexOfAttributeToKeep);
+        removeFilter.setAttributeIndicesArray(indexOfAttributeToKeepArray);
+        removeFilter.setInvertSelection(true);
+        Instances centroidsBaseSimplified = null;
+        try {
+            removeFilter.setInputFormat(centroidsBase);
+            centroidsBaseSimplified = Filter.useFilter(centroidsBase, removeFilter);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        Log.i("centroidsBaseSimplified", centroidsBaseSimplified.toSummaryString());
 
         /*NumericToBinary filter = new NumericToBinary();
         //Data.setClassIndex(-1);
@@ -217,14 +232,24 @@ public class LoadingHostActivity extends AppCompatActivity {
         }*/
     }
 
-    public LinkedHashMap<Integer, Double> sortHashMapByValues(
+    private int[] convertIntegers(ArrayList<Integer> integers)
+    {
+        int[] ret = new int[integers.size()];
+        for (int i=0; i < ret.length; i++)
+        {
+            ret[i] = integers.get(i);
+        }
+        return ret;
+    }
+
+    private LinkedHashMap<Integer, Double> sortHashMapByValues(
             HashMap<Integer, Double> passedMap) {
         List<Integer> mapKeys = new ArrayList<>(passedMap.keySet());
         List<Double> mapValues = new ArrayList<>(passedMap.values());
         Collections.sort(mapValues);
         Collections.sort(mapKeys);
-        //Collections.reverse(mapValues);
-        //Collections.reverse(mapKeys);
+        Collections.reverse(mapValues);
+        Collections.reverse(mapKeys);
 
         LinkedHashMap<Integer, Double> sortedMap =
                 new LinkedHashMap<>();
