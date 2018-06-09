@@ -177,10 +177,8 @@ public class LoadingHostActivity extends AppCompatActivity {
             }
             LinkedHashMap<Integer, Double> sortedHashMap = sortHashMapByValues(attributeHashMap);
             Iterator<Integer> hashIterator = sortedHashMap.keySet().iterator();
-            int j = 0;
-            while (hashIterator.hasNext() && j < (int) (sortedHashMap.size()*0.75)){
+            for (int j = 0;hashIterator.hasNext() && j < (int) (sortedHashMap.size()*0.90); j++){
                 currentInstance.deleteAttributeAt(hashIterator.next());
-                j++;
             }
             Log.i("instanceApres", currentInstance.toString());
         }
