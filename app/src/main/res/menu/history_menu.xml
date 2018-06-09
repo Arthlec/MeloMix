@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+        <item
+            android:id="@+id/nav_like"
+            android:title="Like" />
+        <item
+            android:id="@+id/nav_dislike"
+            android:title="Dislike" />
+        <item
+            android:id="@+id/nav_save_music"
+            android:title="Ajouter à mes musiques" />
+</menu>

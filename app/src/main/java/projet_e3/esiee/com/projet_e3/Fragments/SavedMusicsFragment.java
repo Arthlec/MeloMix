@@ -41,7 +41,7 @@ public class SavedMusicsFragment extends Fragment implements RecyclerItemTouchHe
         View view = inflater.inflate(R.layout.fragment_saved_musics, container, false);
 
         RecyclerView rv = view.findViewById(R.id.saved_music_list);
-        myAdapter = new MyAdapter(trackCoverList, trackNameList);
+        myAdapter = new MyAdapter(getContext(),trackCoverList, trackNameList);
 
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
         rv.setAdapter(myAdapter);
