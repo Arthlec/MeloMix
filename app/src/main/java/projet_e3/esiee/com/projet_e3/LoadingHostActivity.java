@@ -221,7 +221,7 @@ public class LoadingHostActivity extends AppCompatActivity {
             Instance currentInstance = centroidsBaseSimplified.get(i);
             for(int j = 0; j<numberOfGenres; j++){
                 double currentAttributeValue = currentInstance.value(j);
-                if((currentAttributeValue-0.08) <= 0.00001)
+                if((currentAttributeValue-0.50) <= 0.00001)
                     currentInstance.setValue(j, 0);
                 else
                     currentInstance.setValue(j, 1);
@@ -279,7 +279,7 @@ public class LoadingHostActivity extends AppCompatActivity {
                 Double comp1 = passedMap.get(key);
                 Double comp2 = val;
 
-                if (comp1.equals(comp2)) {
+                if (Math.abs(comp1 - comp2) <= 0.000000000001) {
                     keyIt.remove();
                     sortedMap.put(key, val);
                     break;
