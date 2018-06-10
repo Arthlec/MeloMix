@@ -57,6 +57,7 @@ import weka.core.SparseInstance;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.NumericToBinary;
 import weka.filters.unsupervised.attribute.Remove;
+import weka.filters.unsupervised.attribute.ReplaceMissingWithUserConstant;
 
 public class LoadingHostActivity extends AppCompatActivity {
     private ListView listView;
@@ -147,6 +148,19 @@ public class LoadingHostActivity extends AppCompatActivity {
             dataBase.add(user);
         }
 
+        //Log.i("dataBase", dataBase.toSummaryString());
+        //Log.i("dataBaseNumAttributes", "" + dataBase.numAttributes());
+        ReplaceMissingWithUserConstant filterMissingValues = new ReplaceMissingWithUserConstant();
+        filterMissingValues.setNumericReplacementValue("0.0");
+        try {
+            filterMissingValues.setInputFormat(dataBase);
+            dataBase = Filter.useFilter(dataBase, filterMissingValues);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        //Log.i("dataBase", dataBase.toSummaryString());
+        //Log.i("dataBaseNumAttributes", "" + dataBase.numAttributes());
+
         SimpleKMeans simpleKMeans = new SimpleKMeans();
         try {
             if(numberOfUsers == 2)
@@ -160,7 +174,7 @@ public class LoadingHostActivity extends AppCompatActivity {
             int[] assignments = simpleKMeans.getAssignments();
             int i = 0;
             for(int clusterNum : assignments) {
-                Log.i("Instance " + i, " -> Cluster " + clusterNum + "\n");
+                //Log.i("Instance " + i, " -> Cluster " + clusterNum + "\n");
                 i++;
             }
         } catch (Exception e) {
@@ -181,7 +195,8 @@ public class LoadingHostActivity extends AppCompatActivity {
             }
             LinkedHashMap<Integer, Double> sortedHashMap = sortHashMapByValues(attributeHashMap);
             Iterator<Integer> hashIterator = sortedHashMap.keySet().iterator();
-            for(int j = 0;hashIterator.hasNext() && j < Math.round(sortedHashMap.size()*0.10); j++){
+            int sortedHashMapSize = sortedHashMap.size();
+            for(int j = 0;hashIterator.hasNext() && j < Math.round(sortedHashMapSize*0.10); j++){
                 Integer currentInt = hashIterator.next();
                 if(!indexOfAttributeToKeep.contains(currentInt))
                     indexOfAttributeToKeep.add(currentInt);
@@ -201,18 +216,18 @@ public class LoadingHostActivity extends AppCompatActivity {
         }
 
         Log.i("centroidsBaseSimplified", centroidsBaseSimplified.toSummaryString());
-
-        /*NumericToBinary filter = new NumericToBinary();
-        //Data.setClassIndex(-1);
-
-        try {
-            filter.setInputFormat(dataBase);
-            //dataBase = Filter.useFilter(dataBase, filter);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }*/
-        //Log.i("dataBaseSummary", dataBase.toSummaryString());
-        //Log.i("dataBase", dataBase.toString());
+        numberOfGenres = indexOfAttributeToKeep.size();
+        for(int i=0; i<centroidsBaseSize; i++){
+            Instance currentInstance = centroidsBaseSimplified.get(i);
+            for(int j = 0; j<numberOfGenres; j++){
+                double currentAttributeValue = currentInstance.value(j);
+                if((currentAttributeValue-0.08) <= 0.00001)
+                    currentInstance.setValue(j, 0);
+                else
+                    currentInstance.setValue(j, 1);
+            }
+        }
+        Log.i("centroidsBaseBinarized", centroidsBaseSimplified.toSummaryString());
 
         /*FPGrowth algo = new FPGrowth();
         algo.setLowerBoundMinSupport(0.9); //on définit le seuil minimum
