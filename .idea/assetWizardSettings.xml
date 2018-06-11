@@ -18,7 +18,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/editor/ic_format_list_bulleted_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/image/ic_navigate_before_black_24dp.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -28,10 +28,12 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="color" value="727373" />
-                            <entry key="outputName" value="ic_list" />
+                            <entry key="color" value="3c3c3c" />
+                            <entry key="height" value="87" />
+                            <entry key="outputName" value="ic_before_pressed" />
                             <entry key="overrideSize" value="true" />
                             <entry key="sourceFile" value="C:\Users\Steven" />
+                            <entry key="width" value="56" />
                           </map>
                         </option>
                       </PersistentState>
