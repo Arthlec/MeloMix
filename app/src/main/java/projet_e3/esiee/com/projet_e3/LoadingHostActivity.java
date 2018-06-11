@@ -215,26 +215,34 @@ public class LoadingHostActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        Log.i("centroidsBaseSimplified", centroidsBaseSimplified.toSummaryString());
+        Log.i("centroidsBaseSimplified", centroidsBaseSimplified.toString());
         numberOfGenres = indexOfAttributeToKeep.size();
         for(int i=0; i<centroidsBaseSize; i++){
             Instance currentInstance = centroidsBaseSimplified.get(i);
             for(int j = 0; j<numberOfGenres; j++){
                 double currentAttributeValue = currentInstance.value(j);
-                if((currentAttributeValue-0.50) <= 0.00001)
+                if((currentAttributeValue-0.03) <= 0.00001)
                     currentInstance.setValue(j, 0);
                 else
                     currentInstance.setValue(j, 1);
             }
         }
-        Log.i("centroidsBaseBinarized", centroidsBaseSimplified.toSummaryString());
+        Log.i("centroidsBaseBinarized", centroidsBaseSimplified.toString());
 
-        /*FPGrowth algo = new FPGrowth();
-        algo.setLowerBoundMinSupport(0.9); //on définit le seuil minimum
-        algo.setNumRulesToFind(0);
+        NumericToBinary filterBinary = new NumericToBinary();
         try {
-            //algo.buildAssociations(dataBase);
-            algo.getFrequentItems(dataBase);
+            filterBinary.setInputFormat(centroidsBaseSimplified);
+            centroidsBaseSimplified = Filter.useFilter(centroidsBaseSimplified, filterBinary);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        FPGrowth algo = new FPGrowth();
+        algo.setLowerBoundMinSupport(0.3); //on définit le seuil minimum (pourcentage)
+        //algo.setNumRulesToFind(0);
+        try {
+            algo.buildAssociations(centroidsBaseSimplified);
+            //algo.getFrequentItems(dataBase);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -244,7 +252,7 @@ public class LoadingHostActivity extends AppCompatActivity {
         Log.i("frequentItemsetsSize", "" + sizeItemsets);
         while(itemsets.hasNext()){
             Log.i("itemset", itemsets.next().toString());
-        }*/
+        }
     }
 
     private int[] convertIntegers(ArrayList<Integer> integers)
