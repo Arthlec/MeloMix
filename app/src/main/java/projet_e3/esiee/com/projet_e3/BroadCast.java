@@ -8,6 +8,9 @@ import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.util.Log;
 
+import projet_e3.esiee.com.projet_e3.Activities.GuestActivity;
+import projet_e3.esiee.com.projet_e3.Activities.LoadingHostActivity;
+
 /**
  * Permet de sonder tous les changements d'états Peer to Peer
  */
@@ -44,13 +47,10 @@ public class BroadCast extends BroadcastReceiver {
                 if(guestActivity != null && host == null){
                     manager.requestPeers(channel,guestActivity.peerListListener);
                 }
-                else if(host != null && guestActivity == null) {
-                    manager.requestPeers(channel, host.peerListListener);
-                }
             }
         }
         else if(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)){
-            //Detection d'une connexion
+            //Detection d'une connexion et déco
             if(manager== null){
                 return;
             }
@@ -60,12 +60,17 @@ public class BroadCast extends BroadcastReceiver {
                 if(guestActivity != null && host == null) {
                     manager.requestConnectionInfo(channel, guestActivity.connectionInfoListener);
                 }else if(host != null && guestActivity == null) {
-                    manager.requestConnectionInfo(channel, host.connectionInfoListener);
+                    manager.requestGroupInfo(channel,host.groupInfoListener);
                 }
             }
         }
         else if(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)){
-            Log.i("DEVICE CHANGES","Devices changed action");
+            if(guestActivity != null && host == null) {
+                Log.i("DEVICE guest","Devices changed "+action);
+            }else if(host != null && guestActivity == null) {
+                Log.i("DEVICE Host","Devices changed host "+action);
+            }
+
         }
     }
 }

@@ -1,4 +1,4 @@
-package projet_e3.esiee.com.projet_e3;
+package projet_e3.esiee.com.projet_e3.Services;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,10 +11,12 @@ import java.util.Objects;
 
 import android.annotation.SuppressLint;
 import android.app.IntentService;
-//import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.widget.Toast;
+
+import projet_e3.esiee.com.projet_e3.Activities.GuestActivity;
+
 /**
  * A service that process each file transfer request i.e Intent by opening a
  * socket connection with the WiFi Direct Group Owner and writing the file
@@ -44,7 +46,6 @@ public class FileTransferService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
 
-        //Context context = getApplicationContext();
         if (Objects.equals(intent.getAction(), ACTION_SEND_FILE)) {
 
             String host = Objects.requireNonNull(intent.getExtras()).getString(EXTRAS_GROUP_OWNER_ADDRESS);
@@ -59,14 +60,14 @@ public class FileTransferService extends IntentService {
 
                 File JsonFile = new File(this.getFilesDir(),"userGenres.json");
                 InputStream inputStream = new FileInputStream(JsonFile);
-               //InputStream inputStream = context.getResources().openRawResource(R.drawable.ic_launcher_background);
 
                 GuestActivity.copyFile(inputStream, outputStream);
+
             } catch (IOException e) {
                 e.printStackTrace();
                 mHandler.post(new Runnable() {
                     public void run() {
-                        Toast.makeText(FileTransferService.this, "Veuillez patienter votre fichier est en cours de traitement", Toast.LENGTH_LONG).show();
+                        Toast.makeText(FileTransferService.this, "L'hôte n'est pas prêt à recevoir votre fichier", Toast.LENGTH_LONG).show();
                     }
                 });
             } finally {

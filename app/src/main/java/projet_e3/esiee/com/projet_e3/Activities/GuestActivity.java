@@ -1,7 +1,8 @@
-package projet_e3.esiee.com.projet_e3;
+package projet_e3.esiee.com.projet_e3.Activities;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WpsInfo;
@@ -10,14 +11,22 @@ import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import projet_e3.esiee.com.projet_e3.BroadCast;
+import projet_e3.esiee.com.projet_e3.Services.DisconnectSignal;
+import projet_e3.esiee.com.projet_e3.GuestClass;
+import projet_e3.esiee.com.projet_e3.R;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,19 +40,17 @@ public class GuestActivity extends AppCompatActivity {
 
     private ListView listView;
     private TextView TxtKiKi;
-
+    private Button btnTry;
     private WifiP2pManager aManager;
     private WifiP2pManager.Channel aChannel;
     private BroadcastReceiver mReceiver;
     private IntentFilter mIntent;
 
-    private List<WifiP2pDevice> peers = new ArrayList<WifiP2pDevice>();
-    private ArrayAdapter<String> hAdapter;
-    private String[] deviceName;
-    private WifiP2pDevice[] deviceArray;
+    private List<WifiP2pDevice> peers = new ArrayList<>();
+    private ArrayList<WifiP2pDevice> deviceArray;
+    private InetAddress GoAdress;
 
     private final WifiP2pConfig config = new WifiP2pConfig();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,7 +63,7 @@ public class GuestActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int i, long id) {
-                final WifiP2pDevice device = deviceArray[i];
+                final WifiP2pDevice device = deviceArray.get(i);
                 config.deviceAddress = device.deviceAddress;
                 config.wps.setup = WpsInfo.PBC;
                 aManager.connect(aChannel, config, new WifiP2pManager.ActionListener() {
@@ -67,13 +74,17 @@ public class GuestActivity extends AppCompatActivity {
 
                     @Override
                     public void onFailure(int i) {
-                        Toast.makeText(getApplicationContext(),"Fail connected to "+ device.deviceName, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(),"Fail connection to "+ device.deviceName, Toast.LENGTH_SHORT).show();
                     }
                 });
             }
         });
-
-
+        btnTry.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                discover();
+            }
+        });
 
     }
 
@@ -103,12 +114,12 @@ public class GuestActivity extends AppCompatActivity {
         aManager.removeGroup(aChannel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
-                Toast.makeText(getApplicationContext(), "success suppro", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Deconnected", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFailure(int i) {
-                Toast.makeText(getApplicationContext(), "fail suppr", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Fail deconnection", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -121,8 +132,8 @@ public class GuestActivity extends AppCompatActivity {
 
         listView = findViewById(R.id.HostList);
         TxtKiKi = findViewById(R.id.KieKi);
-
-
+        btnTry = findViewById(R.id.TryBtn);
+        btnTry.setText("Relancer la recherche de groupe");
     }
 
     public void setAction(){
@@ -132,28 +143,24 @@ public class GuestActivity extends AppCompatActivity {
         mIntent.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
     }
 
-    WifiP2pManager.PeerListListener peerListListener =  new WifiP2pManager.PeerListListener() {
+    public WifiP2pManager.PeerListListener peerListListener =  new WifiP2pManager.PeerListListener() {
         @Override
         public void onPeersAvailable(WifiP2pDeviceList peersDevice) {
             if (!peersDevice.getDeviceList().equals(peers)){
                 peers.clear();
                 peers.addAll(peersDevice.getDeviceList());
-                deviceName = new String[peersDevice.getDeviceList().size()];
-                deviceArray = new WifiP2pDevice[peersDevice.getDeviceList().size()];
-                int index =0;
+                ArrayList<String> devicename = new ArrayList<>();
+                deviceArray = new ArrayList<>();
                 for(WifiP2pDevice device : peersDevice.getDeviceList())
                 {
-                    //if(device.isGroupOwner())
-                    // {
-                    deviceName[index] = device.deviceName;
-                    deviceArray[index] = device;
-                    index++;
-                    // }
+                    if(device.isGroupOwner())
+                    {
+                    devicename.add(device.deviceName);
+                    deviceArray.add(device);
+                    }
                 }
-                if(deviceName.length != 0) {
-                    hAdapter = new ArrayAdapter<>(listView.getContext(), android.R.layout.simple_list_item_1, deviceName);
-                    listView.setAdapter(hAdapter);
-                }
+                ArrayAdapter<String> hAdapter = new ArrayAdapter<>(listView.getContext(), android.R.layout.simple_list_item_1, devicename);
+                listView.setAdapter(hAdapter);
             }
             if (peers.isEmpty()) {
                 Toast.makeText(getApplicationContext(), "Aucun appareil à proximité", Toast.LENGTH_SHORT).show();
@@ -161,14 +168,18 @@ public class GuestActivity extends AppCompatActivity {
         }
     };
 
-    WifiP2pManager.ConnectionInfoListener connectionInfoListener = new WifiP2pManager.ConnectionInfoListener() {
+    public WifiP2pManager.ConnectionInfoListener connectionInfoListener = new WifiP2pManager.ConnectionInfoListener() {
         @Override
         public void onConnectionInfoAvailable(WifiP2pInfo info) {
-            final InetAddress groupOwnerAdress = info.groupOwnerAddress;
+            GoAdress = info.groupOwnerAddress;
             if (info.groupFormed && !info.isGroupOwner) {
                 TxtKiKi.setText("Guest");
-                GuestClass guestClass = new GuestClass(groupOwnerAdress, getApplicationContext());
+                GuestClass guestClass = new GuestClass(GoAdress, getApplicationContext());
                 guestClass.start();
+
+                Intent intent = new Intent(GuestActivity.this, LoadingGuestActivity.class);
+                intent.putExtra("authToken", getIntent().getStringExtra("authToken"));
+                startActivity(intent);
             }
         }
     };
@@ -176,15 +187,16 @@ public class GuestActivity extends AppCompatActivity {
         aManager.discoverPeers(aChannel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
-                Toast.makeText(getApplicationContext(), "success disco", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Découverte de groupe lancée", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFailure(int reason){
-                Toast.makeText(getApplicationContext(), "fail disco", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Echec de la recherche", Toast.LENGTH_SHORT).show();
             }
         });
     }
+
     public static void copyFile(InputStream inputStream, OutputStream out) {
 
         byte[] buf = new byte[8500];
@@ -202,6 +214,45 @@ public class GuestActivity extends AppCompatActivity {
         }
     }
 
+    public void DeathRattle(){
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                new Thread(new Runnable() {
+                    public void run() {
+                        Intent serviceIntent = new Intent(getApplicationContext(), DisconnectSignal.class);
+                        serviceIntent.setAction(DisconnectSignal.ACTION_SEND_DEATH);
+                        String HostAdd = GoAdress.getHostAddress();
+                        if (!TextUtils.isEmpty(HostAdd) && HostAdd.length() > 0) {
+                            DisconnectSignal.PORT = 9899;
+                            int sub_port = DisconnectSignal.PORT;
+                            serviceIntent.putExtra(DisconnectSignal.EXTRAS_GROUP_OWNER_ADDRESS,HostAdd);
+                            serviceIntent.putExtra(DisconnectSignal.EXTRAS_GROUP_OWNER_PORT, DisconnectSignal.PORT);
+                            if (sub_port != -1) {
+                                getApplication().startService(serviceIntent);
+                            }
+                        }
+                    }
+                }).start();
+            }
+        });
+    }
+
+    public void disconnect(){
+        aManager.removeGroup(aChannel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+              DeathRattle();
+              Toast.makeText(getApplicationContext(),"Déconnexion réussi",Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(int i) {
+                Toast.makeText(getApplicationContext(),"Echec de la deconnexion",Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -217,6 +268,7 @@ public class GuestActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        disconnect();
         aManager.cancelConnect(aChannel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {

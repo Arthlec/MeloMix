@@ -1,4 +1,4 @@
-package projet_e3.esiee.com.projet_e3;
+package projet_e3.esiee.com.projet_e3.Activities;
 
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -20,11 +20,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Objects;
 import java.util.Set;
 import java.util.Stack;
 
 import javax.net.ssl.HttpsURLConnection;
+
+import projet_e3.esiee.com.projet_e3.R;
 
 import static junit.framework.Assert.assertTrue;
 
@@ -45,6 +46,7 @@ public class LoginActivitySpotify extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.login_spotify_activity);
 
         AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID, AuthenticationResponse.Type.TOKEN, REDIRECT_URI).setShowDialog(true);
         builder.setScopes(new String[]{"user-top-read", "user-library-read", "playlist-read-private"});
@@ -123,9 +125,9 @@ public class LoginActivitySpotify extends AppCompatActivity {
 
                     getArtistsStack("https://api.spotify.com/v1/me/tracks?limit=50&offset=0");
 
-                    for (String playlistsURL : Objects.requireNonNull(playlistsURLs)) {
-                        if (playlistsURL != null) {
-                            getArtistsStack(playlistsURL);
+                    for(int i=0; i<playlistsURLs.length; i++) {
+                        if(playlistsURLs[i] != null) {
+                            getArtistsStack(playlistsURLs[i]);
                         }
                     }
 
@@ -390,6 +392,8 @@ public class LoginActivitySpotify extends AppCompatActivity {
                 int topGenresNumber = topGenresStack.size();
                 int totalGenresNumber = genresNumber + topGenresNumber;
                 float topGenresPercentage = 40;
+                if (topGenresNumber == 0) topGenresPercentage = 0;
+                else if (genresNumber == 0) topGenresPercentage = 100;
                 float classicGenresWeight = (totalGenresNumber * (100 - topGenresPercentage) / 100) / genresStack.size();
                 float topGenresWeight = (totalGenresNumber * topGenresPercentage / 100) / topGenresStack.size();
                 for (int i=0; i<genresNumber; i++) {
