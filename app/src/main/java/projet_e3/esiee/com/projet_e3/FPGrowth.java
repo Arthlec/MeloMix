@@ -5,8 +5,6 @@
 
 package projet_e3.esiee.com.projet_e3;
 
-import android.util.Log;
-
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -32,6 +30,7 @@ import weka.associations.DefaultAssociationRule.METRIC_TYPE;
 import weka.associations.Item;
 import weka.core.Attribute;
 import weka.core.Capabilities;
+import weka.core.Capabilities.Capability;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.Option;
@@ -40,11 +39,10 @@ import weka.core.RevisionUtils;
 import weka.core.SelectedTag;
 import weka.core.SparseInstance;
 import weka.core.TechnicalInformation;
-import weka.core.TechnicalInformationHandler;
-import weka.core.Utils;
-import weka.core.Capabilities.Capability;
 import weka.core.TechnicalInformation.Field;
 import weka.core.TechnicalInformation.Type;
+import weka.core.TechnicalInformationHandler;
+import weka.core.Utils;
 import weka.core.converters.ArffLoader;
 
 public class FPGrowth extends AbstractAssociator implements AssociationRulesProducer, OptionHandler, TechnicalInformationHandler {

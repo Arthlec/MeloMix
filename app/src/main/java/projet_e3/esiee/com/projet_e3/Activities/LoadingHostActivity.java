@@ -12,19 +12,13 @@ import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Button;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.fasterxml.jackson.jr.ob.JSON;
-
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -35,37 +29,11 @@ import java.net.Socket;
 
 import projet_e3.esiee.com.projet_e3.AnalyseData;
 import projet_e3.esiee.com.projet_e3.BroadCast;
-import projet_e3.esiee.com.projet_e3.Services.FileTransferService;
 import projet_e3.esiee.com.projet_e3.HostClass;
 import projet_e3.esiee.com.projet_e3.R;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-
-import weka.associations.BinaryItem;
-import weka.clusterers.SimpleKMeans;
-import weka.core.Attribute;
-import weka.core.DenseInstance;
-import weka.core.Instance;
-import weka.core.Instances;
-import weka.core.SparseInstance;
-import weka.filters.Filter;
-import weka.filters.unsupervised.attribute.NumericToBinary;
-import weka.filters.unsupervised.attribute.Remove;
-import weka.filters.unsupervised.attribute.ReplaceMissingWithUserConstant;
+import projet_e3.esiee.com.projet_e3.Services.FileTransferService;
 
 public class LoadingHostActivity extends AnalyseData {
-    private ListView listView;
-    private TextView TxtStatus;
-    private Button NextBtn;
-    private WifiP2pManager aManager;
 
     private TextView TxtStatus; //Indique que le groupe est bien formé en donnant le grade dans le groupe (Host ou guest)
     private WifiP2pManager aManager; //Manager de P2p
@@ -81,10 +49,6 @@ public class LoadingHostActivity extends AnalyseData {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loading_host);
         InitAttribut();
-
-        /*
-        /Pour appeler analyseData(this.getFilesDir());
-         */
     }
 
     private void InitAttribut() {
@@ -311,7 +275,7 @@ public class LoadingHostActivity extends AnalyseData {
                 Socket client = serverSocket.accept();
                 try {
                     String IpClient = client.getInetAddress().getHostAddress();
-                   final File f = new File(mFilecontext.getFilesDir(), IpClient+".json");
+                    final File f = new File(mFilecontext.getFilesDir(), IpClient+".json");
 
                     File dirs = new File(f.getParent());
                     if (!dirs.exists())

@@ -28,6 +28,9 @@ import weka.filters.unsupervised.attribute.ReplaceMissingWithUserConstant;
 
 public abstract class AnalyseData extends AppCompatActivity {
 
+    /**
+     * Pour appeler analyseData(this.getFilesDir());
+     */
     private ArrayList<String> analyseData(File rootDataDir){
         //File rootDataDir = this.getFilesDir();
         FilenameFilter jsonFilter = new FilenameFilter() {
