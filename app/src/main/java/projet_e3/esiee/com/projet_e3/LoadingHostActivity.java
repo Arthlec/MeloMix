@@ -174,7 +174,7 @@ public class LoadingHostActivity extends AppCompatActivity {
             int[] assignments = simpleKMeans.getAssignments();
             int i = 0;
             for(int clusterNum : assignments) {
-                //Log.i("Instance " + i, " -> Cluster " + clusterNum + "\n");
+                Log.i("Instance " + i, " -> Cluster " + clusterNum + "\n");
                 i++;
             }
         } catch (Exception e) {
@@ -215,7 +215,7 @@ public class LoadingHostActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        Log.i("centroidsBaseSimplified", centroidsBaseSimplified.toString());
+        //Log.i("centroidsBaseSimplified", centroidsBaseSimplified.toString());
         numberOfGenres = indexOfAttributeToKeep.size();
         for(int i=0; i<centroidsBaseSize; i++){
             Instance currentInstance = centroidsBaseSimplified.get(i);
@@ -238,11 +238,11 @@ public class LoadingHostActivity extends AppCompatActivity {
         }
 
         FPGrowth algo = new FPGrowth();
-        algo.setLowerBoundMinSupport(0.3); //on définit le seuil minimum (pourcentage)
-        //algo.setNumRulesToFind(0);
+        algo.setMaxNumberOfItems(5);
+        algo.setLowerBoundMinSupport(Math.exp(-2*centroidsBaseSize+1.4)+0.3/*0.3*/); //on définit le seuil minimum (pourcentage)
+        algo.setNumRulesToFind(2);
         try {
             algo.buildAssociations(centroidsBaseSimplified);
-            //algo.getFrequentItems(dataBase);
         } catch (Exception e) {
             e.printStackTrace();
         }

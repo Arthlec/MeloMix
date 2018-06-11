@@ -302,7 +302,6 @@ public class FPGrowth extends AbstractAssociator implements AssociationRulesProd
             for(j = 0; j < current.numValues(); ++j) {
                 int attIndex = current.index(j);
                 if (((BinaryItem)singletons.get(attIndex)).getFrequency() >= minSupport) {
-                    //Log.i("currentValue", "" + ((BinaryItem)singletons.get(attIndex)).getFrequency());
                     transaction.add(singletons.get(attIndex));
                 }
             }
@@ -845,70 +844,6 @@ public class FPGrowth extends AbstractAssociator implements AssociationRulesProd
         }
 
         return result;
-    }
-
-    public void getFrequentItems(Instances data) throws Exception {
-        Object source = (Object)data;
-        Capabilities capabilities = this.getCapabilities();
-        boolean arffLoader = false;
-        boolean breakOnNext = false;
-
-        capabilities.testWithFail(data);
-        if (this.m_transactionsMustContain.length() > 0 && source instanceof Instances) {
-            data = this.parseTransactionsMustContain(data);
-            this.getCapabilities().testWithFail(data);
-        }
-
-        ArrayList<Item> rulesMustContain = null;
-        if (this.m_rulesMustContain.length() > 0) {
-            rulesMustContain = this.parseRulesMustContain(data);
-        }
-
-        ArrayList<BinaryItem> singletons = this.getSingletons(source);
-        int upperBoundMinSuppAsInstances = this.m_upperBoundMinSupport > 1.0D ? (int)this.m_upperBoundMinSupport : (int)Math.ceil(this.m_upperBoundMinSupport * (double)this.m_numInstances);
-        int lowerBoundMinSuppAsInstances = this.m_lowerBoundMinSupport > 1.0D ? (int)this.m_lowerBoundMinSupport : (int)Math.ceil(this.m_lowerBoundMinSupport * (double)this.m_numInstances);
-        double var10000;
-        if (this.m_upperBoundMinSupport > 1.0D) {
-            var10000 = this.m_upperBoundMinSupport / (double)this.m_numInstances;
-        } else {
-            var10000 = this.m_upperBoundMinSupport;
-        }
-
-        double lowerBoundMinSuppAsFraction = this.m_lowerBoundMinSupport > 1.0D ? this.m_lowerBoundMinSupport / (double)this.m_numInstances : this.m_lowerBoundMinSupport;
-        double deltaAsFraction = this.m_delta > 1.0D ? this.m_delta / (double)this.m_numInstances : this.m_delta;
-        double currentSupport = 1.0D;
-        if (this.m_findAllRulesForSupportLevel) {
-            currentSupport = lowerBoundMinSuppAsFraction;
-        }
-
-        do {
-            int currentSupportAsInstances = currentSupport > 1.0D ? (int)currentSupport : (int)Math.ceil(currentSupport * (double)this.m_numInstances);
-
-            FPGrowth.FPTreeRoot tree = this.buildFPTree(singletons,(Instances) source, currentSupportAsInstances);
-            FPGrowth.FrequentItemSets largeItemSets = new FPGrowth.FrequentItemSets(this.m_numInstances);
-
-            FPGrowth.FrequentBinaryItemSet conditionalItems = new FPGrowth.FrequentBinaryItemSet(new ArrayList(), 0);
-            this.mineTree(tree, largeItemSets, 0, conditionalItems, currentSupportAsInstances);
-            this.m_largeItemSets = largeItemSets;
-
-            this.m_rules = generateRulesBruteForce(this.m_largeItemSets, this.m_metric, this.m_metricThreshold, upperBoundMinSuppAsInstances, lowerBoundMinSuppAsInstances, this.m_numInstances);
-
-            if (this.m_findAllRulesForSupportLevel || breakOnNext) {
-                break;
-            }
-
-            currentSupport -= deltaAsFraction;
-            if (currentSupport < lowerBoundMinSuppAsFraction) {
-                if (currentSupport + deltaAsFraction <= lowerBoundMinSuppAsFraction) {
-                    break;
-                }
-
-                currentSupport = lowerBoundMinSuppAsFraction;
-                breakOnNext = true;
-            }
-        } while(this.m_rules.size() < this.m_numRulesToFind);
-
-        Collections.sort(this.m_rules);
     }
 
     private void buildAssociations(Object source) throws Exception {
