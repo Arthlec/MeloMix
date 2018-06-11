@@ -2,9 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
         <item
             android:id="@+id/nav_like"
+            android:icon="@drawable/like"
             android:title="Like" />
         <item
             android:id="@+id/nav_dislike"
+            android:icon="@drawable/dislike"
             android:title="Dislike" />
         <item
             android:id="@+id/nav_save_music"
