@@ -19,16 +19,35 @@ import com.fasterxml.jackson.jr.private_.TreeNode;
 import com.fasterxml.jackson.jr.stree.JacksonJrsTreeCodec;
 import com.fasterxml.jackson.jr.stree.JrsString;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import weka.clusterers.SimpleKMeans;
+import weka.core.Attribute;
+import weka.core.Instance;
+import weka.core.Instances;
+import weka.core.SparseInstance;
+import weka.filters.Filter;
+import weka.filters.unsupervised.attribute.NumericToBinary;
+import weka.filters.unsupervised.attribute.Remove;
+import weka.filters.unsupervised.attribute.ReplaceMissingWithUserConstant;
+
 import static junit.framework.Assert.assertTrue;
 
-public class HostActivity extends AppCompatActivity {
+public class HostActivity extends AnalyseData  {
 
     private static Bitmap bmp;
     private static String trackName;
@@ -39,7 +58,9 @@ public class HostActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.host_activity);
 
-
+        /*
+        /Pour appeler analyseData(this.getFilesDir());
+         */
 
         int host = getIntent().getIntExtra("host", 0);
         authToken = getIntent().getStringExtra("authToken");
@@ -106,6 +127,7 @@ public class HostActivity extends AppCompatActivity {
             });
         }
     }
+
 public static class RequestAsyncTask extends AsyncTask<String,String,String>{
         private static Bitmap bmp;
         private static String trackName;
