@@ -83,7 +83,7 @@ public class LoadingHostActivity extends AppCompatActivity {
         exqWork();
     }
 
-    private void analyseData(){
+    private ArrayList<String> analyseData(){
         File rootDataDir = this.getFilesDir();
         FilenameFilter jsonFilter = new FilenameFilter() {
             public boolean accept(File dir, String name) {
@@ -221,13 +221,13 @@ public class LoadingHostActivity extends AppCompatActivity {
             Instance currentInstance = centroidsBaseSimplified.get(i);
             for(int j = 0; j<numberOfGenres; j++){
                 double currentAttributeValue = currentInstance.value(j);
-                if((currentAttributeValue-0.03) <= 0.00001)
+                if((currentAttributeValue-0.01) <= 0.00001)
                     currentInstance.setValue(j, 0);
                 else
                     currentInstance.setValue(j, 1);
             }
         }
-        Log.i("centroidsBaseBinarized", centroidsBaseSimplified.toString());
+        //Log.i("centroidsBaseBinarized", centroidsBaseSimplified.toString());
 
         NumericToBinary filterBinary = new NumericToBinary();
         try {
@@ -239,8 +239,8 @@ public class LoadingHostActivity extends AppCompatActivity {
 
         FPGrowth algo = new FPGrowth();
         algo.setMaxNumberOfItems(5);
-        algo.setLowerBoundMinSupport(Math.exp(-2*centroidsBaseSize+1.4)+0.3/*0.3*/); //on définit le seuil minimum (pourcentage)
-        algo.setNumRulesToFind(2);
+        algo.setLowerBoundMinSupport(Math.exp(-2*centroidsBaseSize+1.4)+0.3); //on définit le seuil minimum (pourcentage)
+        //algo.setNumRulesToFind(1);
         try {
             algo.buildAssociations(centroidsBaseSimplified);
         } catch (Exception e) {
@@ -250,9 +250,54 @@ public class LoadingHostActivity extends AppCompatActivity {
         int sizeItemsets = algo.m_largeItemSets.size();
         Iterator<FPGrowth.FrequentBinaryItemSet> itemsets = algo.m_largeItemSets.iterator();
         Log.i("frequentItemsetsSize", "" + sizeItemsets);
+        ArrayList<FPGrowth.FrequentBinaryItemSet> itemSetArrayList = new ArrayList<FPGrowth.FrequentBinaryItemSet>();
         while(itemsets.hasNext()){
-            Log.i("itemset", itemsets.next().toString());
+            FPGrowth.FrequentBinaryItemSet currentFrequentItemSet = itemsets.next();
+            itemSetArrayList.add(currentFrequentItemSet);
+            Log.i("itemset", currentFrequentItemSet.toString());
         }
+
+        int maxSupport = Integer.MIN_VALUE;
+        int maxNumberOfItems = Integer.MIN_VALUE;
+        for(int i=0; i<sizeItemsets; i++){
+            FPGrowth.FrequentBinaryItemSet currentFrequentItemSet = itemSetArrayList.get(i);
+            int currentFrequentItemSetSupport = currentFrequentItemSet.getSupport();
+            int currentFrequentItemSetLength = currentFrequentItemSet.numberOfItems();
+            if(maxSupport < currentFrequentItemSetSupport)
+                maxSupport = currentFrequentItemSetSupport;
+            if(maxNumberOfItems < currentFrequentItemSetLength)
+                maxNumberOfItems = currentFrequentItemSetLength;
+        }
+
+        ArrayList<FPGrowth.FrequentBinaryItemSet> itemSetArrayListMax = new ArrayList<>();
+        for(int i=0; i<sizeItemsets; i++){
+            FPGrowth.FrequentBinaryItemSet currentFrequentItemSet = itemSetArrayList.get(i);
+            int currentFrequentItemSetSupport = currentFrequentItemSet.getSupport();
+            int currentFrequentItemSetLength = currentFrequentItemSet.numberOfItems();
+            if(maxSupport == currentFrequentItemSetSupport && maxNumberOfItems == currentFrequentItemSetLength)
+                itemSetArrayListMax.add(currentFrequentItemSet);
+        }
+
+        ArrayList<String> frequentGenres = new ArrayList<>();
+        int itemSetArrayListMaxSize = itemSetArrayListMax.size();
+        for(int i=0; i<itemSetArrayListMaxSize; i++){
+            FPGrowth.FrequentBinaryItemSet currentFrequentItemSet = itemSetArrayListMax.get(i);
+            int currentFrequentItemSetSize = currentFrequentItemSet.numberOfItems();
+            for(int j=0; j<currentFrequentItemSetSize; j++){
+                String genreName = currentFrequentItemSet.getItem(j).toString();
+                if(!frequentGenres.contains(genreName))
+                    frequentGenres.add(genreName);
+            }
+        }
+
+        int frequentGenresSize = frequentGenres.size();
+        String regex = "_binarized=1";
+        for(int i=0; i<frequentGenresSize; i++){
+            String currentGenreName = frequentGenres.get(i);
+            currentGenreName = currentGenreName.replaceAll(regex, "");
+            frequentGenres.set(i, currentGenreName);
+        }
+        return frequentGenres;
     }
 
     private int[] convertIntegers(ArrayList<Integer> integers)
