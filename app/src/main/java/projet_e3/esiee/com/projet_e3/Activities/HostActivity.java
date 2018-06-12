@@ -47,7 +47,7 @@ import projet_e3.esiee.com.projet_e3.R;
 
 import static junit.framework.Assert.assertTrue;
 
-public class HostActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MainFragment.OnSavedMusicSelectedListener, MainFragment.OnArrowListener, HistoryFragment.OnSaveMusicHistorySelectedListener {
+public class HostActivity extends AnalyseData implements NavigationView.OnNavigationItemSelectedListener, MainFragment.OnSavedMusicSelectedListener, MainFragment.OnArrowListener, HistoryFragment.OnSaveMusicHistorySelectedListener {
 
     private ArrayList<String> frequentGenres = new ArrayList<>();
     private static ArrayList<String> trackNamesList = new ArrayList<>();
@@ -114,9 +114,7 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public void makeAnalyse() {
-        AnalyseData mAnalyseData = new AnalyseData() {
-        };
-        frequentGenres = mAnalyseData.analyseData(this.getFilesDir());
+        frequentGenres = this.analyseData(this.getFilesDir());
         Log.i("GenresFréquents", frequentGenres.toString());
     }
 
