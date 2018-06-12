@@ -40,11 +40,11 @@ public abstract class AnalyseData extends AppCompatActivity {
         dataBase = this.replaceDatabaseMissingValuesWithZeros(dataBase);
 
         SimpleKMeans simpleKMeans = new SimpleKMeans();
-        this.executeKmeans(numberOfUsers,simpleKMeans,dataBase);
+        this.executeKmeans(numberOfUsers,simpleKMeans,dataBase, 10, 0.33, 0.66);
         Instances centroidsBase = simpleKMeans.getClusterCentroids();
         int centroidsBaseSize = centroidsBase.size();
 
-        ArrayList<Integer> indexOfAttributeToKeep = createListIndexOfAttributeToKeep(centroidsBaseSize, centroidsBase);
+        ArrayList<Integer> indexOfAttributeToKeep = createListIndexOfAttributeToKeep(centroidsBaseSize, centroidsBase, 0.10);
         Instances centroidsBaseSimplified = createDatabaseSimplified(indexOfAttributeToKeep, centroidsBase);
         centroidsBaseSimplified = this.binarizedDatabase(centroidsBaseSimplified, 0.01);
 
@@ -171,7 +171,7 @@ public abstract class AnalyseData extends AppCompatActivity {
         return centroidsBaseSimplified;
     }
 
-    private ArrayList<Integer> createListIndexOfAttributeToKeep(int centroidsBaseSize, Instances centroidsBase){
+    private ArrayList<Integer> createListIndexOfAttributeToKeep(int centroidsBaseSize, Instances centroidsBase, double percentOfAttributeToKeep){
         ArrayList<Integer> indexOfAttributeToKeep = new ArrayList<Integer>();
         for(int i=0; i<centroidsBaseSize; i++){
             Instance currentInstance = new SparseInstance(centroidsBase.get(i));
@@ -184,7 +184,7 @@ public abstract class AnalyseData extends AppCompatActivity {
             LinkedHashMap<Integer, Double> sortedHashMap = sortHashMapByValues(attributeHashMap);
             Iterator<Integer> hashIterator = sortedHashMap.keySet().iterator();
             int sortedHashMapSize = sortedHashMap.size();
-            for(int j = 0;hashIterator.hasNext() && j < Math.round(sortedHashMapSize*0.10); j++){
+            for(int j = 0;hashIterator.hasNext() && j < Math.round(sortedHashMapSize*percentOfAttributeToKeep); j++){
                 Integer currentInt = hashIterator.next();
                 if(!indexOfAttributeToKeep.contains(currentInt))
                     indexOfAttributeToKeep.add(currentInt);
@@ -194,14 +194,14 @@ public abstract class AnalyseData extends AppCompatActivity {
         return indexOfAttributeToKeep;
     }
 
-    private void executeKmeans(int numberOfUsers, SimpleKMeans simpleKMeans, Instances dataBase){
+    private void executeKmeans(int numberOfUsers, SimpleKMeans simpleKMeans, Instances dataBase, int numberOfIterations, double a, double b){
         try {
             if(numberOfUsers == 2)
                 simpleKMeans.setNumClusters(2);
             else
-                simpleKMeans.setNumClusters((int)Math.round(0.33*numberOfUsers+0.66));
+                simpleKMeans.setNumClusters((int)Math.round(a*numberOfUsers + b));
 
-            simpleKMeans.setMaxIterations(10);
+            simpleKMeans.setMaxIterations(numberOfIterations);
             simpleKMeans.setPreserveInstancesOrder(true);
             simpleKMeans.buildClusterer(dataBase);
             int[] assignments = simpleKMeans.getAssignments();
