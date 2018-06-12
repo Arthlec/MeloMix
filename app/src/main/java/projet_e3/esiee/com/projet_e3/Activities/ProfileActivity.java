@@ -33,6 +33,15 @@ public class ProfileActivity extends AppCompatActivity {
     private String MY_PREFS = "my_prefs";
     TextView userName = null;
 
+    public boolean isConnectivityOn(){
+        ConnectivityManager cm = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isAvailable() && cm.getActiveNetworkInfo().isConnected()) {
+            return true;
+
+        } else {
+            return false;
+        }
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,11 +61,16 @@ public class ProfileActivity extends AppCompatActivity {
         logoSpotify.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!ProfileActivity.isLoggedInSpotify){
+                if(isConnectivityOn())
+                {
+                    if (!ProfileActivity.isLoggedInSpotify){
                     Intent intent = new Intent(ProfileActivity.this, LoginActivitySpotify.class);
                     startActivityForResult(intent, 1);
-                }else
+                    }else
                     Toast.makeText(ProfileActivity.this,"Compte déjà connecté", Toast.LENGTH_LONG).show();
+                }else {
+                    Toast.makeText(ProfileActivity.this,"Veuillez vous connecter à un réseau", Toast.LENGTH_LONG).show();
+                }
             }
         });
 
