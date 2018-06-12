@@ -26,7 +26,8 @@
     <!-- Fin des permissions du P2P -->
     <!--<uses-permission android:name="android.permission.CLEAR_APP_CACHE" />-->
 
-    <application
+    <application xmlns:tools="http://schemas.android.com/tools"
+        tools:replace="android:theme"
         android:allowBackup="true"
         android:fullBackupContent="true"
         android:icon="@mipmap/ic_launcher"

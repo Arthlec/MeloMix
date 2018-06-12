@@ -31,7 +31,7 @@ public abstract class AnalyseData extends AppCompatActivity {
     /**
      * Pour appeler analyseData(this.getFilesDir());
      */
-    private ArrayList<String> analyseData(File rootDataDir){
+    public ArrayList<String> analyseData(File rootDataDir){
         //File rootDataDir = this.getFilesDir();
         FilenameFilter jsonFilter = new FilenameFilter() {
             public boolean accept(File dir, String name) {

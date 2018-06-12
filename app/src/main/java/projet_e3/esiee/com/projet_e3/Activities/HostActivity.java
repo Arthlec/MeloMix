@@ -32,10 +32,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Stack;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import projet_e3.esiee.com.projet_e3.AnalyseData;
 import projet_e3.esiee.com.projet_e3.Fragments.GuestsListFragment;
 import projet_e3.esiee.com.projet_e3.Fragments.HistoryFragment;
 import projet_e3.esiee.com.projet_e3.Fragments.SavedMusicsFragment;
@@ -47,6 +49,9 @@ import static junit.framework.Assert.assertTrue;
 
 public class HostActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MainFragment.OnSavedMusicSelectedListener, MainFragment.OnArrowListener, HistoryFragment.OnSaveMusicHistorySelectedListener {
 
+    private ArrayList<String> frequentGenres = new ArrayList<>();
+    private static ArrayList<String> trackNamesList = new ArrayList<>();
+    private boolean isInitialisation;
     private static Bitmap bmp;
     private static String trackName;
     private static Bitmap nextBmp;
@@ -82,6 +87,8 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.host_activity);
 
+        isInitialisation = true;
+
         android.support.v7.widget.Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionbar = getSupportActionBar();
@@ -101,8 +108,16 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
         Log.i("authToken", authToken);
         Log.i("manager", aManager+"");
         Log.i("channel", aChannel+"");
-        requestData();
 
+        makeAnalyse();
+        requestData();
+    }
+
+    public void makeAnalyse() {
+        AnalyseData mAnalyseData = new AnalyseData() {
+        };
+        frequentGenres = mAnalyseData.analyseData(this.getFilesDir());
+        Log.i("GenresFréquents", frequentGenres.toString());
     }
 
     @Override
@@ -149,6 +164,7 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
             nextTrackName = null;
             HistoryFragment.trackCoverList.add(0, bmp);
             HistoryFragment.trackNameList.add(0, trackName);
+            requestData();
         }
         else {
             if(!tracksCovers.isEmpty()) {
@@ -315,18 +331,20 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void run() {
                 try {
-                    URL trackURL = new URL(getTrackInfo()[0]);
-                    bmp = BitmapFactory.decodeStream(trackURL.openConnection().getInputStream());
-                    trackName = getTrackInfo()[1];
+                    if(isInitialisation) {
+                        URL trackURL = new URL(getTrackInfo()[0]);
+                        bmp = BitmapFactory.decodeStream(trackURL.openConnection().getInputStream());
+                        trackName = getTrackInfo()[1];
 
-                    // Might cause a issue if requestData isn't used only during the initialisation
-                    HistoryFragment.trackCoverList.add(0, bmp);
-                    HistoryFragment.trackNameList.add(0, trackName);
-                    // Might cause a issue if requestData isn't used only during the initialisation
+                        HistoryFragment.trackCoverList.add(0, bmp);
+                        HistoryFragment.trackNameList.add(0, trackName);
 
-                    URL nextTrackURL = new URL("https://www.theedgesusu.co.uk/wp-content/uploads/2017/10/post-malone-e1508708621268.jpg");
+                        isInitialisation = false;
+                    }
+
+                    URL nextTrackURL = new URL(getTrackInfo()[0]);
                     nextBmp = BitmapFactory.decodeStream(nextTrackURL.openConnection().getInputStream());
-                    nextTrackName = "Rockstar - Post Malone";
+                    nextTrackName = getTrackInfo()[1];
                     new Thread(new Runnable() {
                         public void run() {
                             runOnUiThread(new Runnable() {
@@ -343,9 +361,16 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
             }
 
             private String[] getTrackInfo() throws IOException {
+                String genreSeed = "";
+                if (frequentGenres.size() != 0)
+                    genreSeed = "?limit=100&seed_genres=" + frequentGenres.get(0);
+                for (int i=1; i<frequentGenres.size(); i++) {
+                    genreSeed = genreSeed + "%2C" + frequentGenres.get(i);
+                }
+
                 String[] trackInfo = new String[2];
                 // Create URL
-                URL spotifyEndpoint = new URL("https://api.spotify.com/v1/tracks/11dFghVXANMlKmJXsNCbNl");
+                URL spotifyEndpoint = new URL("https://api.spotify.com/v1/recommendations" + genreSeed);
 
                 // Create connection
                 HttpsURLConnection myConnection;
@@ -372,10 +397,18 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
                     JSON json = JSON.std.with(new JacksonJrsTreeCodec());
                     TreeNode root = json.treeFrom(responseBody);
                     assertTrue(root.isObject());
-                    JrsString imageURL = (JrsString) root.get("album").get("images").get(0).get("url");
-                    JrsString trackName = (JrsString) root.get("album").get("name");
+                    int tracksNumber = root.get("tracks").size();
+                    int i;
+                    for (i=0; i<tracksNumber; i++) {
+                        JrsString trackName = (JrsString) root.get("tracks").get(i).get("name");
+                        if (!trackNamesList.contains(trackName.asText())) {
+                            trackNamesList.add(trackName.asText());
+                            trackInfo[1] = trackName.asText();
+                            break;
+                        }
+                    }
+                    JrsString imageURL = (JrsString) root.get("tracks").get(i).get("album").get("images").get(0).get("url");
                     trackInfo[0] = imageURL.asText();
-                    trackInfo[1] = trackName.asText();
 
                     myConnection.disconnect();
                     return trackInfo;
