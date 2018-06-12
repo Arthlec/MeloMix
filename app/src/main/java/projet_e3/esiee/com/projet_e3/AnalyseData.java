@@ -31,6 +31,8 @@ public abstract class AnalyseData extends AppCompatActivity {
     /**
      * Pour appeler analyseData(this.getFilesDir());
      */
+    private Instances histoBase;
+
     public ArrayList<String> analyseData(File rootDataDir){
         //File rootDataDir = this.getFilesDir();
         FilenameFilter jsonFilter = new FilenameFilter() {
@@ -145,6 +147,7 @@ public abstract class AnalyseData extends AppCompatActivity {
         try {
             removeFilter.setInputFormat(centroidsBase);
             centroidsBaseSimplified = Filter.useFilter(centroidsBase, removeFilter);
+            histoBase = new Instances(centroidsBaseSimplified);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -275,5 +278,32 @@ public abstract class AnalyseData extends AppCompatActivity {
         }
         return sortedMap;
     }
+
+    public List[] buildListTab(){
+        List[] ListTab = new List[2];
+        List<String> AttributeList = new ArrayList<>();
+        List<Double> ValuesList = new ArrayList<>();
+        Log.i("histo",histoBase.toString());
+        int size = histoBase.size();
+        for (int i=0;i<size;i++){
+            int len = histoBase.get(i).numAttributes();
+            for(int j=0;j<len;j++){
+                Attribute currentAttribut = histoBase.get(i).attribute(j);
+                //Log.i("value",histoBase.get(i).value(currentAttribut)+"");
+                Double value = histoBase.get(i).value(currentAttribut);
+                //Log.i("value",currentAttribut.name()+"  "+value.toString());
+                histoBase.get(i).attribute(j).setWeight(currentAttribut.weight()+value);
+                //Log.i("wieght",currentAttribut.name()+"   "+currentAttribut.weight()+"");
+            }
+        }
+        for(int att=0;att<histoBase.numAttributes();att++){
+            AttributeList.add(histoBase.attribute(att).name());
+            ValuesList.add(histoBase.attribute(att).weight()-1);
+        }
+        ListTab[0] = AttributeList;
+        ListTab[1] = ValuesList;
+        return ListTab;
+    }
+
 
 }

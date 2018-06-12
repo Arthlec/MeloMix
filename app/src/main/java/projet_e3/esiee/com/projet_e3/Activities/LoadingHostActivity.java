@@ -119,7 +119,6 @@ public class LoadingHostActivity extends AnalyseData {
                     intent.putExtra("authToken", getIntent().getStringExtra("authToken"));
                     intent.putExtra("host",1);
 
-
                     //intent.putExtra("manager", (Parcelable) aManager);
                     //intent.putExtra("channel", (Parcelable) aChannel);
                     startActivity(intent);

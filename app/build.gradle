@@ -53,4 +53,5 @@ dependencies {
     implementation "com.android.support:customtabs:27.1.1"
     implementation "com.fasterxml.jackson.jr:jackson-jr-all:2.9.5"
     implementation 'com.android.support:design:27.1.1'
+    implementation 'com.github.AnyChart:AnyChart-Android:0.2.5'
 }
