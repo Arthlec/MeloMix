@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -36,11 +37,10 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.profile_activity);
 
         if(!ProfileActivity.this.isOnline())
             Toast.makeText(ProfileActivity.this,"Aucune connexion internet détectée", Toast.LENGTH_LONG).show();
-        setContentView(R.layout.profile_activity);
 
         userName = findViewById(R.id.userName);
 
@@ -55,8 +55,10 @@ public class ProfileActivity extends AppCompatActivity {
                 if (!ProfileActivity.isLoggedInSpotify){
                     Intent intent = new Intent(ProfileActivity.this, LoginActivitySpotify.class);
                     startActivityForResult(intent, 1);
-                }else
-                    Toast.makeText(ProfileActivity.this,"Compte déjà connecté", Toast.LENGTH_LONG).show();
+                }else{
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://accounts.spotify.com"));
+                    startActivity(browserIntent);
+                }
             }
         });
 
@@ -95,7 +97,7 @@ public class ProfileActivity extends AppCompatActivity {
             String userName = null;
             if(bundle != null) {
                 userGenres = (HashMap<String, Float>) bundle.getSerializable("userGenres");
-                userName = bundle.getString("userName", "Non connectée");
+                userName = bundle.getString("userName", "");
                 authToken = bundle.getString("authToken", "");
             }
 
