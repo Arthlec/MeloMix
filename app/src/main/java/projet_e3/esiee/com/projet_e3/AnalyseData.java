@@ -48,6 +48,13 @@ public abstract class AnalyseData extends AppCompatActivity {
 
         ArrayList<Integer> indexOfAttributeToKeep = createListIndexOfAttributeToKeep(centroidsBaseSize, centroidsBase, 0.10);
         Instances centroidsBaseSimplified = createDatabaseSimplified(indexOfAttributeToKeep, centroidsBase);
+
+        if(centroidsBaseSize<=1){
+            Instances OneCentroidBase = new Instances(centroidsBaseSimplified);
+            OneCentroidBase = this.binarizedDatabase(OneCentroidBase, 0.02);
+            return getFrequentGenresOneUser(OneCentroidBase);
+        }
+
         centroidsBaseSimplified = this.binarizedDatabase(centroidsBaseSimplified, 0.01);
 
         FPGrowth algo = this.createAlgo(centroidsBaseSimplified, 5, 1, -2.0, 1.4, 0.3);
@@ -55,6 +62,36 @@ public abstract class AnalyseData extends AppCompatActivity {
         ArrayList<String> frequentGenres = this.getFrequentGenresList(algo, sizeItemsets);
 
         return frequentGenres;
+    }
+
+    private ArrayList<String> getFrequentGenresOneUser(Instances OneCentroidBase){
+        ArrayList<String> oneUserGenre = new ArrayList<>();
+        int len = OneCentroidBase.numAttributes();
+        for(int i=0;i<len;i++){
+            Attribute currentAttribut = OneCentroidBase.attribute(i);
+            Log.i("current",currentAttribut+"");
+            Log.i("value",OneCentroidBase.get(0).value(currentAttribut)+"");
+            if(OneCentroidBase.get(0).value(currentAttribut)!=0){
+               oneUserGenre.add(currentAttribut.name());
+               Log.i("name",currentAttribut.name());
+            }
+        }
+        Log.i("List",oneUserGenre+"");
+        oneUserGenre = applyRegex(oneUserGenre,"_binarized");
+        return  oneUserGenre;
+    }
+
+    private ArrayList<String> applyRegex(ArrayList<String> list, String regex){
+        ArrayList<String> regexList = new ArrayList<>();
+        int listSize = list.size();
+        for(int i=0; i<listSize; i++){
+            String currentGenreName = list.get(i);
+            Log.i("currenName",currentGenreName);
+            currentGenreName = currentGenreName.replaceAll(regex, "");
+            regexList.add(i, currentGenreName);
+        }
+        Log.i("regex",regexList+"");
+        return  regexList;
     }
 
     private ArrayList<String> getFrequentGenresList(FPGrowth algo, int sizeItemsets){
@@ -72,13 +109,8 @@ public abstract class AnalyseData extends AppCompatActivity {
                     frequentGenres.add(genreName);
             }
         }
-        int frequentGenresSize = frequentGenres.size();
         String regex = "_binarized=1";
-        for(int i=0; i<frequentGenresSize; i++){
-            String currentGenreName = frequentGenres.get(i);
-            currentGenreName = currentGenreName.replaceAll(regex, "");
-            frequentGenres.set(i, currentGenreName);
-        }
+        frequentGenres = applyRegex(frequentGenres,regex);
         return frequentGenres;
     }
 
