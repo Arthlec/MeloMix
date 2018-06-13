@@ -150,15 +150,6 @@ public class ProfileActivity extends AppCompatActivity {
             }
         }
     }
-    public boolean isConnectivityOn(){
-        ConnectivityManager cm = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isAvailable() && cm.getActiveNetworkInfo().isConnected()) {
-            return true;
-
-        } else {
-            return false;
-        }
-    }
 
     private String myprefs_name() {
         SharedPreferences pref = getApplicationContext().getSharedPreferences(MY_PREFS, MODE_PRIVATE);
