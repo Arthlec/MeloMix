@@ -116,7 +116,7 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
         makeAnalyse();
         dataList = buildListTab();
         giveListToStat();
-        //requestData();
+        requestData();
     }
 
     public void makeAnalyse() {
@@ -389,6 +389,8 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
                 for (int i=1; i<frequentAvailableGenresList.size(); i++) {
                     genreSeed = genreSeed + "%2C" + frequentAvailableGenresList.get(i);
                 }
+
+                Log.i("frequent",frequentAvailableGenresList.toString());
 
 
                 String[] trackInfo = new String[2];
