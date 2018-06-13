@@ -28,42 +28,34 @@ import projet_e3.esiee.com.projet_e3.R;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    public static boolean isLoggedInSpotify = false;
-    private String PERSONAL = "personal.txt";
+    //public static boolean isLoggedInSpotify = false;
+    //private String PERSONAL = "personal.txt";
     private String authToken = "";
     private String MY_PREFS = "my_prefs";
-    TextView userName = null;
 
-    public boolean isConnectivityOn(){
-        ConnectivityManager cm = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isAvailable() && cm.getActiveNetworkInfo().isConnected()) {
-            return true;
-
-        } else {
-            return false;
-        }
-    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.profile_activity);
+        SharedPreferences pref = getApplicationContext().getSharedPreferences(MY_PREFS, MODE_PRIVATE);
 
-        if(!ProfileActivity.this.isOnline())
-            Toast.makeText(ProfileActivity.this,"Aucune connexion internet détectée", Toast.LENGTH_LONG).show();
-
-        userName = findViewById(R.id.userName);
-
-
+        TextView userName = findViewById(R.id.userName);
         userName.setText("Bonjour " +myprefs_name()+ ".");
 
+        TextView textSpotify = findViewById(R.id.textSpotify);
+        if (pref.contains("userAccountSpotify")){
+            textSpotify.setText("Connecté avec le compte : " + myprefs_accountSpotify());
+        }else
+            textSpotify.setText("Non connecté");
 
         ImageButton logoSpotify = findViewById(R.id.imageButton);
         logoSpotify.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                SharedPreferences pref = getApplicationContext().getSharedPreferences(MY_PREFS, MODE_PRIVATE);
                 if(isConnectivityOn())
                 {
-                    if (!ProfileActivity.isLoggedInSpotify){
+                    if (!pref.contains("userAccountSpotify")){
                         Intent intent = new Intent(ProfileActivity.this, LoginActivitySpotify.class);
                         startActivityForResult(intent, 1);
                     }else{
@@ -80,15 +72,15 @@ public class ProfileActivity extends AppCompatActivity {
         buttonDisconnect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(ProfileActivity.isLoggedInSpotify){
-                    ProfileActivity.isLoggedInSpotify = false;
+                SharedPreferences pref = getApplicationContext().getSharedPreferences(MY_PREFS, MODE_PRIVATE);
+                if(pref.contains("userAccountSpotify")){
+                    pref.edit().remove("userAccountSpotify").apply(); //clear pref user account Spotify
                     Toast.makeText(ProfileActivity.this,"Déconnexion réussie", Toast.LENGTH_LONG).show();
                 }else{
                     Toast.makeText(ProfileActivity.this,"Aucun compte n'est connecté", Toast.LENGTH_LONG).show();
                 }
                 TextView textSpotify = findViewById(R.id.textSpotify);
                 textSpotify.setText("Non connecté");
-
             }
         });
 
@@ -108,18 +100,21 @@ public class ProfileActivity extends AppCompatActivity {
         if(resultCode == 1){
             Bundle bundle = intent.getExtras();
             HashMap<String, Float> userGenres = null;
-            String userName = null;
+            String userAccountSpotify = null;
             if(bundle != null) {
                 userGenres = (HashMap<String, Float>) bundle.getSerializable("userGenres");
-                userName = bundle.getString("userName", "");
+                userAccountSpotify = bundle.getString("userAccountSpotify", "");
                 authToken = bundle.getString("authToken", "");
             }
 
-            TextView textSpotify = findViewById(R.id.textSpotify);
-            //String userName = this.getIntent().getStringExtra("userName");
-            //String userName = LoginActivitySpotify.userName;
-            if(userName != null)
-                textSpotify.setText("Connecté avec le compte : " + userName);
+            if(userAccountSpotify != null){
+                TextView textSpotify = findViewById(R.id.textSpotify);
+                SharedPreferences pref = getApplicationContext().getSharedPreferences(MY_PREFS, MODE_PRIVATE);
+                SharedPreferences.Editor editor = pref.edit();
+                editor.putString("userAccountSpotify", userAccountSpotify);
+                editor.apply();
+                textSpotify.setText("Connecté avec le compte : " + myprefs_accountSpotify());
+            }
 
             //HashMap<String, Float> userGenres = this.getIntent().getSerializableExtra("genres");
             //HashMap<String, Float> userGenres = LoginActivitySpotify.userGenres;
@@ -128,38 +123,41 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
-    private void writeJSONfile(HashMap<String, Float> userGenres){
-        try {
-            //MainActivity.this.deleteFile("userGenres.json");
-            File file = new File(this.getFilesDir(), "userGenres.json");
-
-            Log.i("FileExists", "" + file.exists());
-            //Log.i("FileIsHidden", "" + file.isHidden());
-
-            JSON json = JSON.std.with(new JacksonJrsTreeCodec())
-                    .with(JSON.Feature.PRETTY_PRINT_OUTPUT)
-                    .without(JSON.Feature.WRITE_NULL_PROPERTIES);
-
-            Log.i("prettyPrintEnabled", "" + json.isEnabled(JSON.Feature.PRETTY_PRINT_OUTPUT));
-
-            json.write(userGenres, file);
-
-            Log.i("FileLength", "" + file.length());
-            Log.i("MainActivity", "Fichier créé !");
-        } catch (Exception e) {
-            e.printStackTrace();
+    private boolean isConnectivityOn(){
+        ConnectivityManager cm = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isAvailable() && cm.getActiveNetworkInfo().isConnected()) {
+            return true;
+        } else {
+            return false;
         }
     }
 
-    public boolean isOnline() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        return netInfo != null && netInfo.isConnectedOrConnecting();
+    private void writeJSONfile(HashMap<String, Float> userGenres){
+        if(!userGenres.isEmpty()){
+            try {
+                //MainActivity.this.deleteFile("userGenres.json");
+                File file = new File(this.getFilesDir(), "userGenres.json");
+
+                JSON json = JSON.std.with(new JacksonJrsTreeCodec())
+                        .with(JSON.Feature.PRETTY_PRINT_OUTPUT)
+                        .without(JSON.Feature.WRITE_NULL_PROPERTIES);
+
+                json.write(userGenres, file);
+                Log.i("FileLength", "" + file.length());
+                Log.i("MainActivity", "Fichier créé !");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
-    public String myprefs_name() {
+    private String myprefs_name() {
         SharedPreferences pref = getApplicationContext().getSharedPreferences(MY_PREFS, MODE_PRIVATE);
-        String pseudo = pref.getString("user_name", null);//null is the default value.
-        return pseudo;
+        return pref.getString("user_name", null);//null is the default value.
+    }
+
+    private String myprefs_accountSpotify() {
+        SharedPreferences pref = getApplicationContext().getSharedPreferences(MY_PREFS, MODE_PRIVATE);
+        return pref.getString("userAccountSpotify", getString(R.string.non_connect));
     }
 }

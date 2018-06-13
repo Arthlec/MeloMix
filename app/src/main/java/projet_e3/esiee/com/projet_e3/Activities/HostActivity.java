@@ -419,10 +419,11 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
     }
 
     private void disconnect() {
-        deleteCache(this);
-        ProfileActivity.isLoggedInSpotify = false; //disconnect from spotify
+        //deleteCache(this);
         SharedPreferences pref = getApplicationContext().getSharedPreferences(MY_PREFS, MODE_PRIVATE);
         pref.edit().remove("user_name").apply(); //clear pref pseudo
+        if(pref.contains("userAccountSpotify"))
+            pref.edit().remove("userAccountSpotify").apply(); //clear pref user account Spotify
         Intent intent = new Intent(HostActivity.this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); //clear stack activity
         startActivity(intent);
