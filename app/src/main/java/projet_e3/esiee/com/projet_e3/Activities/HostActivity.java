@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -47,7 +48,7 @@ import projet_e3.esiee.com.projet_e3.R;
 
 import static junit.framework.Assert.assertTrue;
 
-public class HostActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MainFragment.OnSavedMusicSelectedListener, MainFragment.OnArrowListener, HistoryFragment.OnSaveMusicHistorySelectedListener {
+public class HostActivity extends AnalyseData implements NavigationView.OnNavigationItemSelectedListener, MainFragment.OnSavedMusicSelectedListener, MainFragment.OnArrowListener, HistoryFragment.OnSaveMusicHistorySelectedListener {
 
     private ArrayList<String> frequentGenres = new ArrayList<>();
     private static ArrayList<String> trackNamesList = new ArrayList<>();
@@ -65,6 +66,7 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
     private WifiP2pGroup wifiP2pGroup;
     private WifiP2pManager aManager;
     private WifiP2pManager.Channel aChannel;
+    private List[] dataList;
 
     //FOR FRAGMENTS
     // 1 - Declare fragment handled by Navigation Drawer
@@ -112,14 +114,17 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
         Log.i("channel", aChannel+"");
 
         makeAnalyse();
-        requestData();
+        dataList = buildListTab();
+        giveListToStat();
+        //requestData();
     }
 
     public void makeAnalyse() {
-        AnalyseData mAnalyseData = new AnalyseData() {
-        };
-        frequentGenres = mAnalyseData.analyseData(this.getFilesDir());
+        frequentGenres = this.analyseData(this.getFilesDir());
         Log.i("GenresFréquents", frequentGenres.toString());
+    }
+    public void giveListToStat(){
+        StatsFragment.dataList = dataList;
     }
 
     @Override
@@ -439,10 +444,11 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void disconnect() {
-        deleteCache(this);
-        ProfileActivity.isLoggedInSpotify = false; //disconnect from spotify
+        //deleteCache(this);
         SharedPreferences pref = getApplicationContext().getSharedPreferences(MY_PREFS, MODE_PRIVATE);
         pref.edit().remove("user_name").apply(); //clear pref pseudo
+        if(pref.contains("userAccountSpotify"))
+            pref.edit().remove("userAccountSpotify").apply(); //clear pref user account Spotify
         Intent intent = new Intent(HostActivity.this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); //clear stack activity
         startActivity(intent);

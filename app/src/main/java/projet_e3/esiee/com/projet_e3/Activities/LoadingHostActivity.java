@@ -120,7 +120,6 @@ public class LoadingHostActivity extends AnalyseData {
                     intent.putExtra("availableGenres", getIntent().getStringArrayListExtra("availableGenres"));
                     intent.putExtra("host",1);
 
-
                     //intent.putExtra("manager", (Parcelable) aManager);
                     //intent.putExtra("channel", (Parcelable) aChannel);
                     startActivity(intent);

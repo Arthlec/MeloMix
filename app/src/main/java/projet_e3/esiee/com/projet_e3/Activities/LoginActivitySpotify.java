@@ -73,7 +73,6 @@ public class LoginActivitySpotify extends AppCompatActivity {
                     // Handle successful response
                     authToken = response.getAccessToken();
                     requestData();
-                    ProfileActivity.isLoggedInSpotify = true;
                     while(!asyncTaskIsDone){
                         try { Thread.sleep(100); }
                         catch (InterruptedException e) { e.printStackTrace(); }
@@ -105,7 +104,7 @@ public class LoginActivitySpotify extends AppCompatActivity {
         Intent data = new Intent(LoginActivitySpotify.this, ProfileActivity.class);
         data.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         Bundle extras = new Bundle();
-        extras.putString("userName", LoginActivitySpotify.userName);
+        extras.putString("userAccountSpotify", LoginActivitySpotify.userName);
         extras.putSerializable("userGenres",LoginActivitySpotify.userGenres);
         extras.putString("authToken", LoginActivitySpotify.authToken);
         extras.putStringArrayList("availableGenres", LoginActivitySpotify.availableGenresList);
