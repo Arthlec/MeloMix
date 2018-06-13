@@ -1,60 +1,68 @@
 package projet_e3.esiee.com.projet_e3;
 
-
-import com.anychart.anychart.AnyChart;
-import com.anychart.anychart.AnyChartView;
-import com.anychart.anychart.Cartesian;
-import com.anychart.anychart.CartesianSeriesColumn;
-import com.anychart.anychart.DataEntry;
-import com.anychart.anychart.EnumsAnchor;
-import com.anychart.anychart.HoverMode;
-import com.anychart.anychart.Position;
-import com.anychart.anychart.TooltipPositionMode;
-import com.anychart.anychart.ValueDataEntry;
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChartUtils extends AnalyseData {
+public class ChartUtils{
 
     public ChartUtils(){
 
     }
 
-    public void buildBarChart(List[] lists) {
+    public void buildBarChart(List[] lists, android.view.View view) {
 
-        AnyChartView anyChartView = findViewById(R.id.barchart);
-
+        BarChart barChart = view.findViewById(R.id.barchart);
         List<String> genres = lists[0];
         List<Double> values = lists[1];
+        List<BarEntry> dataEntries = new ArrayList<>();
+        int numberOfgenre = genres.size();
 
-        Cartesian cartesian = AnyChart.column();
-        List<DataEntry> dataEntries = new ArrayList<>();
-        for (int i = 0; i < genres.size(); i++) {
-        dataEntries.add(new ValueDataEntry(genres.get(i),values.get(i)));
+        barChart.setDrawBarShadow(false);
+        barChart.setDrawValueAboveBar(true);
+        barChart.setMaxVisibleValueCount(numberOfgenre);
+        barChart.setPinchZoom(false);
+        barChart.setDrawGridBackground(false);
+
+        for (int i = 0; i < numberOfgenre; i++) {
+            Float currentFloat = Float.valueOf(String.valueOf(values.get(i)));
+            dataEntries.add(new BarEntry(i,currentFloat));
         }
-        CartesianSeriesColumn column = cartesian.column(dataEntries);
-        column.getTooltip()
-                .setTitleFormat("{%X}")
-                .setPosition(Position.CENTER_BOTTOM)
-                .setAnchor(EnumsAnchor.CENTER_BOTTOM)
-                .setOffsetX(0d)
-                .setOffsetY(5d)
-                .setFormat("${%Value}{groupsSeparator: }");
 
-        cartesian.setAnimation(true);
-        cartesian.setTitle("Top 10 Cosmetic Products by Revenue");
+        BarDataSet barDataSet = new BarDataSet(dataEntries,"genres");
+        barDataSet.setColors(ColorTemplate.COLORFUL_COLORS);
 
-        cartesian.getYScale().setMinimum(0d);
+        BarData genreData = new BarData(barDataSet);
+        genreData.setBarWidth(0.16f);
+        XAxis xAxis = barChart.getXAxis();
+        xAxis.setValueFormatter(new MyXAxisValueFormatter(genres));
+        xAxis.setPosition(XAxis.XAxisPosition.BOTH_SIDED);
+        xAxis.setGranularity(1);
 
-        cartesian.getYAxis().getLabels().setFormat("${%Value}{groupsSeparator: }");
+        barChart.setData(genreData);
+    }
 
-        cartesian.getTooltip().setPositionMode(TooltipPositionMode.POINT);
-        cartesian.getInteractivity().setHoverMode(HoverMode.BY_X);
+    public class MyXAxisValueFormatter implements IAxisValueFormatter {
 
-        cartesian.getXAxis().setTitle("Product");
-        cartesian.getYAxis().setTitle("Revenue");
+        private List<String> mValues;
 
-        anyChartView.setChart(cartesian);
+        public MyXAxisValueFormatter(List<String> values) {
+            this.mValues = values;
+        }
+
+        @Override
+        public String getFormattedValue(float value, AxisBase axis) {
+            // "value" represents the position of the label on the axis (x or y)
+            return mValues.get((int) value);
+        }
+        public int getDecimalDigits() { return 0; }
     }
 }

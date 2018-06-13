@@ -33,15 +33,6 @@ public class ProfileActivity extends AppCompatActivity {
     private String MY_PREFS = "my_prefs";
     TextView userName = null;
 
-    public boolean isConnectivityOn(){
-        ConnectivityManager cm = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isAvailable() && cm.getActiveNetworkInfo().isConnected()) {
-            return true;
-
-        } else {
-            return false;
-        }
-    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,7 +60,7 @@ public class ProfileActivity extends AppCompatActivity {
                     }else
                     Toast.makeText(ProfileActivity.this,"Compte déjà connecté", Toast.LENGTH_LONG).show();
                 }else {
-                    Toast.makeText(ProfileActivity.this,"Veuillez vous connecter à un réseau", Toast.LENGTH_LONG).show();
+                    Toast.makeText(ProfileActivity.this,"Aucune connexion internet détectée", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -146,6 +137,15 @@ public class ProfileActivity extends AppCompatActivity {
             Log.i("MainActivity", "Fichier créé !");
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+    public boolean isConnectivityOn(){
+        ConnectivityManager cm = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isAvailable() && cm.getActiveNetworkInfo().isConnected()) {
+            return true;
+
+        } else {
+            return false;
         }
     }
 
