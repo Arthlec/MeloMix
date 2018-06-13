@@ -23,6 +23,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,16 +46,19 @@ import projet_e3.esiee.com.projet_e3.Services.FileTransferService;
 import projet_e3.esiee.com.projet_e3.HostClass;
 import projet_e3.esiee.com.projet_e3.R;
 
+import static java.lang.System.out;
+
 public class LoadingHostActivity extends AppCompatActivity {
 
-    private TextView TxtStatus; //Indique que le groupe est bien formé en donnant le grade dans le groupe (Host ou guest)
-    private WifiP2pManager aManager; //Manager de P2p
-    private WifiP2pManager.Channel aChannel;
+    private static WifiP2pManager aManager; //Manager de P2p
+    private static WifiP2pManager.Channel aChannel;
     private BroadcastReceiver mReceiver;
     private IntentFilter mIntent;
     private final WifiP2pConfig config = new WifiP2pConfig();
     private WifiP2pGroup wifiP2pGroup;
     private int guestNb;
+    private ProgressBar progressBar;
+    private TextView loadingText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +81,7 @@ public class LoadingHostActivity extends AppCompatActivity {
 
         config.groupOwnerIntent = 15;
 
-        mReceiver = new BroadCast(aManager,aChannel,null,this, wifiManager);
+        mReceiver = new BroadCast(aManager,aChannel,null,this,null, wifiManager);
         mIntent = new IntentFilter();
         setAction();
 
@@ -88,7 +92,10 @@ public class LoadingHostActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Guestnumber : " + guestNb, Toast.LENGTH_SHORT).show();
         }
 
-        TxtStatus = findViewById(R.id.KieKi);
+        loadingText = findViewById(R.id.loading_text);
+        progressBar = findViewById(R.id.progressBar);
+        progressBar.setMax(guestNb);
+
     }
 
     public void setAction(){
@@ -116,23 +123,34 @@ public class LoadingHostActivity extends AppCompatActivity {
         }
     }
 
+    public static WifiP2pManager getManager() {
+        return aManager;
+    }
+
+    public static WifiP2pManager.Channel getChannel() {
+        return aChannel;
+    }
+
     //Listener de connexion appelé dans à chaque modification du groupe
     WifiP2pManager.ConnectionInfoListener connectionInfoListener = new WifiP2pManager.ConnectionInfoListener() {
         @Override
         public void onConnectionInfoAvailable(WifiP2pInfo info) {
             if(info.groupFormed && info.isGroupOwner){
-                TxtStatus.setText("Host");
+                //TxtStatus.setText("Host");
                 HostClass hostClass = new HostClass(getApplicationContext());
                 hostClass.start();
-
+                progressBar.setProgress(wifiP2pGroup.getClientList().size());
+                int diff = guestNb-wifiP2pGroup.getClientList().size();
+                loadingText.setText("Vous devez encore attendre "+ diff +" invités");
                 Toast.makeText(getApplicationContext(), "ClientList : " + wifiP2pGroup.getClientList().size(), Toast.LENGTH_SHORT).show();
-                if(wifiP2pGroup.getClientList().size()== guestNb){
+
+                if(wifiP2pGroup.getClientList().size()>= guestNb) {
                     Intent intent = new Intent(LoadingHostActivity.this, HostActivity.class);
                     intent.putExtra("authToken", getIntent().getStringExtra("authToken"));
-                    intent.putExtra("host",1);
+                    intent.putExtra("wifip2pGroup", wifiP2pGroup);
+                    intent.putExtra("host", 1);
                     startActivity(intent);
                 }
-
             }
         }
     };

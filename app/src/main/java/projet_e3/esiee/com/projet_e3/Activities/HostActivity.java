@@ -4,7 +4,10 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
@@ -21,6 +24,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 
 import com.fasterxml.jackson.jr.ob.JSON;
@@ -36,6 +40,7 @@ import java.util.Stack;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import projet_e3.esiee.com.projet_e3.BroadCast;
 import projet_e3.esiee.com.projet_e3.Fragments.GuestsListFragment;
 import projet_e3.esiee.com.projet_e3.Fragments.HistoryFragment;
 import projet_e3.esiee.com.projet_e3.Fragments.SavedMusicsFragment;
@@ -57,6 +62,10 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
     private Stack<String> tracksNames = new Stack<>();
     private String MY_PREFS = "my_prefs";
     private WifiP2pGroup wifiP2pGroup;
+    private WifiP2pManager manager;
+    private WifiP2pManager.Channel channel;
+    private BroadCast mReceiver;
+    private IntentFilter mIntent;
 
     //FOR FRAGMENTS
     // 1 - Declare fragment handled by Navigation Drawer
@@ -64,7 +73,7 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
     private Fragment fragmentStats;
     private Fragment fragmentSavedMusics;
     private Fragment fragmentHistory;
-    private Fragment fragmentGuestsList;
+    private GuestsListFragment fragmentGuestsList;
 
     //FOR DATAS
     // 2 - Identify each fragment with a number
@@ -96,6 +105,25 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
         Log.i("authToken", authToken);
         requestData();
 
+        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+
+        manager = LoadingHostActivity.getManager();
+        channel = LoadingHostActivity.getChannel();
+
+        Bundle bundle = getIntent().getExtras();
+        assert bundle != null;
+        wifiP2pGroup =  bundle.getParcelable("wifip2pGroup");
+
+        mReceiver = new BroadCast(manager,channel,null,null,this, wifiManager);
+        mIntent = new IntentFilter();
+        setAction();
+    }
+
+    public void setAction(){
+        mIntent.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
+        mIntent.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
+        mIntent.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
+        mIntent.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
     }
 
     @Override
@@ -227,7 +255,13 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
 
     private void showGuestsListFragment(){
         if (this.fragmentGuestsList == null) this.fragmentGuestsList = GuestsListFragment.newInstance();
+        manager.requestGroupInfo(channel, groupInfoListener);
+        fragmentGuestsList.setWifiP2PGroup(wifiP2pGroup);
+        fragmentGuestsList.setManager(manager);
+        fragmentGuestsList.setChannel(channel);
+        fragmentGuestsList.setGroupInfoListener(groupInfoListener);
         this.startTransactionFragment(this.fragmentGuestsList);
+
     }
 
     // 3 - Generic method that will replace and show a fragment inside the MainActivity Frame Layout
@@ -273,8 +307,10 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
             if(group!=null)
             {
                 wifiP2pGroup = group;
-                //aManager.requestConnectionInfo(aChannel,connectionInfoListener);
+                Toast.makeText(getApplicationContext(),"clientGroup : " + wifiP2pGroup.getClientList(),Toast.LENGTH_SHORT).show();
+                manager.requestConnectionInfo(channel,connectionInfoListener);
             }
+            fragmentGuestsList.setWifiP2PGroup(wifiP2pGroup);
         }
     };
 

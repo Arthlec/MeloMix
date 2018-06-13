@@ -9,6 +9,7 @@ import android.net.wifi.p2p.WifiP2pManager;
 import android.util.Log;
 
 import projet_e3.esiee.com.projet_e3.Activities.GuestActivity;
+import projet_e3.esiee.com.projet_e3.Activities.HostActivity;
 import projet_e3.esiee.com.projet_e3.Activities.LoadingHostActivity;
 
 /**
@@ -19,16 +20,18 @@ public class BroadCast extends BroadcastReceiver {
     private WifiP2pManager manager;
     private WifiP2pManager.Channel channel;
     private GuestActivity guestActivity;
-    private LoadingHostActivity host;
+    private LoadingHostActivity loadingHost;
     private WifiManager wifiManager;
+    private HostActivity host;
 
-    public BroadCast(WifiP2pManager pmanager, WifiP2pManager.Channel pchannel, GuestActivity pGuest,LoadingHostActivity pHost, WifiManager wifi){
+    public BroadCast(WifiP2pManager pmanager, WifiP2pManager.Channel pchannel, GuestActivity pGuest, LoadingHostActivity pLoadingHost, HostActivity pHost, WifiManager wifi){
 
         this.manager = pmanager;
         this.channel = pchannel;
         this.guestActivity = pGuest;
         this.host = pHost;
         this.wifiManager = wifi;
+        this.loadingHost = pLoadingHost;
     }
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -57,10 +60,12 @@ public class BroadCast extends BroadcastReceiver {
             NetworkInfo networkInfo = intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
             networkInfo.getDetailedState();
             if(networkInfo.isConnected()){
-                if(guestActivity != null && host == null) {
+                if(guestActivity != null && loadingHost == null && host == null) {
                     manager.requestConnectionInfo(channel, guestActivity.connectionInfoListener);
-                }else if(host != null && guestActivity == null) {
-                    manager.requestGroupInfo(channel,host.groupInfoListener);
+                }else if(loadingHost != null && guestActivity == null && host == null) {
+                    manager.requestGroupInfo(channel,loadingHost.groupInfoListener);
+                }else if(host != null && guestActivity == null && loadingHost == null) {
+                    manager.requestGroupInfo(channel, host.groupInfoListener);
                 }
             }
         }
