@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -35,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //splash screen
-        setTheme(R.style.AppTheme_Green);
+        setTheme(R.style.MeloTheme);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -54,6 +55,37 @@ public class MainActivity extends AppCompatActivity {
         result = findViewById(R.id.result);
 
         pseudo.addTextChangedListener(textWatcher);
+
+        /* use ENTER key on softkeyboard */
+
+        pseudo.setOnKeyListener(new View.OnKeyListener()
+        {
+            public boolean onKey(View v, int keyCode, KeyEvent event)
+            {
+                if (event.getAction() == KeyEvent.ACTION_DOWN)
+                {
+                    switch (keyCode)
+                    {
+                        case KeyEvent.KEYCODE_DPAD_CENTER:
+                        case KeyEvent.KEYCODE_ENTER:
+                            SharedPreferences pref = getApplicationContext().getSharedPreferences(MY_PREFS, MODE_PRIVATE);
+                            SharedPreferences.Editor editor = pref.edit();
+                            editor.putString("user_name", pseudo.getText().toString());
+                            editor.apply();
+                            if (myprefs_name() != null && myprefs_license()/*les conditions sont respectées*/) {
+                                Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+                                startActivity(intent);
+                            } else if (!myprefs_license()) {
+                                showDialogue();
+                            }
+                            return true;
+                        default:
+                            break;
+                    }
+                }
+                return false;
+            }
+        });
 
         mEnter = findViewById(R.id.enter);
         mEnter.setEnabled(false);

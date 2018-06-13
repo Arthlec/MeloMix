@@ -119,6 +119,20 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
         requestData();
     }
 
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this)
+                .setTitle("Voulez-vous vraiment quitter cette page?")
+                .setMessage("Les données en cours d'utilisation seront perdues")
+                .setNegativeButton(android.R.string.no, null)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface arg0, int arg1) {
+                        HostActivity.super.onBackPressed();
+                    }
+                }).create().show();
+    }
+
     public void makeAnalyse() {
         frequentGenres = this.analyseData(this.getFilesDir());
         Log.i("GenresFréquents", frequentGenres.toString());

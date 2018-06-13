@@ -123,6 +123,7 @@ public class LoadingHostActivity extends AnalyseData {
                     //intent.putExtra("manager", (Parcelable) aManager);
                     //intent.putExtra("channel", (Parcelable) aChannel);
                     startActivity(intent);
+                    finish();
                 }
 
             }
