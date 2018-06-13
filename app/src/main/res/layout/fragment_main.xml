@@ -98,34 +98,36 @@
             android:id="@+id/imageView5"
             android:layout_width="match_parent"
             android:layout_height="110dp"
-            android:background="@android:color/darker_gray"
+            android:background="@color/colorPrimaryDark"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/moreButton"
             app:layout_constraintVertical_bias="1.0"
-            app:srcCompat="@android:color/darker_gray" />
+            app:srcCompat="@color/colorPrimaryDark" />
 
         <ImageView
             android:id="@+id/nextTrackCover"
-            android:layout_width="85dp"
-            android:layout_height="85dp"
-            android:layout_marginBottom="15dp"
-            android:background="@android:color/background_light"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:layout_marginBottom="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/imageView5"
-            app:layout_constraintHorizontal_bias="0.79"
-            app:layout_constraintStart_toEndOf="@+id/imageView5"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.054"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1.0"
             app:srcCompat="@android:color/background_dark" />
 
         <TextView
             android:id="@+id/bottomDescription"
             android:layout_width="wrap_content"
             android:layout_height="16dp"
-            android:layout_marginBottom="85dp"
+            android:layout_marginBottom="84dp"
             android:layout_marginStart="5dp"
             android:text="Prochaine musique :"
+            android:textColor="@android:color/background_light"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/imageView5"
             app:layout_constraintHorizontal_bias="0.0"
@@ -137,10 +139,24 @@
             android:layout_height="27dp"
             android:layout_marginBottom="64dp"
             android:layout_marginStart="5dp"
+            android:textColor="@android:color/background_light"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/imageView5"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/nextTrackCover" />
+
+        <ProgressBar
+            android:id="@+id/nextTrackLoading"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:layout_marginBottom="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.054"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1.0"
+            tools:visibility="invisible" />
 
     </android.support.constraint.ConstraintLayout>
 

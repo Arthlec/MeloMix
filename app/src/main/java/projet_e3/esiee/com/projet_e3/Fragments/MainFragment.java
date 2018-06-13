@@ -4,6 +4,8 @@ package projet_e3.esiee.com.projet_e3.Fragments;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -11,7 +13,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -57,6 +61,9 @@ public class MainFragment extends Fragment {
         nextTrackCover.setImageBitmap(bmpNextCover);
         TextView nextTrackNameField = view.findViewById(R.id.nextTrackName);
         nextTrackNameField.setText(nextName);
+        ProgressBar nextTrackLoading = view.findViewById(R.id.nextTrackLoading);
+        nextTrackLoading.setVisibility(View.INVISIBLE);
+        nextTrackLoading.getIndeterminateDrawable().setColorFilter(0xFFFFFFFF, android.graphics.PorterDuff.Mode.MULTIPLY);
 
         int host = getActivity().getIntent().getIntExtra("host", 0);
 
@@ -74,6 +81,7 @@ public class MainFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 //dislike la musique actuelle
+                Toast.makeText(getActivity().getApplicationContext(), "Votre avis a été pris en compte", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -82,6 +90,7 @@ public class MainFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 //like la musique actuelle
+                Toast.makeText(getActivity().getApplicationContext(), "Votre avis a été pris en compte", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -134,10 +143,18 @@ public class MainFragment extends Fragment {
         trackNameField.setText(trackName);
         name = trackName;
         ImageView nextTrackCover = view.findViewById(R.id.nextTrackCover);
-        nextTrackCover.setImageBitmap(bmpNextTrackCover);
-        bmpNextCover = bmpNextTrackCover;
         TextView nextTrackNameField = view.findViewById(R.id.nextTrackName);
-        nextTrackNameField.setText(nextTrackName);
-        nextName = nextTrackName;
+        if ((bmpNextTrackCover != null) && (nextTrackName != null)) {
+            view.findViewById(R.id.nextTrackLoading).setVisibility(View.GONE);
+            nextTrackCover.setImageBitmap(bmpNextTrackCover);
+            bmpNextCover = bmpNextTrackCover;
+            nextTrackNameField.setText(nextTrackName);
+            nextName = nextTrackName;
+        }
+        else {
+            view.findViewById(R.id.nextTrackLoading).setVisibility(View.VISIBLE);
+            nextTrackCover.setImageBitmap(bmpNextTrackCover);
+            nextTrackNameField.setText(nextTrackName);
+        }
     }
 }

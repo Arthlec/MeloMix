@@ -14,6 +14,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -144,6 +145,8 @@ public class LoadingHostActivity extends AnalyseData {
                     intent.putExtra("host",1);
                     setFrequentGenres();
                     intent.putStringArrayListExtra("frequentGenres", hostActivity.frequentGenres);
+                    findViewById(R.id.loading_panel).setVisibility(View.VISIBLE);
+                    loadingText.setText("Traitement de vos données...");
                     hostActivity.requestData();
                     startActivity(intent);
                     finish();

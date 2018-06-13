@@ -186,7 +186,7 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
 
     @Override
     public void onArrowSelected(String direction) {
-        if(direction.equals("next")) {
+        if(direction.equals("next") && nextBmp != null && nextTrackName != null) {
             tracksCovers.push(bmp);
             tracksNames.push(trackName);
             bmp = nextBmp;
@@ -196,6 +196,9 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
             HistoryFragment.trackCoverList.add(0, bmp);
             HistoryFragment.trackNameList.add(0, trackName);
             requestData();
+        }
+        else if (direction.equals("next") && (nextBmp == null || nextTrackName == null)) {
+            Toast.makeText(getApplicationContext(), "Veuillez attendre la recherche du prochain titre", Toast.LENGTH_SHORT).show();
         }
         else {
             if(!tracksCovers.isEmpty()) {
@@ -220,6 +223,7 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
                         public void onClick(DialogInterface dialog, int which) {
                             SavedMusicsFragment.trackCoverList.add(0, bmp);
                             SavedMusicsFragment.trackNameList.add(0, trackName);
+                            Toast.makeText(getApplicationContext(), "Musique ajoutée à vos musiques", Toast.LENGTH_SHORT).show();
                         }
                     })
                     .setNegativeButton("Annuler", new DialogInterface.OnClickListener() {
@@ -232,6 +236,7 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
         else {
             SavedMusicsFragment.trackCoverList.add(0, bmp);
             SavedMusicsFragment.trackNameList.add(0, trackName);
+            Toast.makeText(getApplicationContext(), "Musique ajoutée à vos musiques", Toast.LENGTH_SHORT).show();
         }
     }
 
