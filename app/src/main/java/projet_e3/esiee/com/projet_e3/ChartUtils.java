@@ -28,6 +28,12 @@ public class ChartUtils{
         List<Double> values = lists[1];
         List<BarEntry> dataEntries = new ArrayList<>();
         int numberOfgenre = genres.size();
+        int numberToUse;
+        if(numberOfgenre<5){
+            numberToUse = numberOfgenre;
+        }else {
+            numberToUse = 5;
+        }
 
         barChart.setDrawBarShadow(false);
         barChart.setDrawValueAboveBar(false);
@@ -40,7 +46,7 @@ public class ChartUtils{
         description.setText(" ");
         barChart.setDescription(description);
 
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < numberToUse; i++) {
             Float currentFloat = Float.valueOf(String.valueOf(values.get(i)));
             dataEntries.add(new BarEntry(i,currentFloat));
         }
