@@ -371,10 +371,10 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
                 ArrayList<String> frequentAvailableGenresList = new ArrayList<>();
 
                 for (int i=0; i<frequentGenres.size(); i++) {
+                    String frequentGenreWithHyphen = frequentGenres.get(i).replace(' ', '-');
                     if (availableGenresList.contains(frequentGenres.get(i)))
                         frequentAvailableGenresList.add(frequentGenres.get(i));
-                    String frequentGenreWithHyphen = frequentGenres.get(i).replace(' ', '-');
-                    if (availableGenresList.contains(frequentGenreWithHyphen))
+                    else if (availableGenresList.contains(frequentGenreWithHyphen))
                         frequentAvailableGenresList.add(frequentGenreWithHyphen);
                 }
 
