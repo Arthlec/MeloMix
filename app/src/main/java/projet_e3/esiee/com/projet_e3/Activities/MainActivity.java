@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //splash screen
-        setTheme(R.style.AppTheme_Green);
+        setTheme(R.style.MeloTheme);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
