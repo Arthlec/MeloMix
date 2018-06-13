@@ -57,6 +57,7 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
     private static String trackName;
     private static Bitmap nextBmp;
     private static String nextTrackName;
+    private static ArrayList<String> availableGenresList = new ArrayList<>();;
     private static String authToken = "";
     private DrawerLayout mDrawerLayout;
     private Stack<Bitmap> tracksCovers = new Stack<>();
@@ -104,6 +105,7 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
 
         showFirstFragment();
         authToken = getIntent().getStringExtra("authToken");
+        availableGenresList = getIntent().getStringArrayListExtra("availableGenres");
         //aManager = getIntent().getParcelableExtra("manager");
         //aChannel = getIntent().getParcelableExtra("channel");
 
@@ -380,12 +382,32 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
             }
 
             private String[] getTrackInfo() throws IOException {
-                String genreSeed = "";
-                if (frequentGenres.size() != 0)
-                    genreSeed = "?limit=100&seed_genres=" + frequentGenres.get(0);
-                for (int i=1; i<frequentGenres.size(); i++) {
-                    genreSeed = genreSeed + "%2C" + frequentGenres.get(i);
+                ArrayList<String> frequentAvailableGenresList = new ArrayList<>();
+
+                for (int i=0; i<frequentGenres.size(); i++) {
+                    String frequentGenreWithHyphen = frequentGenres.get(i).replace(' ', '-');
+                    if (availableGenresList.contains(frequentGenres.get(i)))
+                        frequentAvailableGenresList.add(frequentGenres.get(i));
+                    else if (availableGenresList.contains(frequentGenreWithHyphen))
+                        frequentAvailableGenresList.add(frequentGenreWithHyphen);
                 }
+
+                String genreSeed;
+                if (frequentAvailableGenresList.size() == 0) {
+                    Log.i("Note : ", "Search less accurate");
+                    for (int i=0; i<frequentGenres.size(); i++) {
+                        String[] frequentGenresSplit = frequentGenres.get(i).split(" ");
+                        for (int j=0; j<frequentGenresSplit.length; j++)
+                            if (availableGenresList.contains(frequentGenresSplit[j]))
+                                frequentAvailableGenresList.add(frequentGenresSplit[j]);
+                    }
+                }
+
+                genreSeed = "?limit=100&seed_genres=" + frequentAvailableGenresList.get(0);
+                for (int i=1; i<frequentAvailableGenresList.size(); i++) {
+                    genreSeed = genreSeed + "%2C" + frequentAvailableGenresList.get(i);
+                }
+
 
                 String[] trackInfo = new String[2];
                 // Create URL
@@ -440,10 +462,11 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
     }
 
     private void disconnect() {
-        deleteCache(this);
-        ProfileActivity.isLoggedInSpotify = false; //disconnect from spotify
+        //deleteCache(this);
         SharedPreferences pref = getApplicationContext().getSharedPreferences(MY_PREFS, MODE_PRIVATE);
         pref.edit().remove("user_name").apply(); //clear pref pseudo
+        if(pref.contains("userAccountSpotify"))
+            pref.edit().remove("userAccountSpotify").apply(); //clear pref user account Spotify
         Intent intent = new Intent(HostActivity.this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); //clear stack activity
         startActivity(intent);

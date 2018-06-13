@@ -19,6 +19,7 @@ import com.spotify.sdk.android.authentication.AuthenticationResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.Stack;
@@ -34,6 +35,7 @@ public class LoginActivitySpotify extends AppCompatActivity {
 
     private static final String CLIENT_ID = "1aee09c9f4504604b379f867207fd238";
     private static final String REDIRECT_URI = "smooth-i://logincallback";
+    private static ArrayList<String> availableGenresList;
     private static String authToken = "";
     private static String userName = "";
     private static boolean asyncTaskIsDone = false;
@@ -47,6 +49,8 @@ public class LoginActivitySpotify extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_spotify_activity);
+
+        availableGenresList = new ArrayList<>();
 
         AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID, AuthenticationResponse.Type.TOKEN, REDIRECT_URI).setShowDialog(true);
         builder.setScopes(new String[]{"user-top-read", "user-library-read", "playlist-read-private"});
@@ -69,7 +73,6 @@ public class LoginActivitySpotify extends AppCompatActivity {
                     // Handle successful response
                     authToken = response.getAccessToken();
                     requestData();
-                    ProfileActivity.isLoggedInSpotify = true;
                     while(!asyncTaskIsDone){
                         try { Thread.sleep(100); }
                         catch (InterruptedException e) { e.printStackTrace(); }
@@ -101,9 +104,10 @@ public class LoginActivitySpotify extends AppCompatActivity {
         Intent data = new Intent(LoginActivitySpotify.this, ProfileActivity.class);
         data.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         Bundle extras = new Bundle();
-        extras.putString("userName", LoginActivitySpotify.userName);
+        extras.putString("userAccountSpotify", LoginActivitySpotify.userName);
         extras.putSerializable("userGenres",LoginActivitySpotify.userGenres);
         extras.putString("authToken", LoginActivitySpotify.authToken);
+        extras.putStringArrayList("availableGenres", LoginActivitySpotify.availableGenresList);
         data.putExtras(extras);
         setResult(1, data);
         super.finish();
@@ -121,6 +125,7 @@ public class LoginActivitySpotify extends AppCompatActivity {
             public void run() {
                 try {
                     this.setUserName();
+                    this.setAvailableGenres();
                     String[] playlistsURLs = this.getPlaylistsURLs();
 
                     getArtistsStack("https://api.spotify.com/v1/me/tracks?limit=50&offset=0");
@@ -187,6 +192,46 @@ public class LoginActivitySpotify extends AppCompatActivity {
                     assertTrue(root.isObject());
                     JrsString name = (JrsString) root.get("id");
                     LoginActivitySpotify.setUserName(name.asText());
+
+                    myConnection.disconnect();
+                } else {
+                    Log.i("responseCode", "" + myConnection.getResponseCode());
+                }
+            }
+
+            private void setAvailableGenres() throws IOException {
+                // Create URL
+                URL spotifyEndpoint = new URL("https://api.spotify.com/v1/recommendations/available-genre-seeds");
+
+                // Create connection
+                HttpsURLConnection myConnection;
+                String waitTime;
+                do{
+                    myConnection = (HttpsURLConnection) spotifyEndpoint.openConnection();
+                    myConnection.setRequestProperty("Authorization", "Bearer " + authToken);
+                    waitTime = myConnection.getHeaderField("Retry-After");
+                    if(waitTime != null){
+                        int waitTimeSeconds = Integer.parseInt(waitTime);
+                        try {
+                            Thread.sleep(waitTimeSeconds * 1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        Log.i("WaitTime", waitTime);
+                    }
+                }while(waitTime != null);
+
+                if (myConnection.getResponseCode() == 200) {
+                    // Success
+                    InputStream responseBody = myConnection.getInputStream();
+
+                    JSON json = JSON.std.with(new JacksonJrsTreeCodec());
+                    TreeNode root = json.treeFrom(responseBody);
+                    assertTrue(root.isObject());
+                    for (int i=0; i<root.get("genres").size(); i++) {
+                        JrsString genreSeed = (JrsString) root.get("genres").get(i);
+                        availableGenresList.add(genreSeed.asText());
+                    }
 
                     myConnection.disconnect();
                 } else {

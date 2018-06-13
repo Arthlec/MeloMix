@@ -117,6 +117,7 @@ public class LoadingHostActivity extends AnalyseData {
                 if(wifiP2pGroup.getClientList().size()>= guestNb){
                     Intent intent = new Intent(LoadingHostActivity.this, HostActivity.class);
                     intent.putExtra("authToken", getIntent().getStringExtra("authToken"));
+                    intent.putExtra("availableGenres", getIntent().getStringArrayListExtra("availableGenres"));
                     intent.putExtra("host",1);
 
                     //intent.putExtra("manager", (Parcelable) aManager);
