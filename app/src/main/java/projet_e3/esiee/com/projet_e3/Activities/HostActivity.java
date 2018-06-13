@@ -399,7 +399,7 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
 
                 String[] trackInfo = new String[2];
                 // Create URL
-                URL spotifyEndpoint = new URL("https://api.spotify.com/v1/recommendations" + genreSeed);
+                URL spotifyEndpoint = new URL("https://api.spotify.com/v1/recommendations" + genreSeed+"&min_popularity=50");
 
                 // Create connection
                 HttpsURLConnection myConnection;
