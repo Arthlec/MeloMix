@@ -370,9 +370,13 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
             private String[] getTrackInfo() throws IOException {
                 ArrayList<String> frequentAvailableGenresList = new ArrayList<>();
 
-                for (int i=0; i<frequentGenres.size(); i++)
+                for (int i=0; i<frequentGenres.size(); i++) {
                     if (availableGenresList.contains(frequentGenres.get(i)))
                         frequentAvailableGenresList.add(frequentGenres.get(i));
+                    String frequentGenreWithHyphen = frequentGenres.get(i).replace(' ', '-');
+                    if (availableGenresList.contains(frequentGenreWithHyphen))
+                        frequentAvailableGenresList.add(frequentGenreWithHyphen);
+                }
 
                 String genreSeed;
                 if (frequentAvailableGenresList.size() == 0) {
