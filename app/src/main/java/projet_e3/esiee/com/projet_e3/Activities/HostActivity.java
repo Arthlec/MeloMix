@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -64,6 +65,7 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
     private WifiP2pGroup wifiP2pGroup;
     private WifiP2pManager aManager;
     private WifiP2pManager.Channel aChannel;
+    private List[] dataList;
 
     //FOR FRAGMENTS
     // 1 - Declare fragment handled by Navigation Drawer
@@ -110,12 +112,17 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
         Log.i("channel", aChannel+"");
 
         makeAnalyse();
-        requestData();
+        dataList = buildListTab();
+        giveListToStat();
+        //requestData();
     }
 
     public void makeAnalyse() {
         frequentGenres = this.analyseData(this.getFilesDir());
         Log.i("GenresFréquents", frequentGenres.toString());
+    }
+    public void giveListToStat(){
+        StatsFragment.dataList = dataList;
     }
 
     @Override
