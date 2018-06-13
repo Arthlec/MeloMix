@@ -129,7 +129,6 @@ public class LoadingHostActivity extends AppCompatActivity {
         @Override
         public void onConnectionInfoAvailable(WifiP2pInfo info) {
             if(info.groupFormed && info.isGroupOwner){
-                //TxtStatus.setText("Host");
                 HostClass hostClass = new HostClass(getApplicationContext());
                 hostClass.start();
                 progressBar.setProgress(wifiP2pGroup.getClientList().size());
