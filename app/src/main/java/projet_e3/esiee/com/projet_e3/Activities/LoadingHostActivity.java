@@ -136,6 +136,7 @@ public class LoadingHostActivity extends AnalyseData {
                     Intent intent = new Intent(LoadingHostActivity.this, HostActivity.class);
                     intent.putExtra("authToken", getIntent().getStringExtra("authToken"));
                     intent.putExtra("wifip2pGroup", wifiP2pGroup);
+                    intent.putExtra("availableGenres", getIntent().getStringArrayListExtra("availableGenres"));
                     intent.putExtra("host",1);
                     startActivity(intent);
                 }
