@@ -123,7 +123,6 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
         wifiP2pGroup =  bundle.getParcelable("wifip2pGroup");
 
         makeAnalyse();
-
         giveListToStat();
         requestData();
     }
