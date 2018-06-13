@@ -139,6 +139,7 @@ public class LoadingHostActivity extends AnalyseData {
                     intent.putExtra("availableGenres", getIntent().getStringArrayListExtra("availableGenres"));
                     intent.putExtra("host",1);
                     startActivity(intent);
+                    finish();
                 }
 
             }

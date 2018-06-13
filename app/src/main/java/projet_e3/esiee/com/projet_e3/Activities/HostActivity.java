@@ -125,7 +125,21 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
         makeAnalyse();
         dataList = buildListTab();
         giveListToStat();
-        //requestData();
+        requestData();
+    }
+
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this)
+                .setTitle("Voulez-vous vraiment quitter cette page?")
+                .setMessage("Les données en cours d'utilisation seront perdues")
+                .setNegativeButton(android.R.string.no, null)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface arg0, int arg1) {
+                        HostActivity.super.onBackPressed();
+                    }
+                }).create().show();
     }
 
     public void makeAnalyse() {
@@ -355,9 +369,10 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
             public void run() {
                 try {
                     if(isInitialisation) {
-                        URL trackURL = new URL(getTrackInfo()[0]);
+                        String[] trackInfos = getTrackInfo();
+                        URL trackURL = new URL(trackInfos[0]);
                         bmp = BitmapFactory.decodeStream(trackURL.openConnection().getInputStream());
-                        trackName = getTrackInfo()[1];
+                        trackName = trackInfos[1];
 
                         HistoryFragment.trackCoverList.add(0, bmp);
                         HistoryFragment.trackNameList.add(0, trackName);
@@ -365,9 +380,10 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
                         isInitialisation = false;
                     }
 
-                    URL nextTrackURL = new URL(getTrackInfo()[0]);
+                    String[] trackInfos = getTrackInfo();
+                    URL nextTrackURL = new URL(trackInfos[0]);
                     nextBmp = BitmapFactory.decodeStream(nextTrackURL.openConnection().getInputStream());
-                    nextTrackName = getTrackInfo()[1];
+                    nextTrackName = trackInfos[1];
                     new Thread(new Runnable() {
                         public void run() {
                             runOnUiThread(new Runnable() {
@@ -410,10 +426,12 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
                     genreSeed = genreSeed + "%2C" + frequentAvailableGenresList.get(i);
                 }
 
+                Log.i("frequent",frequentAvailableGenresList.toString());
+
 
                 String[] trackInfo = new String[2];
                 // Create URL
-                URL spotifyEndpoint = new URL("https://api.spotify.com/v1/recommendations" + genreSeed);
+                URL spotifyEndpoint = new URL("https://api.spotify.com/v1/recommendations" + genreSeed+"&min_popularity=50");
 
                 // Create connection
                 HttpsURLConnection myConnection;
@@ -447,11 +465,11 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
                         if (!trackNamesList.contains(trackName.asText())) {
                             trackNamesList.add(trackName.asText());
                             trackInfo[1] = trackName.asText();
+                            JrsString imageURL = (JrsString) root.get("tracks").get(i).get("album").get("images").get(0).get("url");
+                            trackInfo[0] = imageURL.asText();
                             break;
                         }
                     }
-                    JrsString imageURL = (JrsString) root.get("tracks").get(i).get("album").get("images").get(0).get("url");
-                    trackInfo[0] = imageURL.asText();
 
                     myConnection.disconnect();
                     return trackInfo;
