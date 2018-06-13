@@ -72,7 +72,6 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
     private WifiP2pManager.Channel channel;
     private BroadCast mReceiver;
     private IntentFilter mIntent;
-    private List[] dataList;
 
     //FOR FRAGMENTS
     // 1 - Declare fragment handled by Navigation Drawer
@@ -123,10 +122,10 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
         assert bundle != null;
         wifiP2pGroup =  bundle.getParcelable("wifip2pGroup");
 
-        //makeAnalyse();
-        //dataList = buildListTab();
-        //giveListToStat();
-        //requestData();
+        makeAnalyse();
+
+        giveListToStat();
+        requestData();
     }
 
     @Override
@@ -149,7 +148,7 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
     }
 
     public void giveListToStat(){
-        StatsFragment.dataList = dataList;
+        StatsFragment.dataList = buildListTab();
     }
 
     @Override
