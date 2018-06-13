@@ -54,15 +54,15 @@ import static junit.framework.Assert.assertTrue;
 
 public class HostActivity extends AnalyseData implements NavigationView.OnNavigationItemSelectedListener, MainFragment.OnSavedMusicSelectedListener, MainFragment.OnArrowListener, HistoryFragment.OnSaveMusicHistorySelectedListener {
 
-    private ArrayList<String> frequentGenres = new ArrayList<>();
+    public ArrayList<String> frequentGenres = new ArrayList<>();
     private static ArrayList<String> trackNamesList = new ArrayList<>();
-    private boolean isInitialisation;
+    private boolean isInitialisation = true;
     private static Bitmap bmp;
     private static String trackName;
     private static Bitmap nextBmp;
     private static String nextTrackName;
-    private static ArrayList<String> availableGenresList = new ArrayList<>();;
-    private static String authToken = "";
+    public ArrayList<String> availableGenresList = new ArrayList<>();
+    public static String authToken = "";
     private DrawerLayout mDrawerLayout;
     private Stack<Bitmap> tracksCovers = new Stack<>();
     private Stack<String> tracksNames = new Stack<>();
@@ -96,7 +96,7 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
         super.onCreate(savedInstanceState);
         setContentView(R.layout.host_activity);
 
-        isInitialisation = true;
+        isInitialisation = false;
 
         android.support.v7.widget.Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -112,6 +112,7 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
         showFirstFragment();
         authToken = getIntent().getStringExtra("authToken");
         availableGenresList = getIntent().getStringArrayListExtra("availableGenres");
+        frequentGenres = getIntent().getStringArrayListExtra("frequentGenres");
 
         Log.i("authToken", authToken);
 
@@ -122,10 +123,10 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
         assert bundle != null;
         wifiP2pGroup =  bundle.getParcelable("wifip2pGroup");
 
-        makeAnalyse();
-        dataList = buildListTab();
-        giveListToStat();
-        requestData();
+        //makeAnalyse();
+        //dataList = buildListTab();
+        //giveListToStat();
+        //requestData();
     }
 
     @Override
@@ -146,6 +147,7 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
         frequentGenres = this.analyseData(this.getFilesDir());
         Log.i("GenresFréquents", frequentGenres.toString());
     }
+
     public void giveListToStat(){
         StatsFragment.dataList = dataList;
     }
@@ -408,6 +410,8 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
                         frequentAvailableGenresList.add(frequentGenres.get(i));
                     else if (availableGenresList.contains(frequentGenreWithHyphen))
                         frequentAvailableGenresList.add(frequentGenreWithHyphen);
+                    else if (frequentGenres.get(i).equals("r&b"))
+                        frequentAvailableGenresList.add("r-n-b");
                 }
 
                 String genreSeed;
@@ -431,7 +435,7 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
 
                 String[] trackInfo = new String[2];
                 // Create URL
-                URL spotifyEndpoint = new URL("https://api.spotify.com/v1/recommendations" + genreSeed+"&min_popularity=50");
+                URL spotifyEndpoint = new URL("https://api.spotify.com/v1/recommendations" + genreSeed + "&min_popularity=50");
 
                 // Create connection
                 HttpsURLConnection myConnection;

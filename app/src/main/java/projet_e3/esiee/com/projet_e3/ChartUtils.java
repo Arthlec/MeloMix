@@ -40,7 +40,7 @@ public class ChartUtils{
         description.setText(" ");
         barChart.setDescription(description);
 
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < values.size(); i++) {
             Float currentFloat = Float.valueOf(String.valueOf(values.get(i)));
             dataEntries.add(new BarEntry(i,currentFloat));
         }
