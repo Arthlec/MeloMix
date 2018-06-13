@@ -37,9 +37,9 @@
 
         <Button
             android:id="@+id/buttonNext"
-            android:layout_width="44dp"
-            android:layout_height="75dp"
-            android:background="@android:drawable/ic_media_next"
+            android:layout_width="56dp"
+            android:layout_height="87dp"
+            android:background="@drawable/next_selector"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.25"
@@ -49,9 +49,9 @@
 
         <Button
             android:id="@+id/buttonBack"
-            android:layout_width="44dp"
-            android:layout_height="75dp"
-            android:background="@android:drawable/ic_media_previous"
+            android:layout_width="56dp"
+            android:layout_height="87dp"
+            android:background="@drawable/before_selector"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/trackCover"
             app:layout_constraintHorizontal_bias="0.77"
@@ -61,38 +61,38 @@
 
         <Button
             android:id="@+id/likeButton"
-            android:layout_width="65dp"
-            android:layout_height="65dp"
-            android:background="@drawable/like_button"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/like_selector"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.711"
+            app:layout_constraintHorizontal_bias="0.724"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/trackName"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintVertical_bias="0.06" />
 
         <Button
             android:id="@+id/dislikeButton"
-            android:layout_width="65dp"
-            android:layout_height="65dp"
-            android:background="@drawable/like_button"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/dislike_selector"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.288"
+            app:layout_constraintHorizontal_bias="0.275"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/trackName"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintVertical_bias="0.06" />
 
         <Button
             android:id="@+id/moreButton"
-            android:layout_width="65dp"
-            android:layout_height="65dp"
-            android:background="@android:drawable/ic_menu_add"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/add_selector"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/trackName"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintVertical_bias="0.06" />
 
         <ImageView
             android:id="@+id/imageView5"

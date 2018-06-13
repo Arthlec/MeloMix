@@ -50,7 +50,7 @@ import projet_e3.esiee.com.projet_e3.R;
 
 import static junit.framework.Assert.assertTrue;
 
-public class HostActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MainFragment.OnSavedMusicSelectedListener, MainFragment.OnArrowListener {
+public class HostActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MainFragment.OnSavedMusicSelectedListener, MainFragment.OnArrowListener, HistoryFragment.OnSaveMusicHistorySelectedListener {
 
     private static Bitmap bmp;
     private static String trackName;
@@ -206,6 +206,31 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
         else {
             SavedMusicsFragment.trackCoverList.add(0, bmp);
             SavedMusicsFragment.trackNameList.add(0, trackName);
+        }
+    }
+
+    @Override
+    public void onSaveMusicHistorySelected(final Bitmap cover, final String name) {
+        if (SavedMusicsFragment.trackNameList.contains(name) && SavedMusicsFragment.trackCoverList.contains(cover)) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Ajouter à mes musiques")
+                    .setMessage("Vous avez déjà enregistré cette musique, voulez-vous l'enregistrer à nouveau ?")
+                    .setPositiveButton("Ajouter", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            SavedMusicsFragment.trackCoverList.add(0, cover);
+                            SavedMusicsFragment.trackNameList.add(0, name);
+                        }
+                    })
+                    .setNegativeButton("Annuler", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // do nothing
+                        }
+                    })
+                    .show();
+        }
+        else {
+            SavedMusicsFragment.trackCoverList.add(0, cover);
+            SavedMusicsFragment.trackNameList.add(0, name);
         }
     }
 
