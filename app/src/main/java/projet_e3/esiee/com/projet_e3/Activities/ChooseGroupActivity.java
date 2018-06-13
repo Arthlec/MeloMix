@@ -91,8 +91,8 @@ public class ChooseGroupActivity extends AppCompatActivity implements NumberPick
             numberPicker.setMaxValue(10);
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle("How many");
-            builder.setMessage("Choose a number :");
+            builder.setTitle("Combien de personnes sont présentes ?");
+            builder.setMessage("Choisissez un nombre :");
 
             builder.setPositiveButton("ok", new DialogInterface.OnClickListener() {
                 @Override

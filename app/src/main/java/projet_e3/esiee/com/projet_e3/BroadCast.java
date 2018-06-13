@@ -9,6 +9,7 @@ import android.net.wifi.p2p.WifiP2pManager;
 import android.util.Log;
 
 import projet_e3.esiee.com.projet_e3.Activities.GuestActivity;
+import projet_e3.esiee.com.projet_e3.Activities.HostActivity;
 import projet_e3.esiee.com.projet_e3.Activities.LoadingHostActivity;
 
 /**
@@ -19,15 +20,15 @@ public class BroadCast extends BroadcastReceiver {
     private WifiP2pManager manager;
     private WifiP2pManager.Channel channel;
     private GuestActivity guestActivity;
-    private LoadingHostActivity host;
+    private LoadingHostActivity loadingHost;
     private WifiManager wifiManager;
 
-    public BroadCast(WifiP2pManager pmanager, WifiP2pManager.Channel pchannel, GuestActivity pGuest,LoadingHostActivity pHost, WifiManager wifi){
+    public BroadCast(WifiP2pManager pmanager, WifiP2pManager.Channel pchannel, GuestActivity pGuest,LoadingHostActivity pLoadingHost, WifiManager wifi){
 
         this.manager = pmanager;
         this.channel = pchannel;
         this.guestActivity = pGuest;
-        this.host = pHost;
+        this.loadingHost = pLoadingHost;
         this.wifiManager = wifi;
     }
     @Override
@@ -44,7 +45,7 @@ public class BroadCast extends BroadcastReceiver {
         else if( WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
             //Détection d'appareil à proximité
             if(manager != null){
-                if(guestActivity != null && host == null){
+                if(guestActivity != null && loadingHost == null){
                     manager.requestPeers(channel,guestActivity.peerListListener);
                 }
             }
@@ -57,17 +58,17 @@ public class BroadCast extends BroadcastReceiver {
             NetworkInfo networkInfo = intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
             networkInfo.getDetailedState();
             if(networkInfo.isConnected()){
-                if(guestActivity != null && host == null) {
+                if(guestActivity != null && loadingHost == null) {
                     manager.requestConnectionInfo(channel, guestActivity.connectionInfoListener);
-                }else if(host != null && guestActivity == null) {
-                    manager.requestGroupInfo(channel,host.groupInfoListener);
+                }else if(loadingHost != null && guestActivity == null) {
+                    manager.requestGroupInfo(channel,loadingHost.groupInfoListener);
                 }
             }
         }
         else if(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)){
-            if(guestActivity != null && host == null) {
+            if(guestActivity != null && loadingHost == null) {
                 Log.i("DEVICE guest","Devices changed "+action);
-            }else if(host != null && guestActivity == null) {
+            }else if(loadingHost != null && guestActivity == null) {
                 Log.i("DEVICE Host","Devices changed host "+action);
             }
 
