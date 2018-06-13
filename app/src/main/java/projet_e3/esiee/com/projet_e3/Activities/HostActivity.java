@@ -112,13 +112,8 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
         showFirstFragment();
         authToken = getIntent().getStringExtra("authToken");
         availableGenresList = getIntent().getStringArrayListExtra("availableGenres");
-        //aManager = getIntent().getParcelableExtra("manager");
-        //aChannel = getIntent().getParcelableExtra("channel");
 
         Log.i("authToken", authToken);
-
-        //makeAnalyse();
-        //requestData();
 
         manager = LoadingHostActivity.getManager();
         channel = LoadingHostActivity.getChannel();
