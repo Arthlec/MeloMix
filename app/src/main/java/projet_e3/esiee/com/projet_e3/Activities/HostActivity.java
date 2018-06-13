@@ -56,6 +56,7 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
     private static String trackName;
     private static Bitmap nextBmp;
     private static String nextTrackName;
+    private static ArrayList<String> availableGenresList = new ArrayList<>();;
     private static String authToken = "";
     private DrawerLayout mDrawerLayout;
     private Stack<Bitmap> tracksCovers = new Stack<>();
@@ -102,6 +103,7 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
 
         showFirstFragment();
         authToken = getIntent().getStringExtra("authToken");
+        availableGenresList = getIntent().getStringArrayListExtra("availableGenres");
         //aManager = getIntent().getParcelableExtra("manager");
         //aChannel = getIntent().getParcelableExtra("channel");
 
@@ -361,12 +363,28 @@ public class HostActivity extends AppCompatActivity implements NavigationView.On
             }
 
             private String[] getTrackInfo() throws IOException {
-                String genreSeed = "";
-                if (frequentGenres.size() != 0)
-                    genreSeed = "?limit=100&seed_genres=" + frequentGenres.get(0);
-                for (int i=1; i<frequentGenres.size(); i++) {
-                    genreSeed = genreSeed + "%2C" + frequentGenres.get(i);
+                ArrayList<String> frequentAvailableGenresList = new ArrayList<>();
+
+                for (int i=0; i<frequentGenres.size(); i++)
+                    if (availableGenresList.contains(frequentGenres.get(i)))
+                        frequentAvailableGenresList.add(frequentGenres.get(i));
+
+                String genreSeed;
+                if (frequentAvailableGenresList.size() == 0) {
+                    Log.i("Note : ", "Search less accurate");
+                    for (int i=0; i<frequentGenres.size(); i++) {
+                        String[] frequentGenresSplit = frequentGenres.get(i).split(" ");
+                        for (int j=0; j<frequentGenresSplit.length; j++)
+                            if (availableGenresList.contains(frequentGenresSplit[j]))
+                                frequentAvailableGenresList.add(frequentGenresSplit[j]);
+                    }
                 }
+
+                genreSeed = "?limit=100&seed_genres=" + frequentAvailableGenresList.get(0);
+                for (int i=1; i<frequentAvailableGenresList.size(); i++) {
+                    genreSeed = genreSeed + "%2C" + frequentAvailableGenresList.get(i);
+                }
+
 
                 String[] trackInfo = new String[2];
                 // Create URL

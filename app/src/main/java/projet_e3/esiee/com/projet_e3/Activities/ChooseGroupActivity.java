@@ -102,6 +102,7 @@ public class ChooseGroupActivity extends AppCompatActivity implements NumberPick
 
                         Intent intent = new Intent(ChooseGroupActivity.this, LoadingHostActivity.class);
                         intent.putExtra("authToken", getIntent().getStringExtra("authToken"));
+                        intent.putExtra("availableGenres", getIntent().getStringArrayListExtra("availableGenres"));
                         intent.putExtra("host", 1);
                         intent.putExtra("guestNumber", numberPicker.getValue());
                         startActivity(intent);

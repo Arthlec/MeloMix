@@ -21,6 +21,7 @@ import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.stree.JacksonJrsTreeCodec;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import projet_e3.esiee.com.projet_e3.R;
@@ -30,6 +31,7 @@ public class ProfileActivity extends AppCompatActivity {
     public static boolean isLoggedInSpotify = false;
     private String PERSONAL = "personal.txt";
     private String authToken = "";
+    private ArrayList<String> availableGenresList;
     private String MY_PREFS = "my_prefs";
     TextView userName = null;
 
@@ -41,6 +43,8 @@ public class ProfileActivity extends AppCompatActivity {
         if(!ProfileActivity.this.isOnline())
             Toast.makeText(ProfileActivity.this,"Aucune connexion internet détectée", Toast.LENGTH_LONG).show();
         setContentView(R.layout.profile_activity);
+
+        availableGenresList = new ArrayList<>();
 
         userName = findViewById(R.id.userName);
 
@@ -82,6 +86,7 @@ public class ProfileActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(ProfileActivity.this, ChooseGroupActivity.class);
                 intent.putExtra("authToken", authToken);
+                intent.putStringArrayListExtra("availableGenres", availableGenresList);
                 startActivity(intent);
             }
         });
@@ -97,6 +102,7 @@ public class ProfileActivity extends AppCompatActivity {
                 userGenres = (HashMap<String, Float>) bundle.getSerializable("userGenres");
                 userName = bundle.getString("userName", "Non connectée");
                 authToken = bundle.getString("authToken", "");
+                availableGenresList = bundle.getStringArrayList("availableGenres");
             }
 
             TextView textSpotify = findViewById(R.id.textSpotify);
