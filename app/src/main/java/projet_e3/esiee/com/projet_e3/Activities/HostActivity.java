@@ -114,8 +114,10 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
         authToken = getIntent().getStringExtra("authToken");
         availableGenresList = getIntent().getStringArrayListExtra("availableGenres");
         frequentGenres = getIntent().getStringArrayListExtra("frequentGenres");
-        //setDataList(getIntent().get("dataList"));
+
         Log.i("authToken", authToken);
+
+        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
         manager = LoadingHostActivity.getManager();
         channel = LoadingHostActivity.getChannel();
@@ -126,9 +128,21 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
         dataList = LoadingHostActivity.getLoadingDatalist();
         Log.i("i0",dataList[0].toString());
         Log.i("i1",dataList[1].toString());
+
+        mReceiver = new BroadCast(manager,channel,null,null,this, wifiManager);
+        mIntent = new IntentFilter();
+        setAction();
+
         //makeAnalyse();
         giveListToStat();
         //requestData();
+    }
+
+    public void setAction(){
+        mIntent.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
+        mIntent.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
+        mIntent.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
+        mIntent.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
     }
 
     @Override
@@ -367,7 +381,7 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
             if(group!=null)
             {
                 wifiP2pGroup = group;
-                Toast.makeText(getApplicationContext(),"clientGroup : " + wifiP2pGroup.getClientList(),Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(),"clientGroup : " + wifiP2pGroup.getClientList(),Toast.LENGTH_SHORT).show();
                 manager.requestConnectionInfo(channel,connectionInfoListener);
             }
             fragmentGuestsList.setWifiP2PGroup(wifiP2pGroup);

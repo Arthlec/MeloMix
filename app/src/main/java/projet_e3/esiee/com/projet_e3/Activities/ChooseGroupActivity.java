@@ -69,8 +69,6 @@ public class ChooseGroupActivity extends AppCompatActivity implements NumberPick
 
     @Override
     public void onValueChange(NumberPicker numberPicker, int i, int i1) {
-        Toast.makeText(this,
-                "selected number " + numberPicker.getValue(), Toast.LENGTH_SHORT).show();
     }
 
     public void showNumberPicker(View view){
@@ -103,7 +101,7 @@ public class ChooseGroupActivity extends AppCompatActivity implements NumberPick
             numberPicker.setDisplayedValues(displayedValues);
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle("Combien de personnes sont présentes ?");
+            builder.setTitle("A partir de combien d'invités, voulez-vous commencer le traitement ? (d'autres personnes pourront vous rejoindre par la suite)");
             builder.setMessage("Choisissez un nombre :");
 
             builder.setPositiveButton("ok", new DialogInterface.OnClickListener() {
@@ -120,7 +118,7 @@ public class ChooseGroupActivity extends AppCompatActivity implements NumberPick
                         startActivity(intent);
                 }
             });
-            builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+            builder.setNegativeButton("annuler", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     valueChangeListener.onValueChange(numberPicker,
                             numberPicker.getValue(), numberPicker.getValue());
