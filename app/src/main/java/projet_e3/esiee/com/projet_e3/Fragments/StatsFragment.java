@@ -88,7 +88,7 @@ public class StatsFragment extends Fragment{
             holder.chart.getDescription().setEnabled(false);
             holder.chart.setDrawGridBackground(false);
             holder.chart.setDrawBarShadow(false);
-            holder.chart.setDrawValueAboveBar(false);
+            holder.chart.setDrawValueAboveBar(true);
             holder.chart.setPinchZoom(false);
             holder.chart.setDoubleTapToZoomEnabled(false);
 
