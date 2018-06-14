@@ -84,8 +84,6 @@ public class StatsFragment extends Fragment{
             }else {
                 holder = (ViewHolder) convertView.getTag();
             }
-            if(holder==null)
-                holder = new ViewHolder();
             data.setValueTextColor(Color.BLACK);
             holder.chart.getDescription().setEnabled(false);
             holder.chart.setDrawGridBackground(false);
