@@ -122,9 +122,9 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
         assert bundle != null;
         wifiP2pGroup =  bundle.getParcelable("wifip2pGroup");
 
-        makeAnalyse();
-        giveListToStat();
-        requestData();
+        //makeAnalyse();
+        //giveListToStat();
+        //requestData();
     }
 
     @Override
