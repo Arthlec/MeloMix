@@ -142,7 +142,6 @@ public class MainFragment extends Fragment {
                 public void onClick(View v) {
                     //passe a la musique suivante
                     mArrowListener.onArrowSelected("next");
-                    mLikeDislikeTransition.setDuration(1000);
                     TransitionManager.go(basicScene, mFadeTransition);
                     songLiked = false;
                     setListeners();
@@ -154,7 +153,6 @@ public class MainFragment extends Fragment {
                 public void onClick(View v) {
                     //revient a la musique precedente
                     mArrowListener.onArrowSelected("back");
-                    mLikeDislikeTransition.setDuration(1000);
                     TransitionManager.go(basicScene, mFadeTransition);
                     songLiked = false;
                     setListeners();
