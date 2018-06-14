@@ -31,6 +31,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -52,6 +53,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import java.io.InputStream;
 import java.util.Scanner;
@@ -61,16 +63,12 @@ import projet_e3.esiee.com.projet_e3.R;
 public class MainActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks {
 
     GoogleAccountCredential mCredential;
-    private TextView mOutputText;
-    private Button mCallApiButton;
-    ProgressDialog mProgress;
 
     static final int REQUEST_ACCOUNT_PICKER = 1000;
     static final int REQUEST_AUTHORIZATION = 1001;
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
     static final int REQUEST_PERMISSION_GET_ACCOUNTS = 1003;
 
-    private static final String BUTTON_TEXT = "Call YouTube Data API";
     private static final String PREF_ACCOUNT_NAME = "accountName";
     private static final String[] SCOPES = { YouTubeScopes.YOUTUBE_READONLY };
 
@@ -92,58 +90,16 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        LinearLayout activityLayout = new LinearLayout(this);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT);
-        activityLayout.setLayoutParams(lp);
-        activityLayout.setOrientation(LinearLayout.VERTICAL);
-        activityLayout.setPadding(16, 16, 16, 16);
-
-        ViewGroup.LayoutParams tlp = new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
-
-        mCallApiButton = new Button(this);
-        mCallApiButton.setText(BUTTON_TEXT);
-        mCallApiButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mCallApiButton.setEnabled(false);
-                mOutputText.setText("");
-                getResultsFromApi();
-                mCallApiButton.setEnabled(true);
-            }
-        });
-        activityLayout.addView(mCallApiButton);
-
-        mOutputText = new TextView(this);
-        mOutputText.setLayoutParams(tlp);
-        mOutputText.setPadding(16, 16, 16, 16);
-        mOutputText.setVerticalScrollBarEnabled(true);
-        mOutputText.setMovementMethod(new ScrollingMovementMethod());
-        mOutputText.setText(
-                "Click the \'" + BUTTON_TEXT +"\' button to test the API.");
-        activityLayout.addView(mOutputText);
-
-        mProgress = new ProgressDialog(this);
-        mProgress.setMessage("Calling YouTube Data API ...");
-
-        setContentView(activityLayout);
-
         // Initialize credentials and service object.
         mCredential = GoogleAccountCredential.usingOAuth2(
                 getApplicationContext(), Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff());
+        getResultsFromApi();
 
-        /*
         if (myprefs_name() != null && myprefs_license()) {
             Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
             startActivity(intent);
         }
-
-        if (!myprefs_license())
-            showDialogue();
 
         //Récupération des vues
         pseudo = findViewById(R.id.pseudo);
@@ -151,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
         pseudo.addTextChangedListener(textWatcher);
 
-        *//* use ENTER key on softkeyboard *//*
+        /* use ENTER key on softkeyboard */
 
         pseudo.setOnKeyListener(new View.OnKeyListener()
         {
@@ -167,10 +123,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                             SharedPreferences.Editor editor = pref.edit();
                             editor.putString("user_name", pseudo.getText().toString());
                             editor.apply();
-                            if (myprefs_name() != null && myprefs_license()*//*les conditions sont respectées*//*) {
-                                Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-                                startActivity(intent);
-                            } else if (!myprefs_license()) {
+                            if (!myprefs_license()) {
                                 showDialogue();
                             }
                             return true;
@@ -190,14 +143,11 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 SharedPreferences.Editor editor = pref.edit();
                 editor.putString("user_name", pseudo.getText().toString());
                 editor.apply();
-                if (myprefs_name() != null && myprefs_license()*//*les conditions sont respectées*//*) {
-                    Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-                    startActivity(intent);
-                } else if (!myprefs_license()) {
+                if (!myprefs_license()) {
                     showDialogue();
                 }
             }
-        });*/
+        });
     }
 
 
@@ -242,6 +192,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                             SharedPreferences.Editor editor = pref.edit();
                             editor.putBoolean("agreed", true);
                             editor.apply();
+                            Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+                            startActivity(intent);
                         }
                     })
                     .setNegativeButton("Je refuse", null)
@@ -297,7 +249,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         } else if (mCredential.getSelectedAccountName() == null) {
             chooseAccount();
         } else if (! isDeviceOnline()) {
-            mOutputText.setText("No network connection available.");
+            Toast.makeText(getApplicationContext(), "No network connection available", Toast.LENGTH_SHORT).show();
         } else {
             new MakeRequestTask(mCredential).execute();
         }
@@ -355,9 +307,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         switch(requestCode) {
             case REQUEST_GOOGLE_PLAY_SERVICES:
                 if (resultCode != RESULT_OK) {
-                    mOutputText.setText(
-                            "This app requires Google Play Services. Please install " +
-                                    "Google Play Services on your device and relaunch this app.");
+                    Toast.makeText(getApplicationContext(), "This app requires Google Play Services. Please install Google Play Services on your device and relaunch this app.", Toast.LENGTH_SHORT).show();
                 } else {
                     getResultsFromApi();
                 }
@@ -538,24 +488,21 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
         @Override
         protected void onPreExecute() {
-            mOutputText.setText("");
-            mProgress.show();
+            //En cours de traitement
         }
 
         @Override
         protected void onPostExecute(List<String> output) {
-            mProgress.hide();
             if (output == null || output.size() == 0) {
-                mOutputText.setText("No results returned.");
+                Toast.makeText(getApplicationContext(), "No results returned", Toast.LENGTH_SHORT).show();
             } else {
                 output.add(0, "Data retrieved using the YouTube Data API:");
-                mOutputText.setText(TextUtils.join("\n", output));
+                Log.i("Resultat", TextUtils.join("\n", output));
             }
         }
 
         @Override
         protected void onCancelled() {
-            mProgress.hide();
             if (mLastError != null) {
                 if (mLastError instanceof GooglePlayServicesAvailabilityIOException) {
                     showGooglePlayServicesAvailabilityErrorDialog(
@@ -566,11 +513,10 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                             ((UserRecoverableAuthIOException) mLastError).getIntent(),
                             MainActivity.REQUEST_AUTHORIZATION);
                 } else {
-                    mOutputText.setText("The following error occurred:\n"
-                            + mLastError.getMessage());
+                    Log.i("ERROR", "The following error occurred :" + mLastError.getMessage());
                 }
             } else {
-                mOutputText.setText("Request cancelled.");
+                Log.i("Status", "Request canceled");
             }
         }
     }
