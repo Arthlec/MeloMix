@@ -126,8 +126,6 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
         assert bundle != null;
         wifiP2pGroup =  bundle.getParcelable("wifip2pGroup");
         dataList = LoadingHostActivity.getLoadingDatalist();
-        Log.i("i0",dataList[0].toString());
-        Log.i("i1",dataList[1].toString());
 
         mReceiver = new BroadCast(manager,channel,null,null,this, wifiManager);
         mIntent = new IntentFilter();
@@ -167,7 +165,6 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
 
     public void giveListToStat(){
         StatsFragment.setDataList(getDataList());
-        Log.i("stat",StatsFragment.getDataList().toString());
     }
 
     @Override
@@ -387,13 +384,7 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
             fragmentGuestsList.setWifiP2PGroup(wifiP2pGroup);
         }
     };
-
-    public void setDataList(List[] list){
-        Log.i("list",list.toString());
-        this.dataList = list;
-    }
     public List[] getDataList(){
-        Log.i("hdata",dataList.toString());
         return dataList;
     }
 

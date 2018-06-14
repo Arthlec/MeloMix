@@ -170,7 +170,6 @@ public class LoadingHostActivity extends AnalyseData {
         public void onGroupInfoAvailable(WifiP2pGroup group) {
             if(group!=null)
             {
-                Log.i("pass",group.getPassphrase());
                 wifiP2pGroup = group;
                 aManager.requestConnectionInfo(aChannel,connectionInfoListener);
             }
@@ -180,7 +179,6 @@ public class LoadingHostActivity extends AnalyseData {
     public void setFrequentGenres() {
         hostActivity.frequentGenres = this.analyseData(this.getFilesDir());
         datalist = buildListTab();
-        Log.i("lil",datalist[0].toString()+"\n"+datalist[1].toString());
         hostActivity.availableGenresList = getIntent().getStringArrayListExtra("availableGenres");
         hostActivity.authToken = getIntent().getStringExtra("authToken");
     }

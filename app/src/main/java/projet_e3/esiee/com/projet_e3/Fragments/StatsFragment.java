@@ -45,12 +45,10 @@ public class StatsFragment extends Fragment{
     }
 
     public static List[] getDataList(){
-        Log.i("datalist",dataList.toString());
         return dataList;
     }
 
     public static void setDataList(List[] data){
-        Log.i("data",data.toString());
         dataList = data;
     }
     @Override
@@ -97,7 +95,7 @@ public class StatsFragment extends Fragment{
             holder.chart.getDescription().setEnabled(false);
             holder.chart.setDrawGridBackground(false);
             holder.chart.setDrawBarShadow(false);
-            holder.chart.setDrawValueAboveBar(true);
+            //holder.chart.setDrawValueAboveBar(true);
             holder.chart.setPinchZoom(false);
             holder.chart.setDoubleTapToZoomEnabled(false);
 
