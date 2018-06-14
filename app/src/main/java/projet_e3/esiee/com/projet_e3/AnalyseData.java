@@ -51,7 +51,7 @@ public abstract class AnalyseData extends AppCompatActivity {
 
         if(centroidsBaseSize<=1){
             Instances OneCentroidBase = new Instances(centroidsBaseSimplified);
-            OneCentroidBase = this.binarizedDatabase(OneCentroidBase, 0.02);
+            OneCentroidBase = this.binarizedDatabase(OneCentroidBase, 0.01);
             return getFrequentGenresOneUser(OneCentroidBase);
         }
 
@@ -379,7 +379,7 @@ public abstract class AnalyseData extends AppCompatActivity {
         List[] ListTab = new List[2];
         List<String> AttributeList = new ArrayList<>();
         List<Double> ValuesList = new ArrayList<>();
-        Log.i("histo",histoBase.toString());
+        //Log.i("histo",histoBase.toString());
         int size = histoBase.size();
         for (int i=0;i<size;i++){
             int len = histoBase.get(i).numAttributes();

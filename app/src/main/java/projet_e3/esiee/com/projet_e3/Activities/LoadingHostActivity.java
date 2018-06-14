@@ -14,6 +14,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,6 +28,7 @@ import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import projet_e3.esiee.com.projet_e3.AnalyseData;
 import projet_e3.esiee.com.projet_e3.BroadCast;
@@ -46,10 +48,13 @@ public class LoadingHostActivity extends AnalyseData {
     private ProgressBar progressBar;
     private TextView loadingText;
 
+    private HostActivity hostActivity;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loading_host);
+        hostActivity = new HostActivity();
         InitAttribut();
     }
 
@@ -133,11 +138,16 @@ public class LoadingHostActivity extends AnalyseData {
                     progressBar.setMax(1);
                     progressBar.setProgress(1);
                     loadingText.setText("C'est bon!");
-                    Intent intent = new Intent(LoadingHostActivity.this, HostActivity.class);
+                    Intent intent = new Intent(LoadingHostActivity.this, hostActivity.getClass());
                     intent.putExtra("authToken", getIntent().getStringExtra("authToken"));
+                    intent.putStringArrayListExtra("availableGenres", getIntent().getStringArrayListExtra("availableGenres"));
                     intent.putExtra("wifip2pGroup", wifiP2pGroup);
                     intent.putExtra("host",1);
-                    intent.putExtra("availableGenres", getIntent().getStringArrayListExtra("availableGenres"));
+                    setFrequentGenres();
+                    intent.putStringArrayListExtra("frequentGenres", hostActivity.frequentGenres);
+                    findViewById(R.id.loading_panel).setVisibility(View.VISIBLE);
+                    loadingText.setText("Traitement de vos données...");
+                    hostActivity.requestData();
                     startActivity(intent);
                     //finish();
                 }
@@ -158,6 +168,12 @@ public class LoadingHostActivity extends AnalyseData {
             }
         }
     };
+
+    public void setFrequentGenres() {
+        hostActivity.frequentGenres = this.analyseData(this.getFilesDir());
+        hostActivity.availableGenresList = getIntent().getStringArrayListExtra("availableGenres");
+        hostActivity.authToken = getIntent().getStringExtra("authToken");
+    }
 
     /**
      * Créer le groupe P2P

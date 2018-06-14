@@ -21,6 +21,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import projet_e3.esiee.com.projet_e3.Activities.HostActivity;
 import projet_e3.esiee.com.projet_e3.R;
@@ -79,10 +80,10 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder>{
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()) {
                             case R.id.nav_like:
-                                //handle menu1 click
+                                Toast.makeText(mCtx, "Votre avis a été pris en compte", Toast.LENGTH_SHORT).show();
                                 return true;
                             case R.id.nav_dislike:
-                                //handle menu2 click
+                                Toast.makeText(mCtx, "Votre avis a été pris en compte", Toast.LENGTH_SHORT).show();
                                 return true;
                             case R.id.nav_save_music:
                                 final Bitmap cover = holder.currentPair.first;
@@ -95,6 +96,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder>{
                                                 public void onClick(DialogInterface dialog, int which) {
                                                     SavedMusicsFragment.trackCoverList.add(0, cover);
                                                     SavedMusicsFragment.trackNameList.add(0, name);
+                                                    Toast.makeText(mCtx, "Musique ajoutée à vos musiques", Toast.LENGTH_SHORT).show();
                                                 }
                                             })
                                             .setNegativeButton("Annuler", new DialogInterface.OnClickListener() {
@@ -107,6 +109,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder>{
                                 else {
                                     SavedMusicsFragment.trackCoverList.add(0, cover);
                                     SavedMusicsFragment.trackNameList.add(0, name);
+                                    Toast.makeText(mCtx, "Musique ajoutée à vos musiques", Toast.LENGTH_SHORT).show();
                                 }
                                 return true;
                             default:

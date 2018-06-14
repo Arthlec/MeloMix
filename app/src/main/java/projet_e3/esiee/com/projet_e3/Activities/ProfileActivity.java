@@ -62,10 +62,12 @@ public class ProfileActivity extends AppCompatActivity {
                     if (!pref.contains("userAccountSpotify")){
                         Intent intent = new Intent(ProfileActivity.this, LoginActivitySpotify.class);
                         startActivityForResult(intent, 1);
-                    }else{
+                    }else
+                        Toast.makeText(ProfileActivity.this,"Compte déjà connecté", Toast.LENGTH_LONG).show();
+                    /*else{
                         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://accounts.spotify.com"));
                         startActivity(browserIntent);
-                    }
+                    }*/
                 }else {
                     Toast.makeText(ProfileActivity.this,"Aucune connexion internet détectée", Toast.LENGTH_SHORT).show();
                 }

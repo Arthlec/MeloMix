@@ -54,15 +54,15 @@ import static junit.framework.Assert.assertTrue;
 
 public class HostActivity extends AnalyseData implements NavigationView.OnNavigationItemSelectedListener, MainFragment.OnSavedMusicSelectedListener, MainFragment.OnArrowListener, HistoryFragment.OnSaveMusicHistorySelectedListener {
 
-    private ArrayList<String> frequentGenres = new ArrayList<>();
+    public ArrayList<String> frequentGenres = new ArrayList<>();
     private static ArrayList<String> trackNamesList = new ArrayList<>();
-    private boolean isInitialisation;
+    private boolean isInitialisation = true;
     private static Bitmap bmp;
     private static String trackName;
     private static Bitmap nextBmp;
     private static String nextTrackName;
-    private static ArrayList<String> availableGenresList = new ArrayList<>();;
-    private static String authToken = "";
+    public ArrayList<String> availableGenresList = new ArrayList<>();
+    public static String authToken = "";
     private DrawerLayout mDrawerLayout;
     private Stack<Bitmap> tracksCovers = new Stack<>();
     private Stack<String> tracksNames = new Stack<>();
@@ -72,7 +72,6 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
     private WifiP2pManager.Channel channel;
     private BroadCast mReceiver;
     private IntentFilter mIntent;
-    private List[] dataList;
 
     //FOR FRAGMENTS
     // 1 - Declare fragment handled by Navigation Drawer
@@ -96,7 +95,7 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
         super.onCreate(savedInstanceState);
         setContentView(R.layout.host_activity);
 
-        isInitialisation = true;
+        isInitialisation = false;
 
         android.support.v7.widget.Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -112,6 +111,7 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
         showFirstFragment();
         authToken = getIntent().getStringExtra("authToken");
         availableGenresList = getIntent().getStringArrayListExtra("availableGenres");
+        frequentGenres = getIntent().getStringArrayListExtra("frequentGenres");
 
         Log.i("authToken", authToken);
 
@@ -128,10 +128,9 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
         mIntent = new IntentFilter();
         setAction();
 
-        makeAnalyse();
-        dataList = buildListTab();
-        giveListToStat();
-        requestData();
+        //makeAnalyse();
+        //giveListToStat();
+        //requestData();
     }
 
     public void setAction(){
@@ -159,8 +158,9 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
         frequentGenres = this.analyseData(this.getFilesDir());
         Log.i("GenresFréquents", frequentGenres.toString());
     }
+
     public void giveListToStat(){
-        StatsFragment.dataList = dataList;
+        StatsFragment.dataList = buildListTab();
     }
 
     @Override
@@ -198,7 +198,7 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
 
     @Override
     public void onArrowSelected(String direction) {
-        if(direction.equals("next")) {
+        if(direction.equals("next") && nextBmp != null && nextTrackName != null) {
             tracksCovers.push(bmp);
             tracksNames.push(trackName);
             bmp = nextBmp;
@@ -208,6 +208,9 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
             HistoryFragment.trackCoverList.add(0, bmp);
             HistoryFragment.trackNameList.add(0, trackName);
             requestData();
+        }
+        else if (direction.equals("next") && (nextBmp == null || nextTrackName == null)) {
+            Toast.makeText(getApplicationContext(), "Veuillez attendre la recherche du prochain titre", Toast.LENGTH_SHORT).show();
         }
         else {
             if(!tracksCovers.isEmpty()) {
@@ -232,6 +235,7 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
                         public void onClick(DialogInterface dialog, int which) {
                             SavedMusicsFragment.trackCoverList.add(0, bmp);
                             SavedMusicsFragment.trackNameList.add(0, trackName);
+                            Toast.makeText(getApplicationContext(), "Musique ajoutée à vos musiques", Toast.LENGTH_SHORT).show();
                         }
                     })
                     .setNegativeButton("Annuler", new DialogInterface.OnClickListener() {
@@ -244,6 +248,7 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
         else {
             SavedMusicsFragment.trackCoverList.add(0, bmp);
             SavedMusicsFragment.trackNameList.add(0, trackName);
+            Toast.makeText(getApplicationContext(), "Musique ajoutée à vos musiques", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -421,6 +426,8 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
                         frequentAvailableGenresList.add(frequentGenres.get(i));
                     else if (availableGenresList.contains(frequentGenreWithHyphen))
                         frequentAvailableGenresList.add(frequentGenreWithHyphen);
+                    else if (frequentGenres.get(i).equals("r&b"))
+                        frequentAvailableGenresList.add("r-n-b");
                 }
 
                 String genreSeed;
@@ -444,7 +451,7 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
 
                 String[] trackInfo = new String[2];
                 // Create URL
-                URL spotifyEndpoint = new URL("https://api.spotify.com/v1/recommendations" + genreSeed+"&min_popularity=50");
+                URL spotifyEndpoint = new URL("https://api.spotify.com/v1/recommendations" + genreSeed + "&min_popularity=50");
 
                 // Create connection
                 HttpsURLConnection myConnection;
