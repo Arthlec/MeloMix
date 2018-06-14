@@ -33,13 +33,13 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:screenOrientation="portrait"
         android:supportsRtl="true"
         android:theme="@style/MeloTheme">
         <activity
             android:name=".Activities.MainActivity"
             android:noHistory="true"
-            android:theme="@style/SplashTheme" >
+            android:theme="@style/SplashTheme"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -48,10 +48,12 @@
                 <category android:name="android.intent.category.BROWSABLE" />
             </intent-filter>
         </activity>
-        <activity android:name=".Activities.ProfileActivity" />
+        <activity android:name=".Activities.ProfileActivity"
+                  android:screenOrientation="portrait"/>
         <activity
             android:name=".Activities.LoginActivitySpotify"
-            android:label="Connexion Spotify">
+            android:label="Connexion Spotify"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -64,11 +66,18 @@
         </activity>
         <activity
             android:name="com.spotify.sdk.android.authentication.LoginActivity"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-        <activity android:name=".Activities.HostActivity" />
-        <activity android:name=".Activities.ChooseGroupActivity" />
-        <activity android:name=".Activities.GuestActivity" />
-        <activity android:name=".Activities.LoadingHostActivity" />
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".Activities.HostActivity"
+                  android:screenOrientation="portrait"/>
+        <activity android:name=".Activities.ChooseGroupActivity"
+                  android:screenOrientation="portrait"/>
+        <activity android:name=".Activities.GuestActivity"
+                  android:screenOrientation="portrait"/>
+        <activity android:name=".Activities.LoadingHostActivity"
+                  android:screenOrientation="portrait"/>
+        <activity android:name=".Activities.LoadingGuestActivity"
+            android:screenOrientation="portrait"/>
 
         <service
             android:name=".Services.FileTransferService"
@@ -77,7 +86,6 @@
             android:name=".Services.DisconnectSignal"
             android:enabled="true" />
 
-        <activity android:name=".Activities.LoadingGuestActivity"></activity>
     </application>
 
 </manifest>
