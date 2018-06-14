@@ -39,7 +39,6 @@ import java.util.List;
 public class GuestActivity extends AppCompatActivity {
 
     private ListView listView;
-    private TextView TxtKiKi;
     private Button btnTry;
     private WifiP2pManager aManager;
     private WifiP2pManager.Channel aChannel;
@@ -69,12 +68,10 @@ public class GuestActivity extends AppCompatActivity {
                 aManager.connect(aChannel, config, new WifiP2pManager.ActionListener() {
                     @Override
                     public void onSuccess() {
-                        Toast.makeText(getApplicationContext(),"connected to "+ device.deviceName, Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
                     public void onFailure(int i) {
-                        Toast.makeText(getApplicationContext(),"Fail connection to "+ device.deviceName, Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -114,24 +111,21 @@ public class GuestActivity extends AppCompatActivity {
         aManager.removeGroup(aChannel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
-                Toast.makeText(getApplicationContext(), "Deconnected", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFailure(int i) {
-                Toast.makeText(getApplicationContext(), "Fail deconnection", Toast.LENGTH_SHORT).show();
             }
         });
 
         config.groupOwnerIntent = 0;
 
-        mReceiver = new BroadCast(aManager,aChannel,this,null, wifiManager);
+        mReceiver = new BroadCast(aManager,aChannel,this,null, null, wifiManager);
         mIntent = new IntentFilter();
         setAction();
         this.discover();
 
         listView = findViewById(R.id.HostList);
-        TxtKiKi = findViewById(R.id.KieKi);
         btnTry = findViewById(R.id.TryBtn);
         btnTry.setText("Relancer la recherche de groupe");
     }
@@ -173,7 +167,6 @@ public class GuestActivity extends AppCompatActivity {
         public void onConnectionInfoAvailable(WifiP2pInfo info) {
             GoAdress = info.groupOwnerAddress;
             if (info.groupFormed && !info.isGroupOwner) {
-                TxtKiKi.setText("Guest");
                 GuestClass guestClass = new GuestClass(GoAdress, getApplicationContext());
                 guestClass.start();
 
@@ -187,7 +180,6 @@ public class GuestActivity extends AppCompatActivity {
         aManager.discoverPeers(aChannel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
-                Toast.makeText(getApplicationContext(), "Découverte de groupe lancée", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -243,12 +235,10 @@ public class GuestActivity extends AppCompatActivity {
             @Override
             public void onSuccess() {
               DeathRattle();
-              Toast.makeText(getApplicationContext(),"Déconnexion réussi",Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFailure(int i) {
-                Toast.makeText(getApplicationContext(),"Echec de la deconnexion",Toast.LENGTH_SHORT).show();
             }
         });
     }
