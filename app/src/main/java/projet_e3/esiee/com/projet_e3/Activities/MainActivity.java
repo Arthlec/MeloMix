@@ -123,7 +123,10 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                             SharedPreferences.Editor editor = pref.edit();
                             editor.putString("user_name", pseudo.getText().toString());
                             editor.apply();
-                            if (!myprefs_license()) {
+                            if (myprefs_name() != null && myprefs_license()/*les conditions sont respectées*/) {
+                                Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+                                startActivity(intent);
+                            } else if (!myprefs_license()) {
                                 showDialogue();
                             }
                             return true;
@@ -143,7 +146,10 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 SharedPreferences.Editor editor = pref.edit();
                 editor.putString("user_name", pseudo.getText().toString());
                 editor.apply();
-                if (!myprefs_license()) {
+                if (myprefs_name() != null && myprefs_license()/*les conditions sont respectées*/) {
+                    Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+                    startActivity(intent);
+                } else if (!myprefs_license()) {
                     showDialogue();
                 }
             }
