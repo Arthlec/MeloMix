@@ -21,14 +21,16 @@ public class BroadCast extends BroadcastReceiver {
     private WifiP2pManager.Channel channel;
     private GuestActivity guestActivity;
     private LoadingHostActivity loadingHost;
+    private HostActivity host;
     private WifiManager wifiManager;
 
-    public BroadCast(WifiP2pManager pmanager, WifiP2pManager.Channel pchannel, GuestActivity pGuest,LoadingHostActivity pLoadingHost, WifiManager wifi){
+    public BroadCast(WifiP2pManager pmanager, WifiP2pManager.Channel pchannel, GuestActivity pGuest,LoadingHostActivity pLoadingHost, HostActivity pHost, WifiManager wifi){
 
         this.manager = pmanager;
         this.channel = pchannel;
         this.guestActivity = pGuest;
         this.loadingHost = pLoadingHost;
+        this.host = pHost;
         this.wifiManager = wifi;
     }
     @Override
@@ -58,10 +60,12 @@ public class BroadCast extends BroadcastReceiver {
             NetworkInfo networkInfo = intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
             networkInfo.getDetailedState();
             if(networkInfo.isConnected()){
-                if(guestActivity != null && loadingHost == null) {
+                if(guestActivity != null && loadingHost == null && host == null) {
                     manager.requestConnectionInfo(channel, guestActivity.connectionInfoListener);
-                }else if(loadingHost != null && guestActivity == null) {
+                }else if(loadingHost != null && guestActivity == null && host == null) {
                     manager.requestGroupInfo(channel,loadingHost.groupInfoListener);
+                }else if(host != null && guestActivity == null && loadingHost == null) {
+                    manager.requestGroupInfo(channel, host.groupInfoListener);
                 }
             }
         }

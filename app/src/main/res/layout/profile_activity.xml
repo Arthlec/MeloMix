@@ -81,7 +81,7 @@
         android:id="@+id/buttonNext"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/button_next_selector"
+        android:background="@drawable/button_next"
         android:text="@string/valider_mon_profil"
         android:textAllCaps="false"
         android:textSize="17sp"

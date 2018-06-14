@@ -115,6 +115,8 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
 
         Log.i("authToken", authToken);
 
+        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+
         manager = LoadingHostActivity.getManager();
         channel = LoadingHostActivity.getChannel();
 
@@ -122,10 +124,21 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
         assert bundle != null;
         wifiP2pGroup =  bundle.getParcelable("wifip2pGroup");
 
+        mReceiver = new BroadCast(manager,channel,null,null,this, wifiManager);
+        mIntent = new IntentFilter();
+        setAction();
+
         makeAnalyse();
         dataList = buildListTab();
         giveListToStat();
         requestData();
+    }
+
+    public void setAction(){
+        mIntent.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
+        mIntent.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
+        mIntent.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
+        mIntent.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
     }
 
     @Override

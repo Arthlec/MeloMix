@@ -125,7 +125,7 @@ public class GuestActivity extends AppCompatActivity {
 
         config.groupOwnerIntent = 0;
 
-        mReceiver = new BroadCast(aManager,aChannel,this,null, wifiManager);
+        mReceiver = new BroadCast(aManager,aChannel,this,null, null, wifiManager);
         mIntent = new IntentFilter();
         setAction();
         this.discover();

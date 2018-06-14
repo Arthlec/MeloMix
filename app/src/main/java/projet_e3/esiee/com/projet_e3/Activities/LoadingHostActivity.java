@@ -67,7 +67,7 @@ public class LoadingHostActivity extends AnalyseData {
 
         config.groupOwnerIntent = 15;
 
-        mReceiver = new BroadCast(aManager,aChannel,null,this, wifiManager);
+        mReceiver = new BroadCast(aManager,aChannel,null,this,null, wifiManager);
         mIntent = new IntentFilter();
         setAction();
 
@@ -136,10 +136,10 @@ public class LoadingHostActivity extends AnalyseData {
                     Intent intent = new Intent(LoadingHostActivity.this, HostActivity.class);
                     intent.putExtra("authToken", getIntent().getStringExtra("authToken"));
                     intent.putExtra("wifip2pGroup", wifiP2pGroup);
-                    intent.putExtra("availableGenres", getIntent().getStringArrayListExtra("availableGenres"));
                     intent.putExtra("host",1);
+                    intent.putExtra("availableGenres", getIntent().getStringArrayListExtra("availableGenres"));
                     startActivity(intent);
-                    finish();
+                    //finish();
                 }
 
             }
