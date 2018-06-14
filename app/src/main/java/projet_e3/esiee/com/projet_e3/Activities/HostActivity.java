@@ -374,7 +374,7 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
             if(group!=null)
             {
                 wifiP2pGroup = group;
-                Toast.makeText(getApplicationContext(),"clientGroup : " + wifiP2pGroup.getClientList(),Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(),"clientGroup : " + wifiP2pGroup.getClientList(),Toast.LENGTH_SHORT).show();
                 manager.requestConnectionInfo(channel,connectionInfoListener);
             }
             fragmentGuestsList.setWifiP2PGroup(wifiP2pGroup);
