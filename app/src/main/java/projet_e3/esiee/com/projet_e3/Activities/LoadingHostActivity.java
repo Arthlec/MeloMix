@@ -12,6 +12,7 @@ import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -29,6 +30,7 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.List;
 
 import projet_e3.esiee.com.projet_e3.AnalyseData;
 import projet_e3.esiee.com.projet_e3.BroadCast;
@@ -49,6 +51,15 @@ public class LoadingHostActivity extends AnalyseData {
     private TextView loadingText;
 
     private HostActivity hostActivity;
+    private static List[] datalist;
+
+    public static List[] getLoadingDatalist() {
+        return datalist;
+    }
+
+    public void setLoadingDatalist(List[] datalist) {
+        this.datalist = datalist;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,7 +160,6 @@ public class LoadingHostActivity extends AnalyseData {
                     loadingText.setText("Traitement de vos données...");
                     hostActivity.requestData();
                     startActivity(intent);
-                    finish();
                 }
 
             }
@@ -171,7 +181,8 @@ public class LoadingHostActivity extends AnalyseData {
 
     public void setFrequentGenres() {
         hostActivity.frequentGenres = this.analyseData(this.getFilesDir());
-        hostActivity.setDataList(buildListTab());
+        datalist = buildListTab();
+        Log.i("lil",datalist[0].toString()+"\n"+datalist[1].toString());
         hostActivity.availableGenresList = getIntent().getStringArrayListExtra("availableGenres");
         hostActivity.authToken = getIntent().getStringExtra("authToken");
     }

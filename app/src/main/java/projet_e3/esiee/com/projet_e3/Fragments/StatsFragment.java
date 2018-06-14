@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,12 +39,20 @@ import projet_e3.esiee.com.projet_e3.R;
  */
 public class StatsFragment extends Fragment{
 
-    public static List[] dataList;
+    private static List[] dataList;
     public static StatsFragment newInstance() {
         return (new StatsFragment());
     }
 
+    public static List[] getDataList(){
+        Log.i("datalist",dataList.toString());
+        return dataList;
+    }
 
+    public static void setDataList(List[] data){
+        Log.i("data",data.toString());
+        dataList = data;
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -56,9 +65,9 @@ public class StatsFragment extends Fragment{
         ChartUtils chartUtils = new ChartUtils();
 
         ArrayList<BarData> list = new ArrayList<>();
-        BarData currentBar = chartUtils.buildBarChart(dataList);
+        BarData currentBar = chartUtils.buildBarChart(getDataList());
         list.add(currentBar);
-        ChartDataAdapter chartDataAdapter = new ChartDataAdapter(Objects.requireNonNull(getContext()),0,list,dataList[0]);
+        ChartDataAdapter chartDataAdapter = new ChartDataAdapter(Objects.requireNonNull(getContext()),0,list,getDataList()[0]);
         lv.setAdapter(chartDataAdapter);
 
         return view;

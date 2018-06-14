@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 
@@ -113,7 +114,7 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
         authToken = getIntent().getStringExtra("authToken");
         availableGenresList = getIntent().getStringArrayListExtra("availableGenres");
         frequentGenres = getIntent().getStringArrayListExtra("frequentGenres");
-
+        //setDataList(getIntent().get("dataList"));
         Log.i("authToken", authToken);
 
         manager = LoadingHostActivity.getManager();
@@ -122,7 +123,9 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
         Bundle bundle = getIntent().getExtras();
         assert bundle != null;
         wifiP2pGroup =  bundle.getParcelable("wifip2pGroup");
-
+        dataList = LoadingHostActivity.getLoadingDatalist();
+        Log.i("i0",dataList[0].toString());
+        Log.i("i1",dataList[1].toString());
         //makeAnalyse();
         giveListToStat();
         //requestData();
@@ -149,7 +152,8 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
     }
 
     public void giveListToStat(){
-        StatsFragment.dataList = getDataList();
+        StatsFragment.setDataList(getDataList());
+        Log.i("stat",StatsFragment.getDataList().toString());
     }
 
     @Override
@@ -371,9 +375,13 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
     };
 
     public void setDataList(List[] list){
+        Log.i("list",list.toString());
         this.dataList = list;
     }
-    public List[] getDataList(){return dataList;}
+    public List[] getDataList(){
+        Log.i("hdata",dataList.toString());
+        return dataList;
+    }
 
     public void requestData() {
         AsyncTask.execute(new Runnable() {
