@@ -80,10 +80,10 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder>{
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()) {
                             case R.id.nav_like:
-                                //handle menu1 click
+                                Toast.makeText(mCtx, "Votre avis a été pris en compte", Toast.LENGTH_SHORT).show();
                                 return true;
                             case R.id.nav_dislike:
-                                //handle menu2 click
+                                Toast.makeText(mCtx, "Votre avis a été pris en compte", Toast.LENGTH_SHORT).show();
                                 return true;
                             case R.id.nav_save_music:
                                 final Bitmap cover = holder.currentPair.first;

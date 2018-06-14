@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:id="@+id/like_dislike_container"
+    android:layout_height="match_parent">
+
+    <Button
+        android:id="@+id/dislikeButton"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/dislike_selector">
+
+    </Button>
+
+    <Button
+        android:id="@+id/likeButton"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:background="@drawable/like_selector">
+
+    </Button>
+
+</RelativeLayout>
