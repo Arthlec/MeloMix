@@ -51,7 +51,7 @@ public abstract class AnalyseData extends AppCompatActivity {
 
         if(centroidsBaseSize<=1){
             Instances OneCentroidBase = new Instances(centroidsBaseSimplified);
-            OneCentroidBase = this.binarizedDatabase(OneCentroidBase, 0.02);
+            OneCentroidBase = this.binarizedDatabase(OneCentroidBase, 0.01);
             return getFrequentGenresOneUser(OneCentroidBase);
         }
 
