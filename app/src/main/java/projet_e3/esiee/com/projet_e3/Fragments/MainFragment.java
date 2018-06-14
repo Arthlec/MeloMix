@@ -17,6 +17,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+
+import projet_e3.esiee.com.projet_e3.Activities.MainActivity;
 import projet_e3.esiee.com.projet_e3.R;
 
 

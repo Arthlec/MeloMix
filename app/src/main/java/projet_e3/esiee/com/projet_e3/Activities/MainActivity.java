@@ -13,14 +13,11 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.ExponentialBackOff;
 
 import com.google.api.services.youtube.YouTubeScopes;
-
 import com.google.api.services.youtube.model.*;
 
 import android.Manifest;
 import android.accounts.AccountManager;
-
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -30,12 +27,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
-import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -442,7 +436,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
      * An asynchronous task that handles the YouTube Data API call.
      * Placing the API calls in their own task ensures the UI stays responsive.
      */
-    private class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
+    public class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
         private com.google.api.services.youtube.YouTube mService = null;
         private Exception mLastError = null;
 
@@ -476,19 +470,17 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
          * @throws IOException
          */
         private List<String> getDataFromApi() throws IOException {
-            // Get a list of up to 10 files.
-            List<String> channelInfo = new ArrayList<String>();
-            ChannelListResponse result = mService.channels().list("snippet,contentDetails,statistics")
-                    .setForUsername("GoogleDevelopers")
+            SearchListResponse searchListResponse = mService.search().list("id")
+                    .setMaxResults(Long.parseLong("1"))
+                    .setQ("Camila Cabello Havana audio")
+                    .setType("video")
                     .execute();
-            List<Channel> channels = result.getItems();
-            if (channels != null) {
-                Channel channel = channels.get(0);
-                channelInfo.add("This channel's ID is " + channel.getId() + ". " +
-                        "Its title is '" + channel.getSnippet().getTitle() + ", " +
-                        "and it has " + channel.getStatistics().getViewCount() + " views.");
-            }
-            return channelInfo;
+            String id = searchListResponse.getItems().get(0).getId().getVideoId();
+            Log.i("reponse", id);
+            ArrayList<String> ids = new ArrayList<>();
+            ids.add(searchListResponse.getItems().get(0).getId().getVideoId());
+
+            return ids;
         }
 
 
