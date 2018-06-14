@@ -89,6 +89,18 @@ public class ChooseGroupActivity extends AppCompatActivity implements NumberPick
             final NumberPicker numberPicker = new NumberPicker(getActivity());
             numberPicker.setMinValue(0);
             numberPicker.setMaxValue(10);
+            int maxValue = numberPicker.getMaxValue()-numberPicker.getMinValue()+1;
+            String[] displayedValues = new String[maxValue];
+            String texte = "";
+            for (int i=0;i<maxValue;i++)
+            {
+                if(i<2)
+                    texte = " invité(e)";
+                else
+                    texte = " invité(e)s";
+                displayedValues[i] = i+texte;
+            }
+            numberPicker.setDisplayedValues(displayedValues);
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setTitle("Combien de personnes sont présentes ?");

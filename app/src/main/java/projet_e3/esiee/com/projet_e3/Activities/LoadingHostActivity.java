@@ -171,6 +171,7 @@ public class LoadingHostActivity extends AnalyseData {
 
     public void setFrequentGenres() {
         hostActivity.frequentGenres = this.analyseData(this.getFilesDir());
+        hostActivity.setDataList(buildListTab());
         hostActivity.availableGenresList = getIntent().getStringArrayListExtra("availableGenres");
         hostActivity.authToken = getIntent().getStringExtra("authToken");
     }

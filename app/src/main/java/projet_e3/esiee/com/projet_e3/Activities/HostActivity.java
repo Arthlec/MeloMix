@@ -72,6 +72,7 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
     private WifiP2pManager.Channel channel;
     private BroadCast mReceiver;
     private IntentFilter mIntent;
+    private List[] dataList = new List[2];
 
     //FOR FRAGMENTS
     // 1 - Declare fragment handled by Navigation Drawer
@@ -123,7 +124,7 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
         wifiP2pGroup =  bundle.getParcelable("wifip2pGroup");
 
         //makeAnalyse();
-        //giveListToStat();
+        giveListToStat();
         //requestData();
     }
 
@@ -143,11 +144,12 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
 
     public void makeAnalyse() {
         frequentGenres = this.analyseData(this.getFilesDir());
+        giveListToStat();
         Log.i("GenresFréquents", frequentGenres.toString());
     }
 
     public void giveListToStat(){
-        StatsFragment.dataList = buildListTab();
+        StatsFragment.dataList = getDataList();
     }
 
     @Override
@@ -367,6 +369,11 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
             fragmentGuestsList.setWifiP2PGroup(wifiP2pGroup);
         }
     };
+
+    public void setDataList(List[] list){
+        this.dataList = list;
+    }
+    public List[] getDataList(){return dataList;}
 
     public void requestData() {
         AsyncTask.execute(new Runnable() {
