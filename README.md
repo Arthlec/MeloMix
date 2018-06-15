@@ -1,4 +1,4 @@
-# Projet_E3 - Smooth-i
+# Projet_E3 - MeloMix
 
 Projet de Troisième année à ESIEE Paris (Application Android de musique)
 

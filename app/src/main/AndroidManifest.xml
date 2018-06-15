@@ -2,20 +2,91 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="projet_e3.esiee.com.projet_e3">
 
-    <application
+    <!-- Permissions obligatoires pour le P2P -->
+    <uses-permission
+        android:name="android.permission.ACCESS_WIFI_STATE"
+        android:enabled="true" />
+    <uses-permission
+        android:name="android.permission.CHANGE_WIFI_STATE"
+        android:enabled="true" />
+    <uses-permission
+        android:name="android.permission.ACCESS_NETWORK_STATE"
+        android:enabled="true" />
+    <uses-permission
+        android:name="android.permission.CHANGE_NETWORK_STATE"
+        android:enabled="true" />
+    <uses-permission
+        android:name="android.permission.INTERNET"
+        android:enabled="true" />
+    <uses-permission
+        android:name="android.permission.READ_PHONE_STATE"
+        android:enabled="true" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!-- Fin des permissions du P2P -->
+    <!--<uses-permission android:name="android.permission.CLEAR_APP_CACHE" />-->
+
+    <application xmlns:tools="http://schemas.android.com/tools"
+        tools:replace="android:theme"
         android:allowBackup="true"
+        android:fullBackupContent="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        android:theme="@style/MeloTheme">
+        <activity
+            android:name=".Activities.MainActivity"
+            android:noHistory="true"
+            android:theme="@style/SplashTheme"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.BROWSABLE" />
             </intent-filter>
         </activity>
+        <activity android:name=".Activities.ProfileActivity"
+                  android:screenOrientation="portrait"/>
+        <activity
+            android:name=".Activities.LoginActivitySpotify"
+            android:label="Connexion Spotify"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="logincallback"
+                    android:scheme="smooth-i" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.spotify.sdk.android.authentication.LoginActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".Activities.HostActivity"
+                  android:screenOrientation="portrait"/>
+        <activity android:name=".Activities.ChooseGroupActivity"
+                  android:screenOrientation="portrait"/>
+        <activity android:name=".Activities.GuestActivity"
+                  android:screenOrientation="portrait"/>
+        <activity android:name=".Activities.LoadingHostActivity"
+                  android:screenOrientation="portrait"/>
+        <activity android:name=".Activities.LoadingGuestActivity"
+            android:screenOrientation="portrait"/>
+
+        <service
+            android:name=".Services.FileTransferService"
+            android:enabled="true" />
+        <service
+            android:name=".Services.DisconnectSignal"
+            android:enabled="true" />
+
     </application>
 
 </manifest>
