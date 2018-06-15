@@ -195,11 +195,11 @@ public class MainFragment extends Fragment implements EasyPermissions.Permission
                 public void onClick(View v) {
                     //passe a la musique suivante
                     YPlayer.release();
-                    getResultsFromApi();
                     mArrowListener.onArrowSelected("next");
                     TransitionManager.go(basicScene, mFadeTransition);
                     songLiked = false;
                     setListeners();
+                    getResultsFromApi();
                 }
             });
 
@@ -208,11 +208,11 @@ public class MainFragment extends Fragment implements EasyPermissions.Permission
                 public void onClick(View v) {
                     //revient a la musique precedente
                     YPlayer.release();
-                    getResultsFromApi();
                     mArrowListener.onArrowSelected("back");
                     TransitionManager.go(basicScene, mFadeTransition);
                     songLiked = false;
                     setListeners();
+                    getResultsFromApi();
                 }
             });
         }
