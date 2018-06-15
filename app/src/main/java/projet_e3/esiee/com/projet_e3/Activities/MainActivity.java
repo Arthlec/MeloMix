@@ -56,10 +56,10 @@ import projet_e3.esiee.com.projet_e3.R;
 
 public class MainActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks {
 
-    GoogleAccountCredential mCredential;
+    public static GoogleAccountCredential mCredential;
 
     static final int REQUEST_ACCOUNT_PICKER = 1000;
-    static final int REQUEST_AUTHORIZATION = 1001;
+    public static final int REQUEST_AUTHORIZATION = 1001;
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
     static final int REQUEST_PERMISSION_GET_ACCOUNTS = 1003;
 
@@ -243,7 +243,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
      * of the preconditions are not satisfied, the app will prompt the user as
      * appropriate.
      */
-    private void getResultsFromApi() {
+    public void getResultsFromApi() {
         if (! isGooglePlayServicesAvailable()) {
             acquireGooglePlayServices();
         } else if (mCredential.getSelectedAccountName() == null) {
@@ -422,7 +422,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
      * @param connectionStatusCode code describing the presence (or lack of)
      *     Google Play Services on this device.
      */
-    void showGooglePlayServicesAvailabilityErrorDialog(
+    public void showGooglePlayServicesAvailabilityErrorDialog(
             final int connectionStatusCode) {
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
         Dialog dialog = apiAvailability.getErrorDialog(
@@ -436,7 +436,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
      * An asynchronous task that handles the YouTube Data API call.
      * Placing the API calls in their own task ensures the UI stays responsive.
      */
-    public class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
+    public class MakeRequestTask extends AsyncTask<Void, Void, String> {
         private com.google.api.services.youtube.YouTube mService = null;
         private Exception mLastError = null;
 
@@ -454,7 +454,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
          * @param params no parameters needed for this task.
          */
         @Override
-        protected List<String> doInBackground(Void... params) {
+        protected String doInBackground(Void... params) {
             try {
                 return getDataFromApi();
             } catch (Exception e) {
@@ -469,7 +469,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
          * @return List of Strings containing information about the channel.
          * @throws IOException
          */
-        private List<String> getDataFromApi() throws IOException {
+        public String getDataFromApi() throws IOException {
             SearchListResponse searchListResponse = mService.search().list("id")
                     .setMaxResults(Long.parseLong("1"))
                     .setQ("Camila Cabello Havana audio")
@@ -477,10 +477,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                     .execute();
             String id = searchListResponse.getItems().get(0).getId().getVideoId();
             Log.i("reponse", id);
-            ArrayList<String> ids = new ArrayList<>();
-            ids.add(searchListResponse.getItems().get(0).getId().getVideoId());
 
-            return ids;
+            return id;
         }
 
 
@@ -490,12 +488,11 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         }
 
         @Override
-        protected void onPostExecute(List<String> output) {
-            if (output == null || output.size() == 0) {
+        protected void onPostExecute(String output) {
+            if (output == null) {
                 Toast.makeText(getApplicationContext(), "No results returned", Toast.LENGTH_SHORT).show();
             } else {
-                output.add(0, "Data retrieved using the YouTube Data API:");
-                Log.i("Resultat", TextUtils.join("\n", output));
+                Log.i("Resultat", output);
             }
         }
 
