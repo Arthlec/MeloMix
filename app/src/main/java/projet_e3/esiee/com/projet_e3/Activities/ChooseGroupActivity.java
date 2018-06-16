@@ -101,8 +101,8 @@ public class ChooseGroupActivity extends AppCompatActivity implements NumberPick
             numberPicker.setDisplayedValues(displayedValues);
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle("A partir de combien d'invités, voulez-vous commencer le traitement ? (d'autres personnes pourront vous rejoindre par la suite)");
-            builder.setMessage("Choisissez un nombre :");
+            builder.setTitle("Nombre minimum d'invités avant de lancer la musique");
+            builder.setMessage("A partir de combien d'invités voulez-vous commencer le traitement ? (d'autres personnes pourront vous rejoindre par la suite)");
 
             builder.setPositiveButton("ok", new DialogInterface.OnClickListener() {
                 @Override

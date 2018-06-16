@@ -14,13 +14,14 @@
         android:layout_gravity="bottom"
         android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
-        android:text=""
+        android:text="Veuillez rentrer votre nom d'utilisateur"
+        android:textAlignment="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/pseudo"
-        app:layout_constraintVertical_bias="0.141" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.49" />
 
     <EditText
         android:id="@+id/pseudo"
@@ -43,15 +44,16 @@
         android:id="@+id/enter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/enter"
+        android:layout_marginTop="8dp"
         android:background="@drawable/button_next_selector"
+        android:text="@string/enter"
         android:textAllCaps="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.945"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/result"
-        app:layout_constraintVertical_bias="0.136" />
+        app:layout_constraintTop_toBottomOf="@+id/pseudo"
+        app:layout_constraintVertical_bias="0.71000004" />
 
     <TextView
         android:id="@+id/textView2"
@@ -59,7 +61,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:gravity="center"
-        android:text="@string/app_description"
+        android:text="@string/app_remerciements"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
