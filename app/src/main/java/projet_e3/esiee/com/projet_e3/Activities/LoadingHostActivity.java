@@ -1,6 +1,7 @@
 package projet_e3.esiee.com.projet_e3.Activities;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -12,9 +13,7 @@ import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -29,7 +28,6 @@ import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.List;
 
 import projet_e3.esiee.com.projet_e3.AnalyseData;
@@ -49,6 +47,7 @@ public class LoadingHostActivity extends AnalyseData {
     private int guestNb;
     private ProgressBar progressBar;
     private TextView loadingText;
+    public static Activity fa;
 
     private HostActivity hostActivity;
     private static List[] datalist;
@@ -70,6 +69,7 @@ public class LoadingHostActivity extends AnalyseData {
     }
 
     private void InitAttribut() {
+        fa = this;
 
         WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         assert wifiManager != null;

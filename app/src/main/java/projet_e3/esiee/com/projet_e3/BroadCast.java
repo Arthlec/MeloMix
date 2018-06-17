@@ -66,6 +66,7 @@ public class BroadCast extends BroadcastReceiver {
                     manager.requestGroupInfo(channel,loadingHost.groupInfoListener);
                 }else if(host != null && guestActivity == null && loadingHost == null) {
                     manager.requestGroupInfo(channel, host.groupInfoListener);
+                    host.makeAnalyse();
                 }
             }
         }

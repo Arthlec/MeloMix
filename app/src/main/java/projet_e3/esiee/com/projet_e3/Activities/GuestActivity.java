@@ -1,5 +1,6 @@
 package projet_e3.esiee.com.projet_e3.Activities;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -12,21 +13,15 @@ import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
-
-import projet_e3.esiee.com.projet_e3.BroadCast;
-import projet_e3.esiee.com.projet_e3.Services.DisconnectSignal;
-import projet_e3.esiee.com.projet_e3.GuestClass;
-import projet_e3.esiee.com.projet_e3.R;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,6 +30,11 @@ import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
+
+import projet_e3.esiee.com.projet_e3.BroadCast;
+import projet_e3.esiee.com.projet_e3.GuestClass;
+import projet_e3.esiee.com.projet_e3.R;
+import projet_e3.esiee.com.projet_e3.Services.DisconnectSignal;
 
 public class GuestActivity extends AppCompatActivity {
 
@@ -48,6 +48,7 @@ public class GuestActivity extends AppCompatActivity {
     private List<WifiP2pDevice> peers = new ArrayList<>();
     private ArrayList<WifiP2pDevice> deviceArray;
     private InetAddress GoAdress;
+    public static Activity fa;
 
     private final WifiP2pConfig config = new WifiP2pConfig();
     @Override
@@ -102,7 +103,7 @@ public class GuestActivity extends AppCompatActivity {
     }
 
     private void work() {
-
+        fa = this;
         WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         aManager = (WifiP2pManager) getApplicationContext().getSystemService(Context.WIFI_P2P_SERVICE);
         aChannel = aManager.initialize(this,getMainLooper(),null);
@@ -231,10 +232,10 @@ public class GuestActivity extends AppCompatActivity {
     }
 
     public void disconnect(){
+        DeathRattle();
         aManager.removeGroup(aChannel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
-              DeathRattle();
             }
 
             @Override

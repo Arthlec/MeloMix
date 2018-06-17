@@ -6,25 +6,22 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
-import android.os.Parcelable;
-import android.support.v4.app.Fragment;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
-
 
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.private_.TreeNode;
@@ -36,7 +33,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 
@@ -46,10 +42,12 @@ import projet_e3.esiee.com.projet_e3.AnalyseData;
 import projet_e3.esiee.com.projet_e3.BroadCast;
 import projet_e3.esiee.com.projet_e3.Fragments.GuestsListFragment;
 import projet_e3.esiee.com.projet_e3.Fragments.HistoryFragment;
-import projet_e3.esiee.com.projet_e3.Fragments.SavedMusicsFragment;
 import projet_e3.esiee.com.projet_e3.Fragments.MainFragment;
+import projet_e3.esiee.com.projet_e3.Fragments.SavedMusicsFragment;
 import projet_e3.esiee.com.projet_e3.Fragments.StatsFragment;
+import projet_e3.esiee.com.projet_e3.HostClass;
 import projet_e3.esiee.com.projet_e3.R;
+import projet_e3.esiee.com.projet_e3.ShareDataToTarget;
 
 import static junit.framework.Assert.assertTrue;
 
@@ -74,6 +72,7 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
     private BroadCast mReceiver;
     private IntentFilter mIntent;
     private List[] dataList = new List[2];
+    private int isHost;
 
     //FOR FRAGMENTS
     // 1 - Declare fragment handled by Navigation Drawer
@@ -114,6 +113,7 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
         authToken = getIntent().getStringExtra("authToken");
         availableGenresList = getIntent().getStringArrayListExtra("availableGenres");
         frequentGenres = getIntent().getStringArrayListExtra("frequentGenres");
+        isHost = getIntent().getIntExtra("host", -1);
 
         Log.i("authToken", authToken);
 
@@ -124,12 +124,19 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
 
         Bundle bundle = getIntent().getExtras();
         assert bundle != null;
-        wifiP2pGroup =  bundle.getParcelable("wifip2pGroup");
-        dataList = LoadingHostActivity.getLoadingDatalist();
-
-        mReceiver = new BroadCast(manager,channel,null,null,this, wifiManager);
-        mIntent = new IntentFilter();
-        setAction();
+        wifiP2pGroup = bundle.getParcelable("wifip2pGroup");
+        if (isHost == 1)
+        {
+            dataList = LoadingHostActivity.getLoadingDatalist();
+            mReceiver = new BroadCast(manager,channel,null,null,this, wifiManager);
+            mIntent = new IntentFilter();
+            setAction();
+            lauchSignalToTargets();
+        }else if(isHost ==0){
+            dataList = LoadingGuestActivity.getLoadingDatalist();
+            LoadingGuestActivity.onSignalReceiveAsyncTask onSignalReceiveAsyncTask = new LoadingGuestActivity.onSignalReceiveAsyncTask(getApplicationContext(),10014,"upDate",null);
+            onSignalReceiveAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        }
 
         //makeAnalyse();
         giveListToStat();
@@ -160,11 +167,35 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
     public void makeAnalyse() {
         frequentGenres = this.analyseData(this.getFilesDir());
         giveListToStat();
+        //requestData();
         Log.i("GenresFréquents", frequentGenres.toString());
     }
 
     public void giveListToStat(){
         StatsFragment.setDataList(getDataList());
+    }
+
+    public void sendDataToTarget(String targetAdress){
+        ShareDataToTarget shareDataToTarget = new ShareDataToTarget(targetAdress, getApplicationContext());
+        shareDataToTarget.start();
+    }
+
+    public void lauchSignalToTargets(){
+        File[] files = getJSONFiles(this.getFilesDir());
+        ArrayList<String> adresses = new ArrayList<>();
+        for(int i=0; i<files.length;i++){
+            File currentFile = files[i];
+            if(!currentFile.getName().contains("userGenres")){
+            adresses.add(currentFile.getName());
+            }
+        }
+        if(!adresses.isEmpty())
+        {
+            adresses = applyRegex(adresses,".json","");
+            for(String adress : adresses){
+                sendDataToTarget(adress);
+            }
+        }
     }
 
     @Override
@@ -212,6 +243,7 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
             HistoryFragment.trackCoverList.add(0, bmp);
             HistoryFragment.trackNameList.add(0, trackName);
             requestData();
+            lauchSignalToTargets();
         }
         else if (direction.equals("next") && (nextBmp == null || nextTrackName == null)) {
             Toast.makeText(getApplicationContext(), "Veuillez attendre la recherche du prochain titre", Toast.LENGTH_SHORT).show();
@@ -368,7 +400,10 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
     WifiP2pManager.ConnectionInfoListener connectionInfoListener = new WifiP2pManager.ConnectionInfoListener() {
         @Override
         public void onConnectionInfoAvailable(WifiP2pInfo info) {
-
+            if(isHost==1){
+                HostClass hostClass = new HostClass(getApplicationContext());
+                hostClass.start();
+            }
         }
     };
 
@@ -508,12 +543,30 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
         });
     }
 
+    public void removeGrp(){
+        manager.removeGroup(channel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+            }
+
+            @Override
+            public void onFailure(int i) {
+            }
+        });
+    }
+
     private void disconnect() {
         //deleteCache(this);
         SharedPreferences pref = getApplicationContext().getSharedPreferences(MY_PREFS, MODE_PRIVATE);
         pref.edit().remove("user_name").apply(); //clear pref pseudo
         if(pref.contains("userAccountSpotify"))
             pref.edit().remove("userAccountSpotify").apply(); //clear pref user account Spotify
+        if(isHost==1){
+            LoadingHostActivity.fa.finish();
+        }else if(isHost==0){
+            GuestActivity.fa.finish();
+        }
+        deleteJson();
         Intent intent = new Intent(HostActivity.this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); //clear stack activity
         startActivity(intent);
@@ -524,6 +577,15 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
             File dir = context.getCacheDir();
             deleteDir(dir);
         } catch (Exception e) {}
+    }
+
+    public void deleteJson(){
+        File[] files = getJSONFiles(this.getFilesDir());
+        for (File current : files) {
+            if (!current.getName().contains("userGenres")) {
+                current.delete();
+            }
+        }
     }
 
     public static boolean deleteDir(File dir) {

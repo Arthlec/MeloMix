@@ -77,17 +77,17 @@ public abstract class AnalyseData extends AppCompatActivity {
             }
         }
         Log.i("List",oneUserGenre+"");
-        oneUserGenre = applyRegex(oneUserGenre,"_binarized");
+        oneUserGenre = applyRegex(oneUserGenre,"_binarized","");
         return  oneUserGenre;
     }
 
-    private ArrayList<String> applyRegex(ArrayList<String> list, String regex){
+    public ArrayList<String> applyRegex(ArrayList<String> list, String regex, String replacement){
         ArrayList<String> regexList = new ArrayList<>();
         int listSize = list.size();
         for(int i=0; i<listSize; i++){
             String currentGenreName = list.get(i);
             Log.i("currenName",currentGenreName);
-            currentGenreName = currentGenreName.replaceAll(regex, "");
+            currentGenreName = currentGenreName.replaceAll(regex, replacement);
             regexList.add(i, currentGenreName);
         }
         Log.i("regex",regexList+"");
@@ -110,7 +110,7 @@ public abstract class AnalyseData extends AppCompatActivity {
             }
         }
         String regex = "_binarized=1";
-        frequentGenres = applyRegex(frequentGenres,regex);
+        frequentGenres = applyRegex(frequentGenres,regex,"");
         return frequentGenres;
     }
 
@@ -312,7 +312,7 @@ public abstract class AnalyseData extends AppCompatActivity {
      * @param rootDataDir
      * @return JSONFiles in the rootDataDirectory
      */
-    private File[] getJSONFiles(File rootDataDir){
+    public File[] getJSONFiles(File rootDataDir){
         //File rootDataDir = this.getFilesDir();
         FilenameFilter jsonFilter = new FilenameFilter() {
             public boolean accept(File dir, String name) {
