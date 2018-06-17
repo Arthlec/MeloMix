@@ -59,6 +59,8 @@ import java.util.List;
  */
 public class MainFragment extends Fragment implements EasyPermissions.PermissionCallbacks {
 
+    YouTubePlayerSupportFragment youTubePlayerFragment;
+    android.transition.Transition mFadeTransition;
     private YouTubePlayer YPlayer;
     private static final String YoutubeDeveloperKey = "0D:22:BC:A1:22:C5:0F:6B:BD:42:9D:FE:31:81:05:BE:92:12:BD:84";
     private static final int RECOVERY_DIALOG_REQUEST = 1;
@@ -143,7 +145,7 @@ public class MainFragment extends Fragment implements EasyPermissions.Permission
                 TransitionInflater.from(getContext()).
                         inflateTransition(R.transition.like_dislike_transition);
         mLikeDislikeTransition.setDuration(1500);
-        final android.transition.Transition mFadeTransition =
+        mFadeTransition =
                 TransitionInflater.from(getContext()).
                         inflateTransition(R.transition.fade_transition);
         mLikeDislikeTransition.setDuration(800);
@@ -408,9 +410,9 @@ public class MainFragment extends Fragment implements EasyPermissions.Permission
     }
 
     public void displayYoutubeVideo(final String videoID) {
-        YouTubePlayerSupportFragment youTubePlayerFragment = YouTubePlayerSupportFragment.newInstance();
+        youTubePlayerFragment = YouTubePlayerSupportFragment.newInstance();
         FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-        transaction.add(R.id.youtube_layout, youTubePlayerFragment).commit();
+        transaction.replace(R.id.youtube_layout, youTubePlayerFragment).commit();
 
         youTubePlayerFragment.initialize(YoutubeDeveloperKey, new OnInitializedListener() {
 
@@ -420,6 +422,43 @@ public class MainFragment extends Fragment implements EasyPermissions.Permission
                     YPlayer = youTubePlayer;
                     YPlayer.loadVideo(videoID);
                     YPlayer.play();
+                    YPlayer.setPlayerStateChangeListener(new YouTubePlayer.PlayerStateChangeListener() {
+                        @Override
+                        public void onLoading() {
+
+                        }
+
+                        @Override
+                        public void onLoaded(String s) {
+
+                        }
+
+                        @Override
+                        public void onAdStarted() {
+
+                        }
+
+                        @Override
+                        public void onVideoStarted() {
+
+                        }
+
+                        @Override
+                        public void onVideoEnded() {
+                            //passe a la musique suivante
+                            YPlayer.release();
+                            mArrowListener.onArrowSelected("next");
+                            TransitionManager.go(basicScene, mFadeTransition);
+                            songLiked = false;
+                            setListeners();
+                            getResultsFromApi();
+                        }
+
+                        @Override
+                        public void onError(YouTubePlayer.ErrorReason errorReason) {
+
+                        }
+                    });
                 }
             }
 
@@ -506,6 +545,7 @@ public class MainFragment extends Fragment implements EasyPermissions.Permission
                     .setType("video")
                     .execute();
             String id = searchListResponse.getItems().get(0).getId().getVideoId();
+            Log.i("NOM", name);
             Log.i("reponse", id);
             displayYoutubeVideo(id);
 
