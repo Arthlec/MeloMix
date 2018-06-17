@@ -9,12 +9,12 @@
         android:id="@+id/userName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
         android:text=""
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/textDescription"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.131" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/textSpotify"
@@ -22,10 +22,10 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
+        android:background="@null"
         android:text="@string/non_connect"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat"
-        android:background="@null"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.286"
@@ -36,9 +36,9 @@
     <ImageButton
         android:id="@+id/imageButton"
         android:layout_width="186dp"
-        android:layout_height="69dp"
-        android:layout_marginTop="8dp"
-        android:scaleType="fitCenter"
+        android:layout_height="83dp"
+        android:contentDescription="@string/bouton_spotify"
+        android:scaleType="centerCrop"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.186"
@@ -46,36 +46,35 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.418"
         app:srcCompat="@drawable/logo_spotify"
-        tools:background="#f9f9f9"
-        android:contentDescription="@string/bouton_spotify" />
+        tools:background="#f9f9f9" />
 
     <ImageButton
         android:id="@+id/actualizeButton"
         android:layout_width="49dp"
         android:layout_height="29dp"
         android:background="@null"
+        android:contentDescription="@string/bouton_actualiser"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.178"
         app:layout_constraintStart_toEndOf="@+id/imageButton"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.436"
-        app:srcCompat="@drawable/ic_refresh"
-        android:contentDescription="@string/bouton_actualiser" />
+        app:srcCompat="@drawable/ic_refresh" />
 
     <ImageButton
         android:id="@+id/disconnectButton"
         android:layout_width="49dp"
         android:layout_height="29dp"
         android:background="@null"
+        android:contentDescription="@string/bouton_d_connecter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.888"
         app:layout_constraintStart_toEndOf="@+id/imageButton"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.436"
-        app:srcCompat="@drawable/ic_exit"
-        android:contentDescription="@string/bouton_d_connecter" />
+        app:srcCompat="@drawable/ic_exit" />
 
     <Button
         android:id="@+id/buttonNext"
@@ -91,5 +90,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/userName"
         app:layout_constraintVertical_bias="0.983" />
+
+    <TextView
+        android:id="@+id/textDescription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="@string/descriptionProfileActivity"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toTopOf="@+id/imageButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/userName" />
 
 </android.support.constraint.ConstraintLayout>

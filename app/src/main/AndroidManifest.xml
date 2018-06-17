@@ -35,7 +35,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/MeloTheme">
+        android:theme="@style/MeloTheme"
+        android:name="android.support.multidex.MultiDexApplication">
         <activity
             android:name=".Activities.MainActivity"
             android:noHistory="true"
