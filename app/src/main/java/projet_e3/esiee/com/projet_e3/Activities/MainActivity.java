@@ -2,12 +2,10 @@ package projet_e3.esiee.com.projet_e3.Activities;
 
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.multidex.MultiDex;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -189,11 +187,5 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences pref = getApplicationContext().getSharedPreferences(MY_PREFS, MODE_PRIVATE);
         agreed = pref.getBoolean("agreed", false);//false is the default value.
         return agreed;
-    }
-
-    @Override
-    protected void attachBaseContext(Context base) {
-        super.attachBaseContext(base);
-        MultiDex.install(this);
     }
 }
