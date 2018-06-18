@@ -15,7 +15,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="app_remerciements">Merci d\'avoir téléchargé l\'application MeloMix ! Nous espérons qu\'elle vous conviendra !</string>
     <string name="descriptionProfileActivity">Connectez-vous à votre plateforme de streaming musicale préférée en cliquant sur son logo !</string>
-    <string name="description_role_host">Cliquez ici si vous organisez l\'évènement</string>
-    <string name="description_role_guest">Cliquez ici si vous êtes un participant de l\'évènement</string>
+    <string name="description_role_host">J\'organise l\'évènement</string>
+    <string name="description_role_guest">Je suis un participant de l\'évènement</string>
     <string name="description_choose_host_activity">Choisissez l\'hôte du groupe que vous voulez rejoindre !</string>
 </resources>
