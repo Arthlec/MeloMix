@@ -436,22 +436,12 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
             @Override
             public void run() {
                 try {
-                    if(isInitialisation) {
-                        String[] trackInfos = getTrackInfo();
-                        URL trackURL = new URL(trackInfos[0]);
-                        bmp = BitmapFactory.decodeStream(trackURL.openConnection().getInputStream());
-                        trackName = trackInfos[1];
-
-                        HistoryFragment.trackCoverList.add(0, bmp);
-                        HistoryFragment.trackNameList.add(0, trackName);
-
-                        isInitialisation = false;
-                    }
-
                     String[] trackInfos = getTrackInfo();
+                    URL trackURL = new URL(trackInfos[0]);
+
+
+                    trackInfos = getTrackInfo();
                     URL nextTrackURL = new URL(trackInfos[0]);
-                    nextBmp = BitmapFactory.decodeStream(nextTrackURL.openConnection().getInputStream());
-                    nextTrackName = trackInfos[1];
                     new Thread(new Runnable() {
                         public void run() {
                             runOnUiThread(new Runnable() {
