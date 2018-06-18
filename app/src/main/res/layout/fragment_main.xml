@@ -148,6 +148,18 @@
             app:layout_constraintVertical_bias="1.0"
             tools:visibility="invisible" />
 
+        <FrameLayout
+            android:id="@+id/youtube_layout"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:visibility="visible"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.423" />
+
     </android.support.constraint.ConstraintLayout>
 
 </FrameLayout>

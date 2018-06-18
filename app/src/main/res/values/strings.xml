@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name" translatable="false">MeloMix</string>
-    <string name="pseudo">Pseudo</string>
+    <string name="pseudo">Nom d\'utilisateur</string>
     <string name="enter">Confirmer</string>
     <string name="je_cr_e_mon_groupe">Je crée mon groupe</string>
     <string name="je_rejoins_un_groupe">Je rejoins un groupe</string>
@@ -13,5 +13,9 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="app_description">MeloMix est une application permettant la récolte des goûts musicaux. L’application peut ainsi, orienter les styles de musiques à choisir.</string>
+    <string name="app_remerciements">Merci d\'avoir téléchargé l\'application MeloMix ! Nous espérons qu\'elle vous conviendra !</string>
+    <string name="descriptionProfileActivity">Connectez-vous à votre plateforme de streaming musicale préférée en cliquant sur son logo !</string>
+    <string name="description_role_host">Cliquez ici si vous organisez l\'évènement</string>
+    <string name="description_role_guest">Cliquez ici si vous êtes un participant de l\'évènement</string>
+    <string name="description_choose_host_activity">Choisissez l\'hôte du groupe que vous voulez rejoindre !</string>
 </resources>

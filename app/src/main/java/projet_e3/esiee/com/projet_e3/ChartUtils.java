@@ -39,7 +39,7 @@ public class ChartUtils extends AppCompatActivity{
 
         BarData genreData = new BarData(barDataSet);
         genreData.setBarWidth(0.5f);
-        genreData.setDrawValues(true);
+        genreData.setDrawValues(false);
 
         return genreData;
     }

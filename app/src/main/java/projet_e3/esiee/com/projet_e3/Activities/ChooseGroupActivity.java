@@ -69,8 +69,6 @@ public class ChooseGroupActivity extends AppCompatActivity implements NumberPick
 
     @Override
     public void onValueChange(NumberPicker numberPicker, int i, int i1) {
-        Toast.makeText(this,
-                "selected number " + numberPicker.getValue(), Toast.LENGTH_SHORT).show();
     }
 
     public void showNumberPicker(View view){
@@ -89,10 +87,22 @@ public class ChooseGroupActivity extends AppCompatActivity implements NumberPick
             final NumberPicker numberPicker = new NumberPicker(getActivity());
             numberPicker.setMinValue(0);
             numberPicker.setMaxValue(10);
+            int maxValue = numberPicker.getMaxValue()-numberPicker.getMinValue()+1;
+            String[] displayedValues = new String[maxValue];
+            String texte = "";
+            for (int i=0;i<maxValue;i++)
+            {
+                if(i<2)
+                    texte = " invité(e)";
+                else
+                    texte = " invité(e)s";
+                displayedValues[i] = i+texte;
+            }
+            numberPicker.setDisplayedValues(displayedValues);
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle("Combien de personnes sont présentes ?");
-            builder.setMessage("Choisissez un nombre :");
+            builder.setTitle("Nombre minimum d'invités avant de lancer la musique");
+            builder.setMessage("A partir de combien d'invités voulez-vous commencer le traitement ? (d'autres personnes pourront vous rejoindre par la suite)");
 
             builder.setPositiveButton("ok", new DialogInterface.OnClickListener() {
                 @Override
@@ -108,7 +118,7 @@ public class ChooseGroupActivity extends AppCompatActivity implements NumberPick
                         startActivity(intent);
                 }
             });
-            builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+            builder.setNegativeButton("annuler", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     valueChangeListener.onValueChange(numberPicker,
                             numberPicker.getValue(), numberPicker.getValue());

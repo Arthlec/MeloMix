@@ -12,6 +12,7 @@ import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -29,6 +30,7 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.List;
 
 import projet_e3.esiee.com.projet_e3.AnalyseData;
 import projet_e3.esiee.com.projet_e3.BroadCast;
@@ -49,6 +51,15 @@ public class LoadingHostActivity extends AnalyseData {
     private TextView loadingText;
 
     private HostActivity hostActivity;
+    private static List[] datalist;
+
+    public static List[] getLoadingDatalist() {
+        return datalist;
+    }
+
+    public void setLoadingDatalist(List[] datalist) {
+        this.datalist = datalist;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +83,7 @@ public class LoadingHostActivity extends AnalyseData {
 
         config.groupOwnerIntent = 15;
 
-        mReceiver = new BroadCast(aManager,aChannel,null,this, wifiManager);
+        mReceiver = new BroadCast(aManager,aChannel,null,this,null, wifiManager);
         mIntent = new IntentFilter();
         setAction();
 
@@ -80,7 +91,6 @@ public class LoadingHostActivity extends AnalyseData {
 
         if (getIntent().hasExtra("guestNumber")){
             guestNb = getIntent().getIntExtra("guestNumber",-1);
-            Toast.makeText(getApplicationContext(), "Guestnumber : " + guestNb, Toast.LENGTH_SHORT).show();
         }
 
         loadingText = findViewById(R.id.loading_text);
@@ -133,7 +143,6 @@ public class LoadingHostActivity extends AnalyseData {
                 int diff = guestNb-wifiP2pGroup.getClientList().size();
                 loadingText.setText("Vous devez encore attendre "+ diff +" invités");
 
-                Toast.makeText(getApplicationContext(), "ClientList : " + wifiP2pGroup.getClientList().size(), Toast.LENGTH_SHORT).show();
                 if(wifiP2pGroup.getClientList().size()>= guestNb){
                     progressBar.setMax(1);
                     progressBar.setProgress(1);
@@ -149,7 +158,6 @@ public class LoadingHostActivity extends AnalyseData {
                     loadingText.setText("Traitement de vos données...");
                     hostActivity.requestData();
                     startActivity(intent);
-                    finish();
                 }
 
             }
@@ -162,7 +170,6 @@ public class LoadingHostActivity extends AnalyseData {
         public void onGroupInfoAvailable(WifiP2pGroup group) {
             if(group!=null)
             {
-                Log.i("pass",group.getPassphrase());
                 wifiP2pGroup = group;
                 aManager.requestConnectionInfo(aChannel,connectionInfoListener);
             }
@@ -171,6 +178,7 @@ public class LoadingHostActivity extends AnalyseData {
 
     public void setFrequentGenres() {
         hostActivity.frequentGenres = this.analyseData(this.getFilesDir());
+        datalist = buildListTab();
         hostActivity.availableGenresList = getIntent().getStringArrayListExtra("availableGenres");
         hostActivity.authToken = getIntent().getStringExtra("authToken");
     }
@@ -181,10 +189,10 @@ public class LoadingHostActivity extends AnalyseData {
     public void createGrp(){
         aManager.createGroup(aChannel, new WifiP2pManager.ActionListener() {
             @Override
-            public void onSuccess() {Toast.makeText(getApplicationContext(), "Groupe crée", Toast.LENGTH_SHORT).show(); }
+            public void onSuccess() {}
 
             @Override
-            public void onFailure(int i) {Toast.makeText(getApplicationContext(), "Groupe déjà crée", Toast.LENGTH_SHORT).show(); }
+            public void onFailure(int i) {}
         });
     }
 
@@ -195,12 +203,10 @@ public class LoadingHostActivity extends AnalyseData {
         aManager.removeGroup(aChannel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
-                Toast.makeText(getApplicationContext(),"Groupe fermé",Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFailure(int i) {
-                Toast.makeText(getApplicationContext(),"Echec de la suppression du groupe",Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -333,7 +339,7 @@ public class LoadingHostActivity extends AnalyseData {
         @Override
         protected void onPostExecute(String result) {
             if (result != null) {
-                Toast.makeText(mFilecontext,"Fichier reçu avec succes",Toast.LENGTH_SHORT).show();
+                Toast.makeText(mFilecontext,"Fichier reçu avec succès",Toast.LENGTH_SHORT).show();
                 if (!TextUtils.isEmpty(result)) {
                     FileServerAsyncTask FileServerobj = new
                             FileServerAsyncTask(mFilecontext, FileTransferService.PORT);

@@ -10,7 +10,6 @@ import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
-import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -20,7 +19,6 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -72,6 +70,7 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
     private WifiP2pManager.Channel channel;
     private BroadCast mReceiver;
     private IntentFilter mIntent;
+    private List[] dataList = new List[2];
 
     //FOR FRAGMENTS
     // 1 - Declare fragment handled by Navigation Drawer
@@ -115,16 +114,30 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
 
         Log.i("authToken", authToken);
 
+        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+
         manager = LoadingHostActivity.getManager();
         channel = LoadingHostActivity.getChannel();
 
         Bundle bundle = getIntent().getExtras();
         assert bundle != null;
         wifiP2pGroup =  bundle.getParcelable("wifip2pGroup");
+        dataList = LoadingHostActivity.getLoadingDatalist();
+
+        mReceiver = new BroadCast(manager,channel,null,null,this, wifiManager);
+        mIntent = new IntentFilter();
+        setAction();
 
         //makeAnalyse();
-        //giveListToStat();
+        giveListToStat();
         //requestData();
+    }
+
+    public void setAction(){
+        mIntent.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
+        mIntent.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
+        mIntent.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
+        mIntent.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
     }
 
     @Override
@@ -143,11 +156,12 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
 
     public void makeAnalyse() {
         frequentGenres = this.analyseData(this.getFilesDir());
+        giveListToStat();
         Log.i("GenresFréquents", frequentGenres.toString());
     }
 
     public void giveListToStat(){
-        StatsFragment.dataList = buildListTab();
+        StatsFragment.setDataList(getDataList());
     }
 
     @Override
@@ -361,12 +375,15 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
             if(group!=null)
             {
                 wifiP2pGroup = group;
-                Toast.makeText(getApplicationContext(),"clientGroup : " + wifiP2pGroup.getClientList(),Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(),"clientGroup : " + wifiP2pGroup.getClientList(),Toast.LENGTH_SHORT).show();
                 manager.requestConnectionInfo(channel,connectionInfoListener);
             }
             fragmentGuestsList.setWifiP2PGroup(wifiP2pGroup);
         }
     };
+    public List[] getDataList(){
+        return dataList;
+    }
 
     public void requestData() {
         AsyncTask.execute(new Runnable() {

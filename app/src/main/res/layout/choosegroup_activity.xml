@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -8,11 +9,11 @@
         android:id="@+id/DJ_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@drawable/create_group_selector"
+        android:gravity="center|bottom"
         android:text="@string/je_cr_e_mon_groupe"
         android:textAllCaps="false"
         android:textSize="17sp"
-        android:gravity="center|bottom"
-        android:background="@drawable/create_group_selector"
         app:layout_constraintBottom_toTopOf="@+id/searchforgroup_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -23,14 +24,40 @@
         android:id="@+id/searchforgroup_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@drawable/join_group_selector"
+        android:gravity="center|bottom"
         android:text="@string/je_rejoins_un_groupe"
         android:textAllCaps="false"
         android:textSize="17sp"
-        android:gravity="center|bottom"
-        android:background="@drawable/join_group_selector"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/DJ_button" />
+
+    <TextView
+        android:id="@+id/textDescriptionHost"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/description_role_host"
+        app:layout_constraintBottom_toTopOf="@+id/DJ_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.79" />
+
+    <TextView
+        android:id="@+id/textDescriptionGuest"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/description_role_guest"
+        app:layout_constraintBottom_toTopOf="@+id/searchforgroup_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/DJ_button"
+        app:layout_constraintVertical_bias="0.79" />
 </android.support.constraint.ConstraintLayout>
