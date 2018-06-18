@@ -44,7 +44,7 @@ public class ProfileActivity extends AppCompatActivity {
         availableGenresList = new ArrayList<>();
 
         TextView userName = findViewById(R.id.userName);
-        userName.setText("Bonjour " +myprefs_name()+ ".");
+        userName.setText("Bonjour " +myprefs_name());
 
         TextView textSpotify = findViewById(R.id.textSpotify);
         if (pref.contains("userAccountSpotify")){
