@@ -61,7 +61,7 @@ public class BroadCast extends BroadcastReceiver {
             networkInfo.getDetailedState();
             if(networkInfo.isConnected()){
                 if(guestActivity != null && loadingHost == null && host == null) {
-                    manager.requestConnectionInfo(channel, guestActivity.connectionInfoListener);
+                    manager.requestGroupInfo(channel, guestActivity.groupInfoListener);
                 }else if(loadingHost != null && guestActivity == null && host == null) {
                     manager.requestGroupInfo(channel,loadingHost.groupInfoListener);
                 }else if(host != null && guestActivity == null && loadingHost == null) {

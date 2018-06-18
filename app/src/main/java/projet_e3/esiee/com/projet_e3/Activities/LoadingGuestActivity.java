@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -15,6 +16,7 @@ import java.util.List;
 
 import projet_e3.esiee.com.projet_e3.AnalyseData;
 import projet_e3.esiee.com.projet_e3.R;
+import projet_e3.esiee.com.projet_e3.ReceiveDataFlow;
 
 public class LoadingGuestActivity extends AnalyseData {
     private HostActivity hostActivity;
@@ -25,9 +27,8 @@ public class LoadingGuestActivity extends AnalyseData {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loading_guest);
         hostActivity = new HostActivity();
-
-        onSignalReceiveAsyncTask onSignalReceiveAsyncTask = new onSignalReceiveAsyncTask(getApplicationContext(),10014,"firstTimeCo",this);
-        onSignalReceiveAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        ReceiveDataFlow receiveDataFlow = new ReceiveDataFlow(getApplication(),10014,"firstTimeCo",this);
+        receiveDataFlow.start();
     }
 
     public static List[] getLoadingDatalist() {
@@ -53,7 +54,7 @@ public class LoadingGuestActivity extends AnalyseData {
         private int PORT;
         private String reason;
         private LoadingGuestActivity currentActivity;
-        onSignalReceiveAsyncTask(Context context, int port, String rString, LoadingGuestActivity theActivity) {
+        public onSignalReceiveAsyncTask(Context context, int port, String rString, LoadingGuestActivity theActivity) {
             this.mFilecontext = context;
             this.PORT = port;
             this.reason = rString;
@@ -88,7 +89,9 @@ public class LoadingGuestActivity extends AnalyseData {
                 if (!TextUtils.isEmpty(result)) {
                     if(result.equals("firstTimeCo")&&currentActivity!=null){
                         currentActivity.startHost();
+                        Log.i("first",reason);
                     }
+                    Log.i("up",reason);
                     onSignalReceiveAsyncTask onSignalReceiveAsyncTask = new onSignalReceiveAsyncTask(mFilecontext,10014,"upDate",null);
                     onSignalReceiveAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 }

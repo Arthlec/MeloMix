@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -231,10 +232,10 @@ public abstract class AnalyseData extends AppCompatActivity {
 
     private void executeKmeans(int numberOfUsers, SimpleKMeans simpleKMeans, Instances dataBase, int numberOfIterations, double a, double b){
         try {
-            if(numberOfUsers == 2)
+            /*if(numberOfUsers == 2)
                 simpleKMeans.setNumClusters(2);
-            else
-                simpleKMeans.setNumClusters((int)Math.round(a*numberOfUsers + b));
+            else*/
+            simpleKMeans.setNumClusters((int)Math.round(a*numberOfUsers + b));
 
             simpleKMeans.setMaxIterations(numberOfIterations);
             simpleKMeans.setPreserveInstancesOrder(true);
@@ -321,6 +322,7 @@ public abstract class AnalyseData extends AppCompatActivity {
             }
         };
         File[] files = rootDataDir.listFiles(jsonFilter);
+        Log.i("FILE[s]", Arrays.toString(files));
         return files;
     }
 

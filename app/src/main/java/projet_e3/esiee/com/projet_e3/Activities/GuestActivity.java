@@ -10,6 +10,7 @@ import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
+import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.AsyncTask;
@@ -40,14 +41,15 @@ public class GuestActivity extends AppCompatActivity {
 
     private ListView listView;
     private Button btnTry;
-    private WifiP2pManager aManager;
-    private WifiP2pManager.Channel aChannel;
+    private static WifiP2pManager aManager;
+    private static WifiP2pManager.Channel aChannel;
     private BroadcastReceiver mReceiver;
     private IntentFilter mIntent;
 
     private List<WifiP2pDevice> peers = new ArrayList<>();
     private ArrayList<WifiP2pDevice> deviceArray;
     private InetAddress GoAdress;
+    private WifiP2pGroup wifiP2pGroup;
     public static Activity fa;
 
     private final WifiP2pConfig config = new WifiP2pConfig();
@@ -173,10 +175,31 @@ public class GuestActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(GuestActivity.this, LoadingGuestActivity.class);
                 intent.putExtra("authToken", getIntent().getStringExtra("authToken"));
+                intent.putExtra("wifip2pGroup", wifiP2pGroup);
                 startActivity(intent);
             }
         }
     };
+
+    public static WifiP2pManager getaManager() {
+        return aManager;
+    }
+
+    public static WifiP2pManager.Channel getaChannel() {
+        return aChannel;
+    }
+
+    public WifiP2pManager.GroupInfoListener groupInfoListener = new WifiP2pManager.GroupInfoListener() {
+        @Override
+        public void onGroupInfoAvailable(WifiP2pGroup group) {
+            if(group!=null)
+            {
+                wifiP2pGroup = group;
+                aManager.requestConnectionInfo(aChannel,connectionInfoListener);
+            }
+        }
+    };
+
     public void discover(){
         aManager.discoverPeers(aChannel, new WifiP2pManager.ActionListener() {
             @Override

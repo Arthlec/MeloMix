@@ -47,6 +47,7 @@ import projet_e3.esiee.com.projet_e3.Fragments.SavedMusicsFragment;
 import projet_e3.esiee.com.projet_e3.Fragments.StatsFragment;
 import projet_e3.esiee.com.projet_e3.HostClass;
 import projet_e3.esiee.com.projet_e3.R;
+import projet_e3.esiee.com.projet_e3.ReceiveDataFlow;
 import projet_e3.esiee.com.projet_e3.ShareDataToTarget;
 
 import static junit.framework.Assert.assertTrue;
@@ -119,28 +120,26 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
 
         WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
-        manager = LoadingHostActivity.getManager();
-        channel = LoadingHostActivity.getChannel();
-
+        if (isHost == 1)
+        {
+            manager = LoadingHostActivity.getManager();
+            channel = LoadingHostActivity.getChannel();
+            dataList = LoadingHostActivity.getLoadingDatalist();
+        }else if(isHost ==0){
+            manager = GuestActivity.getaManager();
+            channel = GuestActivity.getaChannel();
+            dataList = LoadingGuestActivity.getLoadingDatalist();
+            ReceiveDataFlow receiveDataFlow = new ReceiveDataFlow(getApplicationContext(),10014,"upDate",null);
+            receiveDataFlow.start();
+        }
         Bundle bundle = getIntent().getExtras();
         assert bundle != null;
         wifiP2pGroup = bundle.getParcelable("wifip2pGroup");
-        if (isHost == 1)
-        {
-            dataList = LoadingHostActivity.getLoadingDatalist();
-            mReceiver = new BroadCast(manager,channel,null,null,this, wifiManager);
-            mIntent = new IntentFilter();
-            setAction();
-            lauchSignalToTargets();
-        }else if(isHost ==0){
-            dataList = LoadingGuestActivity.getLoadingDatalist();
-            LoadingGuestActivity.onSignalReceiveAsyncTask onSignalReceiveAsyncTask = new LoadingGuestActivity.onSignalReceiveAsyncTask(getApplicationContext(),10014,"upDate",null);
-            onSignalReceiveAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        }
+        mReceiver = new BroadCast(manager,channel,null,null,this, wifiManager);
+        mIntent = new IntentFilter();
+        setAction();
 
-        //makeAnalyse();
         giveListToStat();
-        //requestData();
     }
 
     public void setAction(){
@@ -166,8 +165,9 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
 
     public void makeAnalyse() {
         frequentGenres = this.analyseData(this.getFilesDir());
+        dataList = buildListTab();
         giveListToStat();
-        //requestData();
+        requestData();
         Log.i("GenresFréquents", frequentGenres.toString());
     }
 
@@ -180,13 +180,12 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
         shareDataToTarget.start();
     }
 
-    public void lauchSignalToTargets(){
-        File[] files = getJSONFiles(this.getFilesDir());
+    public void lauchSignalToTargets(Context context){
+        File[] files = getJSONFiles(context.getFilesDir());
         ArrayList<String> adresses = new ArrayList<>();
-        for(int i=0; i<files.length;i++){
-            File currentFile = files[i];
-            if(!currentFile.getName().contains("userGenres")){
-            adresses.add(currentFile.getName());
+        for (File currentFile : files) {
+            if (!currentFile.getName().contains("userGenres")) {
+                adresses.add(currentFile.getName());
             }
         }
         if(!adresses.isEmpty())
@@ -243,7 +242,7 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
             HistoryFragment.trackCoverList.add(0, bmp);
             HistoryFragment.trackNameList.add(0, trackName);
             requestData();
-            lauchSignalToTargets();
+            lauchSignalToTargets(getApplicationContext());
         }
         else if (direction.equals("next") && (nextBmp == null || nextTrackName == null)) {
             Toast.makeText(getApplicationContext(), "Veuillez attendre la recherche du prochain titre", Toast.LENGTH_SHORT).show();
