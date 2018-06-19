@@ -3,6 +3,7 @@ package projet_e3.esiee.com.projet_e3;
 import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
+import android.util.Log;
 
 import projet_e3.esiee.com.projet_e3.Services.ShareDataFlowService;
 
@@ -22,6 +23,7 @@ public class ShareDataToTarget extends Thread {
         if (!TextUtils.isEmpty(target) && target.length() > 0) {
             ShareDataFlowService.PORT = 10014;
             int sub_port = ShareDataFlowService.PORT;
+            Log.i("addre",target);
             serviceIntent.putExtra(ShareDataFlowService.EXTRAS_TARGET_ADDRESS,target);
             serviceIntent.putExtra(ShareDataFlowService.EXTRAS_TARGET_PORT, ShareDataFlowService.PORT);
 

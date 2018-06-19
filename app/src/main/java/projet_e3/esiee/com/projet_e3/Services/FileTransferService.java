@@ -1,5 +1,11 @@
 package projet_e3.esiee.com.projet_e3.Services;
 
+import android.annotation.SuppressLint;
+import android.app.IntentService;
+import android.content.Intent;
+import android.os.Handler;
+import android.widget.Toast;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -8,12 +14,6 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Objects;
-
-import android.annotation.SuppressLint;
-import android.app.IntentService;
-import android.content.Intent;
-import android.os.Handler;
-import android.widget.Toast;
 
 import projet_e3.esiee.com.projet_e3.Activities.GuestActivity;
 
@@ -25,7 +25,7 @@ public class FileTransferService extends IntentService {
 
     Handler mHandler;
 
-    public static final int SOCKET_TIMEOUT = 5000;
+    public static final int SOCKET_TIMEOUT = 50000;
     public static final String ACTION_SEND_FILE = "com.example.android.wifidirect.SEND_FILE";
     public static final String EXTRAS_GROUP_OWNER_ADDRESS = "go_host";
     public static final String EXTRAS_GROUP_OWNER_PORT = "go_port";

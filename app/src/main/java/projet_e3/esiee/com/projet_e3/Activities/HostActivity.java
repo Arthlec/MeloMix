@@ -91,6 +91,32 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
     private static final int FRAGMENT_HISTORY = 3;
     private static final int FRAGMENT_GUESTS_LIST = 4;
 
+    //Getters
+    public static Bitmap getBmp() {
+        return bmp;
+    }
+    public static Bitmap getNextBmp() {
+        return nextBmp;
+    }
+    public static String getTrackName() {
+        return trackName;
+    }
+    public static String getNextTrackName() {
+        return nextTrackName;
+    }
+    //Setters
+    public static void setBmp(Bitmap bmp) {
+        HostActivity.bmp = bmp;
+    }
+    public static void setNextBmp(Bitmap nextBmp) {
+        HostActivity.nextBmp = nextBmp;
+    }
+    public static void setTrackName(String trackName) {
+        HostActivity.trackName = trackName;
+    }
+    public static void setNextTrackName(String nextTrackName) {
+        HostActivity.nextTrackName = nextTrackName;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,6 +152,7 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
             channel = LoadingHostActivity.getChannel();
             dataList = LoadingHostActivity.getLoadingDatalist();
         }else if(isHost ==0){
+            bmp = getIntent().getExtras().getParcelable("GuestBmp");
             manager = GuestActivity.getaManager();
             channel = GuestActivity.getaChannel();
             dataList = LoadingGuestActivity.getLoadingDatalist();
@@ -167,7 +194,7 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
         frequentGenres = this.analyseData(this.getFilesDir());
         dataList = buildListTab();
         giveListToStat();
-        requestData();
+        //requestData();
         Log.i("GenresFréquents", frequentGenres.toString());
     }
 
@@ -541,6 +568,7 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
             }
         });
     }
+
 
     public void removeGrp(){
         manager.removeGroup(channel, new WifiP2pManager.ActionListener() {

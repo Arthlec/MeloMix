@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -70,8 +71,7 @@ public class LoadingGuestActivity extends AnalyseData {
 
                 Socket client = serverSocket.accept();
                 try {
-                    //Recupère l'Ip du client connecté à la socket et supprime le JSON correspondant
-                    String IpClient = client.getInetAddress().getHostAddress();
+                    InputStream inputStream = client.getInputStream();
                     serverSocket.close();
                     return reason;
                 } catch (Exception e) {

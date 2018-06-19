@@ -157,7 +157,7 @@ public class LoadingHostActivity extends AnalyseData {
                     findViewById(R.id.loading_panel).setVisibility(View.VISIBLE);
                     loadingText.setText("Traitement de vos données...");
                     hostActivity.requestData();
-                    hostActivity.lauchSignalToTargets(getApplicationContext());
+                    //hostActivity.lauchSignalToTargets(getApplicationContext());
                     startActivity(intent);
                 }
 

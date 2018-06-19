@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -58,4 +59,23 @@ public class ShareDataFlowService extends IntentService {
 
         }
     }
+
+    public static void sendObjet(InputStream inputStream, OutputStream out,int size) {
+
+        byte[] buf = new byte[size];
+
+        int len;
+        try {
+            while ((len = inputStream.read(buf)) != -1) {
+                out.write(buf, 0, len);
+            }
+            out.flush();
+            out.close();
+            inputStream.close();
+        } catch (IOException e) {
+            e.getMessage();
+        }
+    }
+
+
 }

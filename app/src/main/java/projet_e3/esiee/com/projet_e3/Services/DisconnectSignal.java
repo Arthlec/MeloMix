@@ -15,7 +15,7 @@ import java.util.Objects;
 public class DisconnectSignal extends IntentService{
         Handler mHandler;
 
-        public static final int SOCKET_TIMEOUT = 5000;
+        public static final int SOCKET_TIMEOUT = 50000;
         public static final String ACTION_SEND_DEATH = "com.example.android.wifidirect.SEND_DEATH";
         public static final String EXTRAS_GROUP_OWNER_ADDRESS = "go_host";
         public static final String EXTRAS_GROUP_OWNER_PORT = "go_port";
