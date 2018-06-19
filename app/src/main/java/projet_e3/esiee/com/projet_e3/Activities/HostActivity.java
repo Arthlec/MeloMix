@@ -244,7 +244,8 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
     }
 
     public void sendDataToTarget(String targetAdress){
-        ShareDataToTarget shareDataToTarget = new ShareDataToTarget(targetAdress, getApplicationContext());
+        String[] objects = null;
+        ShareDataToTarget shareDataToTarget = new ShareDataToTarget(targetAdress, getApplicationContext(),objects);
         shareDataToTarget.start();
     }
 
