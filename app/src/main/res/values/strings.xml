@@ -17,5 +17,5 @@
     <string name="descriptionProfileActivity">Connectez-vous à votre plateforme de streaming musicale préférée en cliquant sur son logo !</string>
     <string name="description_role_host">J\'organise l\'évènement</string>
     <string name="description_role_guest">Je suis un participant de l\'évènement</string>
-    <string name="description_choose_host_activity">Choisissez l\'hôte du groupe que vous voulez rejoindre !</string>
+    <string name="description_choose_host_activity">Choisissez l\'organisateur de l\'évènement que vous voulez rejoindre !</string>
 </resources>
