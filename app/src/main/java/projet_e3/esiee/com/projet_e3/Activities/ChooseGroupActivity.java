@@ -9,15 +9,15 @@ import android.content.Intent;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.NumberPicker;
 
+import projet_e3.esiee.com.projet_e3.AnalyseData;
 import projet_e3.esiee.com.projet_e3.R;
 
-public class ChooseGroupActivity extends AppCompatActivity implements NumberPicker.OnValueChangeListener {
+public class ChooseGroupActivity extends AnalyseData implements NumberPicker.OnValueChangeListener {
     private WifiManager wifiManager;
 
     @Override
@@ -69,6 +69,8 @@ public class ChooseGroupActivity extends AppCompatActivity implements NumberPick
                 startActivity(intent);
             }
         });
+
+        deleteJson();
     }
 
     public boolean isWifi() {

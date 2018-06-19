@@ -625,15 +625,6 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
         } catch (Exception e) {}
     }
 
-    public void deleteJson(){
-        File[] files = getJSONFiles(this.getFilesDir());
-        for (File current : files) {
-            if (!current.getName().contains("userGenres")) {
-                current.delete();
-            }
-        }
-    }
-
     public static boolean deleteDir(File dir) {
         if (dir != null && dir.isDirectory()) {
             String[] children = dir.list();

@@ -324,6 +324,18 @@ public abstract class AnalyseData extends AppCompatActivity {
     }
 
     /**
+     * Supprime les JSON des guests chez le HOST
+     */
+    public void deleteJson(){
+        File[] files = getJSONFiles(this.getFilesDir());
+        for (File current : files) {
+            if (!current.getName().contains("userGenres")) {
+                current.delete();
+            }
+        }
+    }
+
+    /**
      * Convert an ArrayList of Integers to an int array
      * @param integers
      * @return an int array
