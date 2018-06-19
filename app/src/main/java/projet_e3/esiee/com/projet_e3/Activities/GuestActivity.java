@@ -1,5 +1,6 @@
 package projet_e3.esiee.com.projet_e3.Activities;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -48,6 +49,7 @@ public class GuestActivity extends AppCompatActivity {
     private List<WifiP2pDevice> peers = new ArrayList<>();
     private ArrayList<WifiP2pDevice> deviceArray;
     private InetAddress GoAdress;
+    public static Activity guestContext;
 
     private final WifiP2pConfig config = new WifiP2pConfig();
     @Override
@@ -102,7 +104,7 @@ public class GuestActivity extends AppCompatActivity {
     }
 
     private void work() {
-
+        guestContext = this;
         WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         aManager = (WifiP2pManager) getApplicationContext().getSystemService(Context.WIFI_P2P_SERVICE);
         aChannel = aManager.initialize(this,getMainLooper(),null);
