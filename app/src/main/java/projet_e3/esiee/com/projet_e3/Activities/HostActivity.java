@@ -848,11 +848,11 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
             Log.i("mService", mService.toString());
             SearchListResponse searchListResponse = mService.search().list("snippet")
                     .setMaxResults(Long.parseLong("50"))
-                    .setQ(frequentGenres.get(genreNumber))
+                    .setQ(frequentGenres.get(genreNumber) + "music")
                     .setVideoDuration("short")
-                    .setOrder("viewCount")
                     .setType("video")
                     .execute();
+            Log.i("musicGenre", frequentGenres.get(genreNumber));
             String trackID;
             for (int i=0; i<searchListResponse.getItems().size(); i++) {
                 trackID = searchListResponse.getItems().get(i).getId().getVideoId();
