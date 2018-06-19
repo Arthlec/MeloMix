@@ -29,6 +29,7 @@ public class LoadingGuestActivity extends AnalyseData {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loading_guest);
+        findViewById(R.id.loading_panel).setVisibility(View.VISIBLE);
         hostActivity = new HostActivity();
         ReceiveDataFlow receiveDataFlow = new ReceiveDataFlow(10014,"firstTimeCo",this);
         receiveDataFlow.start();
@@ -40,7 +41,6 @@ public class LoadingGuestActivity extends AnalyseData {
 
     public void startHost()
     {
-        findViewById(R.id.loading_panel).setVisibility(View.VISIBLE);
         Intent intent = new Intent(LoadingGuestActivity.this, hostActivity.getClass());
         intent.putExtra("authToken", getIntent().getStringExtra("authToken"));
         intent.putExtra("host",0);

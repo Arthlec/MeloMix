@@ -63,6 +63,7 @@ public class LoadingHostActivity extends AnalyseData {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loading_host);
+        findViewById(R.id.loading_panel).setVisibility(View.VISIBLE);
         hostActivity = new HostActivity();
         InitAttribut();
     }
@@ -136,35 +137,35 @@ public class LoadingHostActivity extends AnalyseData {
             if(info.groupFormed && info.isGroupOwner){
                 HostClass hostClass = new HostClass(getApplicationContext(),LoadingHostActivity.this);
                 hostClass.start();
+                progressBar.setProgress(wifiP2pGroup.getClientList().size());
+                int diff = guestNb-wifiP2pGroup.getClientList().size();
+                loadingText.setText("Vous devez encore attendre "+ diff +" invités");
                 if(guestNb==0){
-                   startHostActivity();
+                    prepareIntentAndStart();
                 }
             }
         }
     };
 
+    public void prepareIntentAndStart(){
+        this.progressBar.setMax(1);
+        this.progressBar.setProgress(1);
+        Intent intent = new Intent(LoadingHostActivity.this, hostActivity.getClass());
+        intent.putExtra("authToken", getIntent().getStringExtra("authToken"));
+        intent.putStringArrayListExtra("availableGenres", getIntent().getStringArrayListExtra("availableGenres"));
+        intent.putExtra("wifip2pGroup", wifiP2pGroup);
+        intent.putExtra("host",1);
+        setFrequentGenres();
+        intent.putStringArrayListExtra("frequentGenres", hostActivity.frequentGenres);
+        this.loadingText.setText("Traitement de vos données...");
+        this.hostActivity.requestData();
+        startActivity(intent);
+    }
+
     public void startHostActivity(){
-
-        progressBar.setProgress(wifiP2pGroup.getClientList().size());
-        int diff = guestNb-wifiP2pGroup.getClientList().size();
-        loadingText.setText("Vous devez encore attendre "+ diff +" invités");
-
         //if(wifiP2pGroup.getClientList().size()>= guestNb){
         if(this.getJSONFiles(getApplicationContext().getFilesDir()).length>= guestNb+1){
-            this.progressBar.setMax(1);
-            this.progressBar.setProgress(1);
-            this.loadingText.setText("C'est bon!");
-            Intent intent = new Intent(LoadingHostActivity.this, hostActivity.getClass());
-            intent.putExtra("authToken", getIntent().getStringExtra("authToken"));
-            intent.putStringArrayListExtra("availableGenres", getIntent().getStringArrayListExtra("availableGenres"));
-            intent.putExtra("wifip2pGroup", wifiP2pGroup);
-            intent.putExtra("host",1);
-            setFrequentGenres();
-            intent.putStringArrayListExtra("frequentGenres", hostActivity.frequentGenres);
-            findViewById(R.id.loading_panel).setVisibility(View.VISIBLE);
-            this.loadingText.setText("Traitement de vos données...");
-            this.hostActivity.requestData();
-            startActivity(intent);
+            prepareIntentAndStart();
         }
     }
 
