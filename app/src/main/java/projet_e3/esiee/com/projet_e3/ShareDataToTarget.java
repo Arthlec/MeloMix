@@ -27,10 +27,7 @@ public class ShareDataToTarget extends Thread {
             int sub_port = ShareDataFlowService.PORT;
             Log.i("addre",target);
 
-            serviceIntent.putExtra(ShareDataFlowService.EXTRAS_URL_BMP,allObjects[0]);
-            serviceIntent.putExtra(ShareDataFlowService.EXTRAS_BMP_NAME,allObjects[1]);
-            serviceIntent.putExtra(ShareDataFlowService.EXTRAS_URL_NEXT_BMP,allObjects[2]);
-            serviceIntent.putExtra(ShareDataFlowService.EXTRAS_NEXT_BMP_NAME,allObjects[3]);
+            serviceIntent.putExtra(ShareDataFlowService.EXTRAS_URL_BMP,allObjects[2]);
 
             serviceIntent.putExtra(ShareDataFlowService.EXTRAS_TARGET_ADDRESS,target);
             serviceIntent.putExtra(ShareDataFlowService.EXTRAS_TARGET_PORT, ShareDataFlowService.PORT);

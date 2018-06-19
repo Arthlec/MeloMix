@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Handler;
 import android.widget.Toast;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -54,8 +55,9 @@ public class ShareDataFlowService extends IntentService {
                 OutputStream outputStream = socket.getOutputStream();
                 outputStream.flush();
 
-                //InputStream stream = objects;
-
+                assert bmp != null;
+                InputStream stream = new ByteArrayInputStream(bmp.getBytes());
+                sendObjet(stream,outputStream,bmp.getBytes().length);
                 outputStream.close();
             } catch (IOException e) {
                 e.printStackTrace();
