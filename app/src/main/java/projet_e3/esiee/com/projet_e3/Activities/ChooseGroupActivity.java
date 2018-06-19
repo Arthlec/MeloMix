@@ -94,8 +94,7 @@ public class ChooseGroupActivity extends AppCompatActivity implements NumberPick
         newFragment.show(getFragmentManager(), "time picker");
     }
 
-    @SuppressLint("ValidFragment")
-    public class NumberDialogFragment extends DialogFragment {
+    public static class NumberDialogFragment extends DialogFragment {
         private NumberPicker.OnValueChangeListener valueChangeListener;
 
         @Override
@@ -127,9 +126,9 @@ public class ChooseGroupActivity extends AppCompatActivity implements NumberPick
                     valueChangeListener.onValueChange(numberPicker,
                             numberPicker.getValue(), numberPicker.getValue());
 
-                        Intent intent = new Intent(ChooseGroupActivity.this, LoadingHostActivity.class);
-                        intent.putExtra("authToken", getIntent().getStringExtra("authToken"));
-                        intent.putExtra("availableGenres", getIntent().getStringArrayListExtra("availableGenres"));
+                        Intent intent = new Intent(getActivity().getApplicationContext()/*ChooseGroupActivity.this*/, LoadingHostActivity.class);
+                        intent.putExtra("authToken", getActivity().getIntent()/*getIntent()*/.getStringExtra("authToken"));
+                        intent.putExtra("availableGenres", getActivity().getIntent()/*getIntent()*/.getStringArrayListExtra("availableGenres"));
                         intent.putExtra("host", 1);
                         intent.putExtra("guestNumber", numberPicker.getValue());
                         startActivity(intent);

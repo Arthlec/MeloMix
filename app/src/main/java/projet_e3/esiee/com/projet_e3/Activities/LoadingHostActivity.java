@@ -244,7 +244,6 @@ public class LoadingHostActivity extends AnalyseData {
      */
     public static class onDecoAsyncTask extends AsyncTask<String, String, String> {
 
-        @SuppressLint("StaticFieldLeak")
         private Context mFilecontext;
         private int PORT;
         public onDecoAsyncTask(Context context, int port) {
@@ -295,7 +294,6 @@ public class LoadingHostActivity extends AnalyseData {
      */
     public static class FileServerAsyncTask extends AsyncTask<String, String, String> {
 
-        @SuppressLint("StaticFieldLeak")
         private Context mFilecontext;
         private int PORT;
         public FileServerAsyncTask(Context context, int port) {
