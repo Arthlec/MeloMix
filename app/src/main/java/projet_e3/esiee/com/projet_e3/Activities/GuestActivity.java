@@ -236,16 +236,19 @@ public class GuestActivity extends AppCompatActivity {
             public void run() {
                 new Thread(new Runnable() {
                     public void run() {
-                        Intent serviceIntent = new Intent(getApplicationContext(), DisconnectSignal.class);
-                        serviceIntent.setAction(DisconnectSignal.ACTION_SEND_DEATH);
-                        String HostAdd = GoAdress.getHostAddress();
-                        if (!TextUtils.isEmpty(HostAdd) && HostAdd.length() > 0) {
-                            DisconnectSignal.PORT = 9899;
-                            int sub_port = DisconnectSignal.PORT;
-                            serviceIntent.putExtra(DisconnectSignal.EXTRAS_GROUP_OWNER_ADDRESS,HostAdd);
-                            serviceIntent.putExtra(DisconnectSignal.EXTRAS_GROUP_OWNER_PORT, DisconnectSignal.PORT);
-                            if (sub_port != -1) {
-                                getApplication().startService(serviceIntent);
+                        if(GoAdress != null) {
+                            Intent serviceIntent = new Intent(getApplicationContext(), DisconnectSignal.class);
+                            serviceIntent.setAction(DisconnectSignal.ACTION_SEND_DEATH);
+
+                            String HostAdd = GoAdress.getHostAddress();
+                            if (!TextUtils.isEmpty(HostAdd) && HostAdd.length() > 0) {
+                                DisconnectSignal.PORT = 9899;
+                                int sub_port = DisconnectSignal.PORT;
+                                serviceIntent.putExtra(DisconnectSignal.EXTRAS_GROUP_OWNER_ADDRESS, HostAdd);
+                                serviceIntent.putExtra(DisconnectSignal.EXTRAS_GROUP_OWNER_PORT, DisconnectSignal.PORT);
+                                if (sub_port != -1) {
+                                    getApplication().startService(serviceIntent);
+                                }
                             }
                         }
                     }

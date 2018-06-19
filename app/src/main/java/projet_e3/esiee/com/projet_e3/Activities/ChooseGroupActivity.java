@@ -1,6 +1,5 @@
 package projet_e3.esiee.com.projet_e3.Activities;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -15,7 +14,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.NumberPicker;
-import android.widget.Toast;
 
 import projet_e3.esiee.com.projet_e3.R;
 
@@ -137,7 +135,7 @@ public class ChooseGroupActivity extends AppCompatActivity implements NumberPick
                         startActivity(intent);
                     }
                     else {
-                        AlertDialog alertDialog = new AlertDialog.Builder(ChooseGroupActivity.this).create();
+                        AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
                         alertDialog.setTitle("Information");
                         alertDialog.setMessage("Toute les fonctionalités ne sont pas disponible pour cette version d'Android. \n \n Vous devez avoir une version 7.0 ou supérieur.");
                         alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE,"OK",
