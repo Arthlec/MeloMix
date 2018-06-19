@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private static final String PREF_ACCOUNT_NAME = "accountName";
     private static final String[] SCOPES = { YouTubeScopes.YOUTUBE_READONLY };
 
-    private String defaut = "Veuillez entrer un pseudo valide";
+    private String defaut = "Veuillez entrer un nom d'utilisateur valide";
     private Button mEnter = null;
     private String MY_PREFS = "my_prefs";
     private String userName = null;

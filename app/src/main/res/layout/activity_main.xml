@@ -42,8 +42,8 @@
 
     <Button
         android:id="@+id/enter"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="163dp"
+        android:layout_height="44dp"
         android:layout_marginTop="8dp"
         android:background="@drawable/button_next_selector"
         android:text="@string/enter"

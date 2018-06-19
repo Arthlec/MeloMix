@@ -40,6 +40,23 @@ public class ChooseGroupActivity extends AppCompatActivity implements NumberPick
             }
         });
 
+        Button buttonInformation = findViewById(R.id.buttonInfo);
+        buttonInformation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog alertDialog = new AlertDialog.Builder(ChooseGroupActivity.this).create();
+                alertDialog.setTitle("Information");
+                alertDialog.setMessage("Si vous choisissez d'organiser l'évènement, les autres utilisateurs participants se connecteront à votre appareil. Vous serez le propriétaire de l'évènement. \n Les participants ne peuvent se connecter qu'à un seul organisateur.");
+                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE,"OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                alertDialog.show();
+            }
+        });
+
         Button buttonSearchForGroup = findViewById(R.id.searchforgroup_button);
         buttonSearchForGroup.setOnClickListener(new View.OnClickListener() {
             @Override

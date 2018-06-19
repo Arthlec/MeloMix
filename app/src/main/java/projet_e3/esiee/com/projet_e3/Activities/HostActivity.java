@@ -63,8 +63,9 @@ import projet_e3.esiee.com.projet_e3.Fragments.HistoryFragment;
 import projet_e3.esiee.com.projet_e3.Fragments.MainFragment;
 import projet_e3.esiee.com.projet_e3.Fragments.SavedMusicsFragment;
 import projet_e3.esiee.com.projet_e3.Fragments.StatsFragment;
-import projet_e3.esiee.com.projet_e3.HostClass;
 import projet_e3.esiee.com.projet_e3.R;
+import projet_e3.esiee.com.projet_e3.Fragments.MainFragment;
+import projet_e3.esiee.com.projet_e3.HostClass;
 import projet_e3.esiee.com.projet_e3.ReceiveDataFlow;
 import projet_e3.esiee.com.projet_e3.ShareDataToTarget;
 import pub.devrel.easypermissions.AfterPermissionGranted;
@@ -106,6 +107,7 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
     private BroadCast mReceiver;
     private IntentFilter mIntent;
     private List[] dataList = new List[2];
+    private int host;
     private int isHost;
 
     //FOR FRAGMENTS
@@ -216,6 +218,11 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
 
     @Override
     public void onBackPressed() {
+        if(host==1){
+            LoadingHostActivity.hostContext.finish();
+        } else {
+            GuestActivity.guestContext.finish();
+        }
         new AlertDialog.Builder(this)
                 .setTitle("Voulez-vous vraiment quitter cette page?")
                 .setMessage("Les données en cours d'utilisation seront perdues")
@@ -926,11 +933,11 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
             Log.i("mService", mService.toString());
             SearchListResponse searchListResponse = mService.search().list("snippet")
                     .setMaxResults(Long.parseLong("50"))
-                    .setQ(frequentGenres.get(genreNumber))
+                    .setQ(frequentGenres.get(genreNumber) + "music")
                     .setVideoDuration("short")
-                    .setOrder("viewCount")
                     .setType("video")
                     .execute();
+            Log.i("musicGenre", frequentGenres.get(genreNumber));
             String trackID;
             for (int i=0; i<searchListResponse.getItems().size(); i++) {
                 trackID = searchListResponse.getItems().get(i).getId().getVideoId();

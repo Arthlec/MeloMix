@@ -50,7 +50,7 @@ public class GuestActivity extends AppCompatActivity {
     private ArrayList<WifiP2pDevice> deviceArray;
     private InetAddress GoAdress;
     private WifiP2pGroup wifiP2pGroup;
-    public static Activity fa;
+    public static Activity guestContext;
 
     private final WifiP2pConfig config = new WifiP2pConfig();
     @Override
@@ -105,7 +105,7 @@ public class GuestActivity extends AppCompatActivity {
     }
 
     private void work() {
-        fa = this;
+        guestContext = this;
         WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         aManager = (WifiP2pManager) getApplicationContext().getSystemService(Context.WIFI_P2P_SERVICE);
         aChannel = aManager.initialize(this,getMainLooper(),null);

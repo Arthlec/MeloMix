@@ -47,7 +47,6 @@ public class LoadingHostActivity extends AnalyseData {
     private int guestNb;
     private ProgressBar progressBar;
     private TextView loadingText;
-    public static Activity fa;
 
     private HostActivity hostActivity;
     private static List[] datalist;
@@ -55,6 +54,7 @@ public class LoadingHostActivity extends AnalyseData {
     public static List[] getLoadingDatalist() {
         return datalist;
     }
+    public static Activity hostContext;
 
     public void setLoadingDatalist(List[] datalist) {
         this.datalist = datalist;
@@ -69,8 +69,7 @@ public class LoadingHostActivity extends AnalyseData {
     }
 
     private void InitAttribut() {
-        fa = this;
-
+        hostContext=this;
         WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         assert wifiManager != null;
         if(!wifiManager.isWifiEnabled()){
@@ -157,7 +156,6 @@ public class LoadingHostActivity extends AnalyseData {
                     findViewById(R.id.loading_panel).setVisibility(View.VISIBLE);
                     loadingText.setText("Traitement de vos données...");
                     hostActivity.requestData();
-                    //hostActivity.lauchSignalToTargets(getApplicationContext());
                     startActivity(intent);
                 }
 
