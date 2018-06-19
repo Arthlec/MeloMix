@@ -54,7 +54,7 @@ public class ShareDataFlowService extends IntentService {
                 OutputStream outputStream = socket.getOutputStream();
                 outputStream.flush();
 
-                //InputStream stream = new ByteArrayInputStream(objects.);
+                //InputStream stream = objects;
 
                 outputStream.close();
             } catch (IOException e) {

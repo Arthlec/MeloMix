@@ -14,7 +14,6 @@ import android.net.wifi.p2p.WifiP2pManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -22,7 +21,6 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -30,7 +28,6 @@ import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Arrays;
 import java.util.List;
 
 import projet_e3.esiee.com.projet_e3.AnalyseData;
@@ -145,7 +142,7 @@ public class LoadingHostActivity extends AnalyseData {
                 int diff = guestNb-wifiP2pGroup.getClientList().size();
                 loadingText.setText("Vous devez encore attendre "+ diff +" invités");
 
-                if(nbJsonInDire(getApplicationContext().getFilesDir())>= guestNb+1){
+                if(getJSONFiles(getApplicationContext().getFilesDir()).length>= guestNb+1){
                     progressBar.setMax(1);
                     progressBar.setProgress(1);
                     loadingText.setText("C'est bon!");
@@ -165,18 +162,6 @@ public class LoadingHostActivity extends AnalyseData {
             }
         }
     };
-
-    public int nbJsonInDire(File rootDataDir){
-        FilenameFilter jsonFilter = new FilenameFilter() {
-            public boolean accept(File dir, String name) {
-                String lowercaseName = name.toLowerCase();
-                return lowercaseName.endsWith(".json");
-            }
-        };
-        File[] files = rootDataDir.listFiles(jsonFilter);
-        Log.i("FILE[s]", Arrays.toString(files));
-        return files.length;
-    }
 
     //Listener du groupP2p appelé dans le broadCast
     public WifiP2pManager.GroupInfoListener groupInfoListener = new WifiP2pManager.GroupInfoListener() {
