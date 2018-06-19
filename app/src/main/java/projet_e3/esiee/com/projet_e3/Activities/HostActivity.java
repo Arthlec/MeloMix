@@ -931,7 +931,7 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
             Log.i("mService", mService.toString());
             SearchListResponse searchListResponse = mService.search().list("snippet")
                     .setMaxResults(Long.parseLong("50"))
-                    .setQ(frequentGenres.get(genreNumber) + "music")
+                    .setQ(frequentGenres.get(genreNumber) + "music" + " -live -radio")
                     .setVideoDuration("short")
                     .setType("video")
                     .execute();
