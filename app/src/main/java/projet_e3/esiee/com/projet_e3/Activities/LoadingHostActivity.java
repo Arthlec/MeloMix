@@ -56,7 +56,7 @@ public class LoadingHostActivity extends AnalyseData {
     public static Activity hostContext;
 
     public void setLoadingDatalist(List[] datalist) {
-        this.datalist = datalist;
+        LoadingHostActivity.datalist = datalist;
     }
 
     @Override
@@ -136,11 +136,15 @@ public class LoadingHostActivity extends AnalyseData {
             if(info.groupFormed && info.isGroupOwner){
                 HostClass hostClass = new HostClass(getApplicationContext(),LoadingHostActivity.this);
                 hostClass.start();
+                if(guestNb==0){
+                   startHostActivity();
+                }
             }
         }
     };
 
     public void startHostActivity(){
+
         progressBar.setProgress(wifiP2pGroup.getClientList().size());
         int diff = guestNb-wifiP2pGroup.getClientList().size();
         loadingText.setText("Vous devez encore attendre "+ diff +" invités");
