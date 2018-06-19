@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -39,6 +40,7 @@ public class LoadingGuestActivity extends AnalyseData {
 
     public void startHost()
     {
+        findViewById(R.id.loading_panel).setVisibility(View.VISIBLE);
         Intent intent = new Intent(LoadingGuestActivity.this, hostActivity.getClass());
         intent.putExtra("authToken", getIntent().getStringExtra("authToken"));
         intent.putExtra("host",0);
