@@ -1,6 +1,7 @@
 package projet_e3.esiee.com.projet_e3.Activities;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -56,6 +57,7 @@ public class LoadingHostActivity extends AnalyseData {
     public static List[] getLoadingDatalist() {
         return datalist;
     }
+    public static Activity hostContext;
 
     public void setLoadingDatalist(List[] datalist) {
         this.datalist = datalist;
@@ -70,7 +72,7 @@ public class LoadingHostActivity extends AnalyseData {
     }
 
     private void InitAttribut() {
-
+        hostContext=this;
         WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         assert wifiManager != null;
         if(!wifiManager.isWifiEnabled()){
