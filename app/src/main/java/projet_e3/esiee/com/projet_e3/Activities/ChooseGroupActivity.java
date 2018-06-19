@@ -104,7 +104,7 @@ public class ChooseGroupActivity extends AppCompatActivity implements NumberPick
             numberPicker.setMaxValue(10);
             int maxValue = numberPicker.getMaxValue()-numberPicker.getMinValue()+1;
             String[] displayedValues = new String[maxValue];
-            String texte = "";
+            String texte;
             for (int i=0;i<maxValue;i++)
             {
                 if(i<2)
