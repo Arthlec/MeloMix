@@ -7,8 +7,8 @@
 
     <Button
         android:id="@+id/DJ_button"
-        android:layout_width="250dp"
-        android:layout_height="86dp"
+        android:layout_width="224dp"
+        android:layout_height="71dp"
         android:background="@drawable/create_group_selector"
         app:layout_constraintBottom_toTopOf="@+id/searchforgroup_button"
         app:layout_constraintEnd_toEndOf="parent"
@@ -18,8 +18,8 @@
 
     <Button
         android:id="@+id/searchforgroup_button"
-        android:layout_width="250dp"
-        android:layout_height="86dp"
+        android:layout_width="224dp"
+        android:layout_height="71dp"
         android:background="@drawable/join_group_selector"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -32,13 +32,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
         android:text="@string/description_role_host"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.503"
+        app:layout_constraintHorizontal_bias="0.502"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.427" />
+        app:layout_constraintTop_toBottomOf="@+id/DJ_button"
+        app:layout_constraintVertical_bias="0.025" />
 
     <TextView
         android:id="@+id/textDescriptionGuest"
@@ -50,6 +51,18 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/DJ_button"
-        app:layout_constraintVertical_bias="0.713" />
+        app:layout_constraintTop_toBottomOf="@+id/searchforgroup_button"
+        app:layout_constraintVertical_bias="0.075" />
+
+    <Button
+        android:id="@+id/buttonInfo"
+        android:layout_width="28dp"
+        android:layout_height="30dp"
+        android:background="@drawable/ic_info"
+        app:layout_constraintBottom_toTopOf="@+id/DJ_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.955"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.156" />
 </android.support.constraint.ConstraintLayout>

@@ -1,15 +1,21 @@
 package projet_e3.esiee.com.projet_e3.Activities;
 
+import android.Manifest;
+import android.accounts.AccountManager;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -28,6 +34,17 @@ import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.private_.TreeNode;
 import com.fasterxml.jackson.jr.stree.JacksonJrsTreeCodec;
 import com.fasterxml.jackson.jr.stree.JrsString;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GooglePlayServicesAvailabilityIOException;
+import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.services.youtube.YouTubeScopes;
+import com.google.api.services.youtube.model.SearchListResponse;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,6 +52,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.Stack;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -47,14 +65,28 @@ import projet_e3.esiee.com.projet_e3.Fragments.SavedMusicsFragment;
 import projet_e3.esiee.com.projet_e3.Fragments.MainFragment;
 import projet_e3.esiee.com.projet_e3.Fragments.StatsFragment;
 import projet_e3.esiee.com.projet_e3.R;
+import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.EasyPermissions;
 
 import static junit.framework.Assert.assertTrue;
 
-public class HostActivity extends AnalyseData implements NavigationView.OnNavigationItemSelectedListener, MainFragment.OnSavedMusicSelectedListener, MainFragment.OnArrowListener, HistoryFragment.OnSaveMusicHistorySelectedListener {
+public class HostActivity extends AnalyseData implements EasyPermissions.PermissionCallbacks, NavigationView.OnNavigationItemSelectedListener, MainFragment.OnSavedMusicSelectedListener, MainFragment.OnArrowListener, HistoryFragment.OnSaveMusicHistorySelectedListener {
+
+    GoogleAccountCredential mCredential;
+    static final int REQUEST_ACCOUNT_PICKER = 1000;
+    public static final int REQUEST_AUTHORIZATION = 1001;
+    static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
+    static final int REQUEST_PERMISSION_GET_ACCOUNTS = 1003;
+
+    private static final String PREF_ACCOUNT_NAME = "accountName";
+    private static final String[] SCOPES = { YouTubeScopes.YOUTUBE_READONLY };
 
     public ArrayList<String> frequentGenres = new ArrayList<>();
     private static ArrayList<String> trackNamesList = new ArrayList<>();
-    private boolean isInitialisation = true;
+    private static ArrayList<String> trackIDList = new ArrayList<>();
+    private boolean isInitialisation;
+    private static String trackID;
+    private static String nextTrackID;
     private static Bitmap bmp;
     private static String trackName;
     private static Bitmap nextBmp;
@@ -62,6 +94,7 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
     public ArrayList<String> availableGenresList = new ArrayList<>();
     public static String authToken = "";
     private DrawerLayout mDrawerLayout;
+    private Stack<String> tracksIDS = new Stack<>();
     private Stack<Bitmap> tracksCovers = new Stack<>();
     private Stack<String> tracksNames = new Stack<>();
     private String MY_PREFS = "my_prefs";
@@ -71,6 +104,7 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
     private BroadCast mReceiver;
     private IntentFilter mIntent;
     private List[] dataList = new List[2];
+    private int host;
 
     //FOR FRAGMENTS
     // 1 - Declare fragment handled by Navigation Drawer
@@ -94,7 +128,12 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
         super.onCreate(savedInstanceState);
         setContentView(R.layout.host_activity);
 
-        isInitialisation = false;
+        isInitialisation = true;
+        mCredential = MainActivity.mCredential;
+        int host = getIntent().getIntExtra("host", 0);
+
+        if(host == 1)
+            getResultsFromApi();
 
         android.support.v7.widget.Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -142,6 +181,11 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
 
     @Override
     public void onBackPressed() {
+        if(host==1){
+            LoadingHostActivity.hostContext.finish();
+        } else {
+            GuestActivity.guestContext.finish();
+        }
         new AlertDialog.Builder(this)
                 .setTitle("Voulez-vous vraiment quitter cette page?")
                 .setMessage("Les données en cours d'utilisation seront perdues")
@@ -199,28 +243,36 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
 
     @Override
     public void onArrowSelected(String direction) {
-        if(direction.equals("next") && nextBmp != null && nextTrackName != null) {
+        if(direction.equals("next") && nextBmp != null && nextTrackName != null && nextTrackID != null) {
+            tracksIDS.push(trackID);
             tracksCovers.push(bmp);
             tracksNames.push(trackName);
+            trackID = nextTrackID;
             bmp = nextBmp;
             trackName = nextTrackName;
+            nextTrackID = null;
             nextBmp = null;
             nextTrackName = null;
             HistoryFragment.trackCoverList.add(0, bmp);
             HistoryFragment.trackNameList.add(0, trackName);
-            requestData();
+            //requestData();
+            getResultsFromApi();
         }
-        else if (direction.equals("next") && (nextBmp == null || nextTrackName == null)) {
+        else if (direction.equals("next") && (nextBmp == null || nextTrackName == null || nextTrackID == null)) {
             Toast.makeText(getApplicationContext(), "Veuillez attendre la recherche du prochain titre", Toast.LENGTH_SHORT).show();
         }
         else {
             if(!tracksCovers.isEmpty()) {
+                nextTrackID = trackID;
                 nextBmp = bmp;
                 nextTrackName = trackName;
+                trackID = tracksIDS.pop();
                 bmp = tracksCovers.pop();
                 trackName = tracksNames.pop();
                 HistoryFragment.trackCoverList.add(0, bmp);
                 HistoryFragment.trackNameList.add(0, trackName);
+                fragmentMain.displayYoutubeVideo(trackID);
+                //getResultsFromApi();
             }
         }
         MainFragment.updateCovers(bmp, trackName, nextBmp, nextTrackName);
@@ -390,22 +442,12 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
             @Override
             public void run() {
                 try {
-                    if(isInitialisation) {
-                        String[] trackInfos = getTrackInfo();
-                        URL trackURL = new URL(trackInfos[0]);
-                        bmp = BitmapFactory.decodeStream(trackURL.openConnection().getInputStream());
-                        trackName = trackInfos[1];
-
-                        HistoryFragment.trackCoverList.add(0, bmp);
-                        HistoryFragment.trackNameList.add(0, trackName);
-
-                        isInitialisation = false;
-                    }
-
                     String[] trackInfos = getTrackInfo();
+                    URL trackURL = new URL(trackInfos[0]);
+
+
+                    trackInfos = getTrackInfo();
                     URL nextTrackURL = new URL(trackInfos[0]);
-                    nextBmp = BitmapFactory.decodeStream(nextTrackURL.openConnection().getInputStream());
-                    nextTrackName = trackInfos[1];
                     new Thread(new Runnable() {
                         public void run() {
                             runOnUiThread(new Runnable() {
@@ -537,6 +579,333 @@ public class HostActivity extends AnalyseData implements NavigationView.OnNaviga
             return dir.delete();
         } else {
             return false;
+        }
+    }
+
+    public void getResultsFromApi() {
+        if (! isGooglePlayServicesAvailable()) {
+            acquireGooglePlayServices();
+        } else if (mCredential.getSelectedAccountName() == null) {
+            chooseAccount();
+        } else if (! isDeviceOnline()) {
+            Toast.makeText(this, "No network connection available", Toast.LENGTH_SHORT).show();
+        } else {
+            new MakeRequestTask(mCredential).execute();
+        }
+    }
+
+    /**
+     * Attempts to set the account used with the API credentials. If an account
+     * name was previously saved it will use that one; otherwise an account
+     * picker dialog will be shown to the user. Note that the setting the
+     * account to use with the credentials object requires the app to have the
+     * GET_ACCOUNTS permission, which is requested here if it is not already
+     * present. The AfterPermissionGranted annotation indicates that this
+     * function will be rerun automatically whenever the GET_ACCOUNTS permission
+     * is granted.
+     */
+    @AfterPermissionGranted(REQUEST_PERMISSION_GET_ACCOUNTS)
+    private void chooseAccount() {
+        if (EasyPermissions.hasPermissions(
+                this, Manifest.permission.GET_ACCOUNTS)) {
+            String accountName = this.getPreferences(Context.MODE_PRIVATE)
+                    .getString(PREF_ACCOUNT_NAME, null);
+            if (accountName != null) {
+                mCredential.setSelectedAccountName(accountName);
+                getResultsFromApi();
+            } else {
+                // Start a dialog from which the user can choose an account
+                startActivityForResult(
+                        mCredential.newChooseAccountIntent(),
+                        REQUEST_ACCOUNT_PICKER);
+            }
+        } else {
+            // Request the GET_ACCOUNTS permission via a user dialog
+            EasyPermissions.requestPermissions(
+                    this,
+                    "This app needs to access your Google account (via Contacts).",
+                    REQUEST_PERMISSION_GET_ACCOUNTS,
+                    Manifest.permission.GET_ACCOUNTS);
+        }
+    }
+
+    /**
+     * Called when an activity launched here (specifically, AccountPicker
+     * and authorization) exits, giving you the requestCode you started it with,
+     * the resultCode it returned, and any additional data from it.
+     * @param requestCode code indicating which activity result is incoming.
+     * @param resultCode code indicating the result of the incoming
+     *     activity result.
+     * @param data Intent (containing result data) returned by incoming
+     *     activity result.
+     */
+    @Override
+    public void onActivityResult(
+            int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch(requestCode) {
+            case REQUEST_GOOGLE_PLAY_SERVICES:
+                if (resultCode != this.RESULT_OK) {
+                    Toast.makeText(this, "This app requires Google Play Services. Please install Google Play Services on your device and relaunch this app.", Toast.LENGTH_SHORT).show();
+                } else {
+                    getResultsFromApi();
+                }
+                break;
+            case REQUEST_ACCOUNT_PICKER:
+                if (resultCode == this.RESULT_OK && data != null &&
+                        data.getExtras() != null) {
+                    String accountName =
+                            data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+                    if (accountName != null) {
+                        SharedPreferences settings =
+                                this.getPreferences(Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = settings.edit();
+                        editor.putString(PREF_ACCOUNT_NAME, accountName);
+                        editor.apply();
+                        mCredential.setSelectedAccountName(accountName);
+                        getResultsFromApi();
+                    }
+                }
+                break;
+            case REQUEST_AUTHORIZATION:
+                if (resultCode == this.RESULT_OK) {
+                    getResultsFromApi();
+                }
+                break;
+        }
+    }
+
+    /**
+     * Respond to requests for permissions at runtime for API 23 and above.
+     * @param requestCode The request code passed in
+     *     requestPermissions(android.app.Activity, String, int, String[])
+     * @param permissions The requested permissions. Never null.
+     * @param grantResults The grant results for the corresponding permissions
+     *     which is either PERMISSION_GRANTED or PERMISSION_DENIED. Never null.
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        EasyPermissions.onRequestPermissionsResult(
+                requestCode, permissions, grantResults, this);
+    }
+
+    /**
+     * Callback for when a permission is granted using the EasyPermissions
+     * library.
+     * @param requestCode The request code associated with the requested
+     *         permission
+     * @param list The requested permission list. Never null.
+     */
+    @Override
+    public void onPermissionsGranted(int requestCode, List<String> list) {
+        // Do nothing.
+    }
+
+    /**
+     * Callback for when a permission is denied using the EasyPermissions
+     * library.
+     * @param requestCode The request code associated with the requested
+     *         permission
+     * @param list The requested permission list. Never null.
+     */
+    @Override
+    public void onPermissionsDenied(int requestCode, List<String> list) {
+        // Do nothing.
+    }
+
+    /**
+     * Checks whether the device currently has a network connection.
+     * @return true if the device has a network connection, false otherwise.
+     */
+    private boolean isDeviceOnline() {
+        ConnectivityManager connMgr =
+                (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        return (networkInfo != null && networkInfo.isConnected());
+    }
+
+    /**
+     * Check that Google Play services APK is installed and up to date.
+     * @return true if Google Play Services is available and up to
+     *     date on this device; false otherwise.
+     */
+    private boolean isGooglePlayServicesAvailable() {
+        GoogleApiAvailability apiAvailability =
+                GoogleApiAvailability.getInstance();
+        final int connectionStatusCode =
+                apiAvailability.isGooglePlayServicesAvailable(this);
+        return connectionStatusCode == ConnectionResult.SUCCESS;
+    }
+
+    /**
+     * Attempt to resolve a missing, out-of-date, invalid or disabled Google
+     * Play Services installation via a user dialog, if possible.
+     */
+    private void acquireGooglePlayServices() {
+        GoogleApiAvailability apiAvailability =
+                GoogleApiAvailability.getInstance();
+        final int connectionStatusCode =
+                apiAvailability.isGooglePlayServicesAvailable(this);
+        if (apiAvailability.isUserResolvableError(connectionStatusCode)) {
+            showGooglePlayServicesAvailabilityErrorDialog(connectionStatusCode);
+        }
+    }
+
+
+    /**
+     * Display an error dialog showing that Google Play Services is missing
+     * or out of date.
+     * @param connectionStatusCode code describing the presence (or lack of)
+     *     Google Play Services on this device.
+     */
+    public void showGooglePlayServicesAvailabilityErrorDialog(
+            final int connectionStatusCode) {
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        Dialog dialog = apiAvailability.getErrorDialog(
+                this,
+                connectionStatusCode,
+                REQUEST_GOOGLE_PLAY_SERVICES);
+        dialog.show();
+    }
+
+    private class MakeRequestTask extends AsyncTask<Void, Void, String> {
+        com.google.api.services.youtube.YouTube mService;
+        private Exception mLastError = null;
+
+        public MakeRequestTask(GoogleAccountCredential credential) {
+            HttpTransport transport = AndroidHttp.newCompatibleTransport();
+            JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
+            mService = new com.google.api.services.youtube.YouTube.Builder(
+                    transport, jsonFactory, credential)
+                    .setApplicationName("YouTube Data API Android Quickstart")
+                    .build();
+        }
+
+        /**
+         * Background task to call YouTube Data API.
+         * @param params no parameters needed for this task.
+         */
+        @Override
+        public String doInBackground(Void... params) {
+            try {
+                return getDataFromApi();
+            } catch (Exception e) {
+                cancel(true);
+                mLastError = e;
+                return null;
+            }
+        }
+
+        /**
+         * Fetch information about the "GoogleDevelopers" YouTube channel.
+         * @return List of Strings containing information about the channel.
+         * @throws IOException
+         */
+        private String getDataFromApi() {
+            String[] trackInfos;
+            try {
+                if(isInitialisation) {
+                    trackInfos = getTracksAttributes();
+                    URL trackURL = new URL(trackInfos[2]);
+                    trackID = trackInfos[0];
+                    bmp = BitmapFactory.decodeStream(trackURL.openConnection().getInputStream());
+                    trackName = trackInfos[1];
+
+                    HistoryFragment.trackCoverList.add(0, bmp);
+                    HistoryFragment.trackNameList.add(0, trackName);
+
+                    isInitialisation = false;
+                }
+
+                fragmentMain.displayYoutubeVideo(trackID);
+
+                trackInfos = getTracksAttributes();
+                URL nextTrackURL = new URL(trackInfos[2]);
+                nextTrackID = trackInfos[0];
+                nextBmp = BitmapFactory.decodeStream(nextTrackURL.openConnection().getInputStream());
+                nextTrackName = trackInfos[1];
+                new Thread(new Runnable() {
+                    public void run() {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                MainFragment.updateCovers(bmp, trackName, nextBmp, nextTrackName);
+                            }
+                        });
+                    }
+                }).start();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+
+            return trackInfos[0];
+        }
+
+        private String[] getTracksAttributes() throws IOException {
+
+            String[] trackInfo = new String[3];
+
+            Random genreSelector = new Random();
+            int genreNumber = genreSelector.nextInt(frequentGenres.size());
+
+            Log.i("mService", mService.toString());
+            SearchListResponse searchListResponse = mService.search().list("snippet")
+                    .setMaxResults(Long.parseLong("50"))
+                    .setQ(frequentGenres.get(genreNumber) + "music")
+                    .setVideoDuration("short")
+                    .setType("video")
+                    .execute();
+            Log.i("musicGenre", frequentGenres.get(genreNumber));
+            String trackID;
+            for (int i=0; i<searchListResponse.getItems().size(); i++) {
+                trackID = searchListResponse.getItems().get(i).getId().getVideoId();
+                if (!trackIDList.contains(trackID)){
+                    trackIDList.add(trackID);
+                    trackInfo[0] = trackID;
+                    trackInfo[1] = searchListResponse.getItems().get(i).getSnippet().getTitle();
+                    trackInfo[2] = searchListResponse.getItems().get(i).getSnippet().getThumbnails().getHigh().getUrl();
+                    break;
+                }
+            }
+            return trackInfo;
+        }
+
+
+        @Override
+        protected void onPreExecute() {
+            //En cours de traitement
+        }
+
+        @Override
+        protected void onPostExecute(String output) {
+            if (output == null) {
+                MainActivity mainActivity = new MainActivity();
+                Toast.makeText(mainActivity.getApplicationContext(), "No results returned", Toast.LENGTH_SHORT).show();
+            } else {
+                Log.i("Resultat", output);
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            if (mLastError != null) {
+                if (mLastError instanceof GooglePlayServicesAvailabilityIOException) {
+                    showGooglePlayServicesAvailabilityErrorDialog(
+                            ((GooglePlayServicesAvailabilityIOException) mLastError)
+                                    .getConnectionStatusCode());
+                } else if (mLastError instanceof UserRecoverableAuthIOException) {
+                    startActivityForResult(
+                            ((UserRecoverableAuthIOException) mLastError).getIntent(),
+                            REQUEST_AUTHORIZATION);
+                } else {
+                    Log.i("ERROR", "The following error occurred :" + mLastError.getMessage());
+                }
+            } else {
+                Log.i("Status", "Request canceled");
+            }
         }
     }
 }
