@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -132,7 +133,22 @@ public class ChooseGroupActivity extends AppCompatActivity implements NumberPick
                         intent.putExtra("availableGenres", getIntent().getStringArrayListExtra("availableGenres"));
                         intent.putExtra("host", 1);
                         intent.putExtra("guestNumber", numberPicker.getValue());
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        // only for Nougat and newer versions
                         startActivity(intent);
+                    }
+                    else {
+                        AlertDialog alertDialog = new AlertDialog.Builder(ChooseGroupActivity.this).create();
+                        alertDialog.setTitle("Information");
+                        alertDialog.setMessage("Toute les fonctionalités ne sont pas disponible pour cette version d'Android. \n \n Vous devez avoir une version 7.0 ou supérieur.");
+                        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE,"OK",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                        alertDialog.show();
+                    }
                 }
             });
             builder.setNegativeButton("annuler", new DialogInterface.OnClickListener() {
