@@ -9,6 +9,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
@@ -17,18 +19,16 @@ import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
-
 
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.private_.TreeNode;
@@ -61,10 +61,13 @@ import projet_e3.esiee.com.projet_e3.AnalyseData;
 import projet_e3.esiee.com.projet_e3.BroadCast;
 import projet_e3.esiee.com.projet_e3.Fragments.GuestsListFragment;
 import projet_e3.esiee.com.projet_e3.Fragments.HistoryFragment;
-import projet_e3.esiee.com.projet_e3.Fragments.SavedMusicsFragment;
 import projet_e3.esiee.com.projet_e3.Fragments.MainFragment;
+import projet_e3.esiee.com.projet_e3.Fragments.SavedMusicsFragment;
 import projet_e3.esiee.com.projet_e3.Fragments.StatsFragment;
+import projet_e3.esiee.com.projet_e3.HostClass;
 import projet_e3.esiee.com.projet_e3.R;
+import projet_e3.esiee.com.projet_e3.ReceiveDataFlow;
+import projet_e3.esiee.com.projet_e3.ShareDataToTarget;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
@@ -104,6 +107,7 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
     private BroadCast mReceiver;
     private IntentFilter mIntent;
     private List[] dataList = new List[2];
+    private int isHost;
 
     //FOR FRAGMENTS
     // 1 - Declare fragment handled by Navigation Drawer
@@ -121,6 +125,32 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
     private static final int FRAGMENT_HISTORY = 3;
     private static final int FRAGMENT_GUESTS_LIST = 4;
 
+    //Getters
+    public static Bitmap getBmp() {
+        return bmp;
+    }
+    public static Bitmap getNextBmp() {
+        return nextBmp;
+    }
+    public static String getTrackName() {
+        return trackName;
+    }
+    public static String getNextTrackName() {
+        return nextTrackName;
+    }
+    //Setters
+    public static void setBmp(Bitmap bmp) {
+        HostActivity.bmp = bmp;
+    }
+    public static void setNextBmp(Bitmap nextBmp) {
+        HostActivity.nextBmp = nextBmp;
+    }
+    public static void setTrackName(String trackName) {
+        HostActivity.trackName = trackName;
+    }
+    public static void setNextTrackName(String nextTrackName) {
+        HostActivity.nextTrackName = nextTrackName;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,26 +179,33 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
         authToken = getIntent().getStringExtra("authToken");
         availableGenresList = getIntent().getStringArrayListExtra("availableGenres");
         frequentGenres = getIntent().getStringArrayListExtra("frequentGenres");
+        isHost = getIntent().getIntExtra("host", -1);
 
         Log.i("authToken", authToken);
 
         WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
-        manager = LoadingHostActivity.getManager();
-        channel = LoadingHostActivity.getChannel();
-
+        if (isHost == 1)
+        {
+            manager = LoadingHostActivity.getManager();
+            channel = LoadingHostActivity.getChannel();
+            dataList = LoadingHostActivity.getLoadingDatalist();
+        }else if(isHost ==0){
+            bmp = getIntent().getExtras().getParcelable("GuestBmp");
+            manager = GuestActivity.getaManager();
+            channel = GuestActivity.getaChannel();
+            dataList = LoadingGuestActivity.getLoadingDatalist();
+            ReceiveDataFlow receiveDataFlow = new ReceiveDataFlow(getApplicationContext(),10014,"upDate",null);
+            receiveDataFlow.start();
+        }
         Bundle bundle = getIntent().getExtras();
         assert bundle != null;
-        wifiP2pGroup =  bundle.getParcelable("wifip2pGroup");
-        dataList = LoadingHostActivity.getLoadingDatalist();
-
+        wifiP2pGroup = bundle.getParcelable("wifip2pGroup");
         mReceiver = new BroadCast(manager,channel,null,null,this, wifiManager);
         mIntent = new IntentFilter();
         setAction();
 
-        //makeAnalyse();
         giveListToStat();
-        //requestData();
     }
 
     public void setAction(){
@@ -194,12 +231,35 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
 
     public void makeAnalyse() {
         frequentGenres = this.analyseData(this.getFilesDir());
+        dataList = buildListTab();
         giveListToStat();
         Log.i("GenresFréquents", frequentGenres.toString());
     }
 
     public void giveListToStat(){
         StatsFragment.setDataList(getDataList());
+    }
+
+    public void sendDataToTarget(String targetAdress){
+        ShareDataToTarget shareDataToTarget = new ShareDataToTarget(targetAdress, getApplicationContext());
+        shareDataToTarget.start();
+    }
+
+    public void lauchSignalToTargets(Context context){
+        File[] files = getJSONFiles(context.getFilesDir());
+        ArrayList<String> adresses = new ArrayList<>();
+        for (File currentFile : files) {
+            if (!currentFile.getName().contains("userGenres")) {
+                adresses.add(currentFile.getName());
+            }
+        }
+        if(!adresses.isEmpty())
+        {
+            adresses = applyRegex(adresses,".json","");
+            for(String adress : adresses){
+                sendDataToTarget(adress);
+            }
+        }
     }
 
     @Override
@@ -251,6 +311,7 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
             HistoryFragment.trackNameList.add(0, trackName);
             //requestData();
             getResultsFromApi();
+            lauchSignalToTargets(getApplicationContext());
         }
         else if (direction.equals("next") && (nextBmp == null || nextTrackName == null || nextTrackID == null)) {
             Toast.makeText(getApplicationContext(), "Veuillez attendre la recherche du prochain titre", Toast.LENGTH_SHORT).show();
@@ -411,7 +472,10 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
     WifiP2pManager.ConnectionInfoListener connectionInfoListener = new WifiP2pManager.ConnectionInfoListener() {
         @Override
         public void onConnectionInfoAvailable(WifiP2pInfo info) {
-
+            if(isHost==1){
+                HostClass hostClass = new HostClass(getApplicationContext());
+                hostClass.start();
+            }
         }
     };
 
@@ -547,6 +611,12 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
         pref.edit().remove("user_name").apply(); //clear pref pseudo
         if(pref.contains("userAccountSpotify"))
             pref.edit().remove("userAccountSpotify").apply(); //clear pref user account Spotify
+        if(isHost==1){
+            LoadingHostActivity.fa.finish();
+        }else if(isHost==0){
+            GuestActivity.fa.finish();
+        }
+        deleteJson();
         Intent intent = new Intent(HostActivity.this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); //clear stack activity
         startActivity(intent);
@@ -557,6 +627,15 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
             File dir = context.getCacheDir();
             deleteDir(dir);
         } catch (Exception e) {}
+    }
+
+    public void deleteJson(){
+        File[] files = getJSONFiles(this.getFilesDir());
+        for (File current : files) {
+            if (!current.getName().contains("userGenres")) {
+                current.delete();
+            }
+        }
     }
 
     public static boolean deleteDir(File dir) {

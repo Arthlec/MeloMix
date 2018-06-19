@@ -24,10 +24,13 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <!-- Fin des permissions du P2P -->
     <!--<uses-permission android:name="android.permission.CLEAR_APP_CACHE" />-->
 
     <application xmlns:tools="http://schemas.android.com/tools"
+        android:name="android.support.multidex.MultiDexApplication"
         tools:replace="android:theme"
         android:allowBackup="true"
         android:fullBackupContent="true"
@@ -87,6 +90,8 @@
         <service
             android:name=".Services.DisconnectSignal"
             android:enabled="true" />
+        <service android:name=".Services.ShareDataFlowService"
+                 android:enabled="true"/>
 
     </application>
 
