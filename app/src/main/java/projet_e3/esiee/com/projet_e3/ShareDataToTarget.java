@@ -10,10 +10,12 @@ import projet_e3.esiee.com.projet_e3.Services.ShareDataFlowService;
 public class ShareDataToTarget extends Thread {
     private String target;
     private Context context;
+    private String[] allObjects;
 
-    public ShareDataToTarget(String trgt, Context app) {
+    public ShareDataToTarget(String trgt, Context app,String[] things) {
         target = trgt;
         context = app;
+        allObjects = things;
     }
 
     @Override
@@ -24,6 +26,9 @@ public class ShareDataToTarget extends Thread {
             ShareDataFlowService.PORT = 10014;
             int sub_port = ShareDataFlowService.PORT;
             Log.i("addre",target);
+
+            serviceIntent.putExtra(ShareDataFlowService.EXTRAS_URL_BMP,allObjects[2]);
+
             serviceIntent.putExtra(ShareDataFlowService.EXTRAS_TARGET_ADDRESS,target);
             serviceIntent.putExtra(ShareDataFlowService.EXTRAS_TARGET_PORT, ShareDataFlowService.PORT);
 

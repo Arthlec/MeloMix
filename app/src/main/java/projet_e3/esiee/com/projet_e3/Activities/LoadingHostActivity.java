@@ -142,7 +142,7 @@ public class LoadingHostActivity extends AnalyseData {
                 int diff = guestNb-wifiP2pGroup.getClientList().size();
                 loadingText.setText("Vous devez encore attendre "+ diff +" invités");
 
-                if(wifiP2pGroup.getClientList().size()>= guestNb){
+                if(getJSONFiles(getApplicationContext().getFilesDir()).length>= guestNb+1){
                     progressBar.setMax(1);
                     progressBar.setProgress(1);
                     loadingText.setText("C'est bon!");

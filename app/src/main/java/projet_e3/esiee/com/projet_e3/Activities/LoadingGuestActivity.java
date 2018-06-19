@@ -1,6 +1,5 @@
 package projet_e3.esiee.com.projet_e3.Activities;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -8,8 +7,10 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -22,6 +23,7 @@ import projet_e3.esiee.com.projet_e3.ReceiveDataFlow;
 public class LoadingGuestActivity extends AnalyseData {
     private HostActivity hostActivity;
     private static List[] datalist;
+    private static String bmp_string;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,16 +43,16 @@ public class LoadingGuestActivity extends AnalyseData {
         Intent intent = new Intent(LoadingGuestActivity.this, hostActivity.getClass());
         intent.putExtra("authToken", getIntent().getStringExtra("authToken"));
         intent.putExtra("host",0);
+        intent.putExtra("bmp_url",bmp_string);
+        Log.i("bmp",bmp_string);
         analyseData(this.getFilesDir());
         datalist = buildListTab();
         startActivity(intent);
     }
 
 
-    @SuppressLint("StaticFieldLeak")
     public static class onSignalReceiveAsyncTask extends AsyncTask<String, String, String> {
 
-        @SuppressLint("StaticFieldLeak")
         private Context mFilecontext;
         private int PORT;
         private String reason;
@@ -72,6 +74,13 @@ public class LoadingGuestActivity extends AnalyseData {
                 Socket client = serverSocket.accept();
                 try {
                     InputStream inputStream = client.getInputStream();
+                    BufferedReader r = new BufferedReader(new InputStreamReader(inputStream));
+                    StringBuilder total = new StringBuilder();
+                    String line;
+                    while ((line = r.readLine()) != null) {
+                        total.append(line).append('\n');
+                    }
+                    bmp_string = String.valueOf(total);
                     serverSocket.close();
                     return reason;
                 } catch (Exception e) {

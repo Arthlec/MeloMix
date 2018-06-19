@@ -103,10 +103,10 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
     private WifiP2pGroup wifiP2pGroup;
     private WifiP2pManager manager;
     private WifiP2pManager.Channel channel;
-    private BroadCast mReceiver;
     private IntentFilter mIntent;
     private List[] dataList = new List[2];
     private int host;
+    private String[] objects;
 
     //FOR FRAGMENTS
     // 1 - Declare fragment handled by Navigation Drawer
@@ -149,6 +149,10 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
     }
     public static void setNextTrackName(String nextTrackName) {
         HostActivity.nextTrackName = nextTrackName;
+    }
+
+    public void setObjects(String[] objects) {
+        this.objects = objects;
     }
 
     @Override
@@ -195,11 +199,12 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
             dataList = LoadingGuestActivity.getLoadingDatalist();
             ReceiveDataFlow receiveDataFlow = new ReceiveDataFlow(getApplicationContext(),10014,"upDate",null);
             receiveDataFlow.start();
+            Log.i("bm",getIntent().getStringExtra("bmp_url"));
         }
         Bundle bundle = getIntent().getExtras();
         assert bundle != null;
         wifiP2pGroup = bundle.getParcelable("wifip2pGroup");
-        mReceiver = new BroadCast(manager,channel,null,null,this, wifiManager);
+        BroadCast mReceiver = new BroadCast(manager, channel, null, null, this, wifiManager);
         mIntent = new IntentFilter();
         setAction();
 
@@ -244,7 +249,7 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
     }
 
     public void sendDataToTarget(String targetAdress){
-        ShareDataToTarget shareDataToTarget = new ShareDataToTarget(targetAdress, getApplicationContext());
+        ShareDataToTarget shareDataToTarget = new ShareDataToTarget(targetAdress, getApplicationContext(),objects);
         shareDataToTarget.start();
     }
 
@@ -916,7 +921,7 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-
+            setObjects(trackInfos);
             return trackInfos[0];
         }
 
@@ -930,7 +935,7 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
             Log.i("mService", mService.toString());
             SearchListResponse searchListResponse = mService.search().list("snippet")
                     .setMaxResults(Long.parseLong("50"))
-                    .setQ(frequentGenres.get(genreNumber) + "music")
+                    .setQ(frequentGenres.get(genreNumber) + "music" + " -live -radio")
                     .setVideoDuration("short")
                     .setType("video")
                     .execute();
