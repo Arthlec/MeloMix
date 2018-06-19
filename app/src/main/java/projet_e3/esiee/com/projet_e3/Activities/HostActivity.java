@@ -481,7 +481,7 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
         @Override
         public void onConnectionInfoAvailable(WifiP2pInfo info) {
             if(host==1){
-                HostClass hostClass = new HostClass(getApplicationContext());
+                HostClass hostClass = new HostClass(getApplicationContext(),null);
                 hostClass.start();
             }
         }

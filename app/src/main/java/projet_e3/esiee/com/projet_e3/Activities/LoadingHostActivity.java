@@ -1,6 +1,5 @@
 package projet_e3.esiee.com.projet_e3.Activities;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -135,33 +134,34 @@ public class LoadingHostActivity extends AnalyseData {
         @Override
         public void onConnectionInfoAvailable(WifiP2pInfo info) {
             if(info.groupFormed && info.isGroupOwner){
-                HostClass hostClass = new HostClass(getApplicationContext());
+                HostClass hostClass = new HostClass(getApplicationContext(),LoadingHostActivity.this);
                 hostClass.start();
-
-                progressBar.setProgress(wifiP2pGroup.getClientList().size());
-                int diff = guestNb-wifiP2pGroup.getClientList().size();
-                loadingText.setText("Vous devez encore attendre "+ diff +" invités");
-
-                if(getJSONFiles(getApplicationContext().getFilesDir()).length>= guestNb+1){
-                    progressBar.setMax(1);
-                    progressBar.setProgress(1);
-                    loadingText.setText("C'est bon!");
-                    Intent intent = new Intent(LoadingHostActivity.this, hostActivity.getClass());
-                    intent.putExtra("authToken", getIntent().getStringExtra("authToken"));
-                    intent.putStringArrayListExtra("availableGenres", getIntent().getStringArrayListExtra("availableGenres"));
-                    intent.putExtra("wifip2pGroup", wifiP2pGroup);
-                    intent.putExtra("host",1);
-                    setFrequentGenres();
-                    intent.putStringArrayListExtra("frequentGenres", hostActivity.frequentGenres);
-                    findViewById(R.id.loading_panel).setVisibility(View.VISIBLE);
-                    loadingText.setText("Traitement de vos données...");
-                    hostActivity.requestData();
-                    startActivity(intent);
-                }
-
             }
         }
     };
+
+    public void startHostActivity(){
+        progressBar.setProgress(wifiP2pGroup.getClientList().size());
+        int diff = guestNb-wifiP2pGroup.getClientList().size();
+        loadingText.setText("Vous devez encore attendre "+ diff +" invités");
+
+        if(this.getJSONFiles(getApplicationContext().getFilesDir()).length>= guestNb+1){
+            this.progressBar.setMax(1);
+            this.progressBar.setProgress(1);
+            this.loadingText.setText("C'est bon!");
+            Intent intent = new Intent(LoadingHostActivity.this, hostActivity.getClass());
+            intent.putExtra("authToken", getIntent().getStringExtra("authToken"));
+            intent.putStringArrayListExtra("availableGenres", getIntent().getStringArrayListExtra("availableGenres"));
+            intent.putExtra("wifip2pGroup", wifiP2pGroup);
+            intent.putExtra("host",1);
+            setFrequentGenres();
+            intent.putStringArrayListExtra("frequentGenres", hostActivity.frequentGenres);
+            findViewById(R.id.loading_panel).setVisibility(View.VISIBLE);
+            this.loadingText.setText("Traitement de vos données...");
+            this.hostActivity.requestData();
+            startActivity(intent);
+        }
+    }
 
     //Listener du groupP2p appelé dans le broadCast
     public WifiP2pManager.GroupInfoListener groupInfoListener = new WifiP2pManager.GroupInfoListener() {
@@ -179,7 +179,7 @@ public class LoadingHostActivity extends AnalyseData {
         hostActivity.frequentGenres = this.analyseData(this.getFilesDir());
         datalist = buildListTab();
         hostActivity.availableGenresList = getIntent().getStringArrayListExtra("availableGenres");
-        hostActivity.authToken = getIntent().getStringExtra("authToken");
+        HostActivity.authToken = getIntent().getStringExtra("authToken");
     }
 
     /**
@@ -296,9 +296,11 @@ public class LoadingHostActivity extends AnalyseData {
 
         private Context mFilecontext;
         private int PORT;
-        public FileServerAsyncTask(Context context, int port) {
+        private LoadingHostActivity loadingHostActivity;
+        public FileServerAsyncTask(Context context, int port,LoadingHostActivity activity) {
             this.mFilecontext = context;
             this.PORT = port;
+            loadingHostActivity = activity;
         }
 
         @Override
@@ -338,8 +340,10 @@ public class LoadingHostActivity extends AnalyseData {
             if (result != null) {
                 Toast.makeText(mFilecontext,"Fichier reçu avec succès",Toast.LENGTH_SHORT).show();
                 if (!TextUtils.isEmpty(result)) {
+                    if(loadingHostActivity != null)
+                        loadingHostActivity.startHostActivity();
                     FileServerAsyncTask FileServerobj = new
-                            FileServerAsyncTask(mFilecontext, FileTransferService.PORT);
+                            FileServerAsyncTask(mFilecontext, FileTransferService.PORT,loadingHostActivity);
                     FileServerobj.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new String[]{null});
                 }
             }
