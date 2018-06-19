@@ -63,9 +63,8 @@ import projet_e3.esiee.com.projet_e3.Fragments.HistoryFragment;
 import projet_e3.esiee.com.projet_e3.Fragments.MainFragment;
 import projet_e3.esiee.com.projet_e3.Fragments.SavedMusicsFragment;
 import projet_e3.esiee.com.projet_e3.Fragments.StatsFragment;
-import projet_e3.esiee.com.projet_e3.R;
-import projet_e3.esiee.com.projet_e3.Fragments.MainFragment;
 import projet_e3.esiee.com.projet_e3.HostClass;
+import projet_e3.esiee.com.projet_e3.R;
 import projet_e3.esiee.com.projet_e3.ReceiveDataFlow;
 import projet_e3.esiee.com.projet_e3.ShareDataToTarget;
 import pub.devrel.easypermissions.AfterPermissionGranted;
@@ -108,7 +107,6 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
     private IntentFilter mIntent;
     private List[] dataList = new List[2];
     private int host;
-    private int isHost;
 
     //FOR FRAGMENTS
     // 1 - Declare fragment handled by Navigation Drawer
@@ -160,7 +158,7 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
 
         isInitialisation = true;
         mCredential = MainActivity.mCredential;
-        int host = getIntent().getIntExtra("host", 0);
+        host = getIntent().getIntExtra("host", 0);
 
         if(host == 1)
             getResultsFromApi();
@@ -180,18 +178,17 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
         authToken = getIntent().getStringExtra("authToken");
         availableGenresList = getIntent().getStringArrayListExtra("availableGenres");
         frequentGenres = getIntent().getStringArrayListExtra("frequentGenres");
-        isHost = getIntent().getIntExtra("host", -1);
 
         Log.i("authToken", authToken);
 
         WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
-        if (isHost == 1)
+        if (host == 1)
         {
             manager = LoadingHostActivity.getManager();
             channel = LoadingHostActivity.getChannel();
             dataList = LoadingHostActivity.getLoadingDatalist();
-        }else if(isHost ==0){
+        }else if(host ==0){
             bmp = getIntent().getExtras().getParcelable("GuestBmp");
             manager = GuestActivity.getaManager();
             channel = GuestActivity.getaChannel();
@@ -218,11 +215,6 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
 
     @Override
     public void onBackPressed() {
-        if(host==1){
-            LoadingHostActivity.hostContext.finish();
-        } else {
-            GuestActivity.guestContext.finish();
-        }
         new AlertDialog.Builder(this)
                 .setTitle("Voulez-vous vraiment quitter cette page?")
                 .setMessage("Les données en cours d'utilisation seront perdues")
@@ -230,6 +222,11 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 
                     public void onClick(DialogInterface arg0, int arg1) {
+                        if(host==1){
+                            LoadingHostActivity.hostContext.finish();
+                        } else {
+                            GuestActivity.guestContext.finish();
+                        }
                         HostActivity.super.onBackPressed();
                     }
                 }).create().show();
@@ -478,7 +475,7 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
     WifiP2pManager.ConnectionInfoListener connectionInfoListener = new WifiP2pManager.ConnectionInfoListener() {
         @Override
         public void onConnectionInfoAvailable(WifiP2pInfo info) {
-            if(isHost==1){
+            if(host==1){
                 HostClass hostClass = new HostClass(getApplicationContext());
                 hostClass.start();
             }
@@ -617,10 +614,10 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
         pref.edit().remove("user_name").apply(); //clear pref pseudo
         if(pref.contains("userAccountSpotify"))
             pref.edit().remove("userAccountSpotify").apply(); //clear pref user account Spotify
-        if(isHost==1){
-            LoadingHostActivity.fa.finish();
-        }else if(isHost==0){
-            GuestActivity.fa.finish();
+        if(host==1){
+            LoadingHostActivity.hostContext.finish();
+        }else if(host==0){
+            GuestActivity.guestContext.finish();
         }
         deleteJson();
         Intent intent = new Intent(HostActivity.this, MainActivity.class);
