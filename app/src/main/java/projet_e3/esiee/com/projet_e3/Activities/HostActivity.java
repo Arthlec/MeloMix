@@ -104,6 +104,7 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
     private BroadCast mReceiver;
     private IntentFilter mIntent;
     private List[] dataList = new List[2];
+    private int host;
 
     //FOR FRAGMENTS
     // 1 - Declare fragment handled by Navigation Drawer
@@ -180,6 +181,11 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
 
     @Override
     public void onBackPressed() {
+        if(host==1){
+            LoadingHostActivity.hostContext.finish();
+        } else {
+            GuestActivity.guestContext.finish();
+        }
         new AlertDialog.Builder(this)
                 .setTitle("Voulez-vous vraiment quitter cette page?")
                 .setMessage("Les données en cours d'utilisation seront perdues")
