@@ -231,9 +231,9 @@ public abstract class AnalyseData extends AppCompatActivity {
 
     private void executeKmeans(int numberOfUsers, SimpleKMeans simpleKMeans, Instances dataBase, int numberOfIterations, double a, double b){
         try {
-            if(numberOfUsers == 2)
+            /*if(numberOfUsers == 2)
                 simpleKMeans.setNumClusters(1);
-            else
+            else*/
                 simpleKMeans.setNumClusters((int)Math.round(a*numberOfUsers + b));
 
             simpleKMeans.setMaxIterations(numberOfIterations);
