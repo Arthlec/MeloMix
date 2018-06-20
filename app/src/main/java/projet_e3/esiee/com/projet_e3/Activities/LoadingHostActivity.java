@@ -66,7 +66,6 @@ public class LoadingHostActivity extends AnalyseData {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loading_host);
-        findViewById(R.id.loading_panel).setVisibility(View.VISIBLE);
         hostActivity = new HostActivity();
         InitAttribut();
     }
@@ -159,9 +158,9 @@ public class LoadingHostActivity extends AnalyseData {
         intent.putExtra("wifip2pGroup", wifiP2pGroup);
         intent.putExtra("host",1);
         setFrequentGenres();
+        findViewById(R.id.loading_panel).setVisibility(View.VISIBLE);
         intent.putStringArrayListExtra("frequentGenres", this.frequentGenres);
         this.loadingText.setText("Traitement de vos données...");
-        //this.hostActivity.requestData();
         startActivity(intent);
     }
 

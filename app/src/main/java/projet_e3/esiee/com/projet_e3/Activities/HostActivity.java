@@ -531,7 +531,7 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
 
                 String genreSeed;
                 if (frequentAvailableGenresList.size() == 0) {
-                    Log.i("Note : ", "Search less accurate");
+                    Log.i("Note ", "Search less accurate");
                     for (int i=0; i<frequentGenres.size(); i++) {
                         String[] frequentGenresSplit = frequentGenres.get(i).split(" ");
                         for (int j=0; j<frequentGenresSplit.length; j++)
