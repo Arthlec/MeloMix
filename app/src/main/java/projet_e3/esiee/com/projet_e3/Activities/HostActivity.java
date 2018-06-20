@@ -306,7 +306,7 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
             HistoryFragment.trackNameList.add(0, trackName);
             //requestData();
             getResultsFromApi();
-            //lauchSignalToTargets(getApplicationContext());
+            lauchSignalToTargets(getApplicationContext());
         }
         else if (direction.equals("next") && (nextBmp == null || nextTrackName == null || nextTrackID == null)) {
             Toast.makeText(getApplicationContext(), "Veuillez attendre la recherche du prochain titre", Toast.LENGTH_SHORT).show();
