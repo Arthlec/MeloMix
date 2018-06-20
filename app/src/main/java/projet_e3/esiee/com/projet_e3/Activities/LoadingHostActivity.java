@@ -13,6 +13,7 @@ import android.net.wifi.p2p.WifiP2pManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -27,6 +28,7 @@ import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
 
 import projet_e3.esiee.com.projet_e3.AnalyseData;
@@ -48,6 +50,7 @@ public class LoadingHostActivity extends AnalyseData {
     private TextView loadingText;
 
     private HostActivity hostActivity;
+    private ArrayList<String> frequentGenres;
     private static List[] datalist;
 
     public static List[] getLoadingDatalist() {
@@ -156,9 +159,9 @@ public class LoadingHostActivity extends AnalyseData {
         intent.putExtra("wifip2pGroup", wifiP2pGroup);
         intent.putExtra("host",1);
         setFrequentGenres();
-        intent.putStringArrayListExtra("frequentGenres", hostActivity.frequentGenres);
+        intent.putStringArrayListExtra("frequentGenres", this.frequentGenres);
         this.loadingText.setText("Traitement de vos données...");
-        this.hostActivity.requestData();
+        //this.hostActivity.requestData();
         startActivity(intent);
     }
 
@@ -182,7 +185,8 @@ public class LoadingHostActivity extends AnalyseData {
     };
 
     public void setFrequentGenres() {
-        hostActivity.frequentGenres = this.analyseData(this.getFilesDir());
+        this.frequentGenres = this.analyseData(this.getFilesDir());
+        Log.i("frequentGenresLoadingHo", this.frequentGenres + "");
         datalist = buildListTab();
         hostActivity.availableGenresList = getIntent().getStringArrayListExtra("availableGenres");
         HostActivity.authToken = getIntent().getStringExtra("authToken");

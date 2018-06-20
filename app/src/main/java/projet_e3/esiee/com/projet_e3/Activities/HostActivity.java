@@ -146,9 +146,6 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
         mCredential = MainActivity.mCredential;
         host = getIntent().getIntExtra("host", 0);
 
-        if(host == 1)
-            getResultsFromApi();
-
         android.support.v7.widget.Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionbar = getSupportActionBar();
@@ -163,7 +160,8 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
         showFirstFragment();
         authToken = getIntent().getStringExtra("authToken");
         availableGenresList = getIntent().getStringArrayListExtra("availableGenres");
-        frequentGenres = getIntent().getStringArrayListExtra("frequentGenres");
+        this.frequentGenres = getIntent().getStringArrayListExtra("frequentGenres");
+        Log.i("frequentGenresHost", this.frequentGenres + "");
 
         Log.i("authToken", authToken);
 
@@ -171,6 +169,7 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
 
         if (host == 1)
         {
+            getResultsFromApi();
             manager = LoadingHostActivity.getManager();
             channel = LoadingHostActivity.getChannel();
             dataList = LoadingHostActivity.getLoadingDatalist();
@@ -908,15 +907,15 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
         private String[] getTracksAttributes() throws IOException {
 
             String[] trackInfo = new String[3];
-
             Random genreSelector = new Random();
             int genreNumber = genreSelector.nextInt(frequentGenres.size());
 
             Log.i("mService", mService.toString());
             SearchListResponse searchListResponse = mService.search().list("snippet")
                     .setMaxResults(Long.parseLong("50"))
-                    .setQ(frequentGenres.get(genreNumber) + "music" + " -live -radio")
-                    .setVideoDuration("short")
+                    .setTopicId("/m/04rlf")
+                    .setQ(frequentGenres.get(genreNumber) /*+ "music"*/  + " -live -radio -cover -riff -riffs -playlist -compilation -mix -top -best -jam -play -kit -pedal -custom -shop -gameplay -cabinet -chairs -opinion -hearing -first -reverse -when -birthday -karaoke -listening -review")
+                    .setVideoDuration("medium")
                     .setType("video")
                     .execute();
             Log.i("musicGenre", frequentGenres.get(genreNumber));

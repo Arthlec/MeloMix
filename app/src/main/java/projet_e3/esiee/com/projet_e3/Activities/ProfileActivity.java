@@ -31,9 +31,7 @@ import java.util.HashMap;
 import projet_e3.esiee.com.projet_e3.R;
 
 public class ProfileActivity extends AppCompatActivity {
-
-    //public static boolean isLoggedInSpotify = false;
-    //private String PERSONAL = "personal.txt";
+    
     private String authToken = "";
     private ArrayList<String> availableGenresList;
     private String MY_PREFS = "my_prefs";
@@ -137,15 +135,12 @@ public class ProfileActivity extends AppCompatActivity {
 
             if (userAccountSpotify != null) {
                 TextView textSpotify = findViewById(R.id.textSpotify);
-                SharedPreferences pref = getApplicationContext().getSharedPreferences(MY_PREFS, MODE_PRIVATE);
+                /*SharedPreferences pref = getApplicationContext().getSharedPreferences(MY_PREFS, MODE_PRIVATE);
                 SharedPreferences.Editor editor = pref.edit();
                 editor.putString("userAccountSpotify", userAccountSpotify);
-                editor.apply();
-                textSpotify.setText("Connecté avec le compte : " + myprefs_accountSpotify());
+                editor.apply();*/
+                textSpotify.setText("Connecté avec le compte : " + userAccountSpotify/*myprefs_accountSpotify()*/);
             }
-
-            //HashMap<String, Float> userGenres = this.getIntent().getSerializableExtra("genres");
-            //HashMap<String, Float> userGenres = LoginActivitySpotify.userGenres;
             if (userGenres != null)
                 this.writeJSONfile(userGenres);
         }
