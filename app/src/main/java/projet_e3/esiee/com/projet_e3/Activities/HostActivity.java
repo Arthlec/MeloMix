@@ -306,7 +306,7 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
             HistoryFragment.trackNameList.add(0, trackName);
             //requestData();
             getResultsFromApi();
-            lauchSignalToTargets(getApplicationContext());
+            //lauchSignalToTargets(getApplicationContext());
         }
         else if (direction.equals("next") && (nextBmp == null || nextTrackName == null || nextTrackID == null)) {
             Toast.makeText(getApplicationContext(), "Veuillez attendre la recherche du prochain titre", Toast.LENGTH_SHORT).show();
@@ -531,7 +531,7 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
 
                 String genreSeed;
                 if (frequentAvailableGenresList.size() == 0) {
-                    Log.i("Note : ", "Search less accurate");
+                    Log.i("Note ", "Search less accurate");
                     for (int i=0; i<frequentGenres.size(); i++) {
                         String[] frequentGenresSplit = frequentGenres.get(i).split(" ");
                         for (int j=0; j<frequentGenresSplit.length; j++)
