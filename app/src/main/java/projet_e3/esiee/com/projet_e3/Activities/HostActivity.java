@@ -65,7 +65,6 @@ import projet_e3.esiee.com.projet_e3.Fragments.SavedMusicsFragment;
 import projet_e3.esiee.com.projet_e3.Fragments.StatsFragment;
 import projet_e3.esiee.com.projet_e3.HostClass;
 import projet_e3.esiee.com.projet_e3.R;
-import projet_e3.esiee.com.projet_e3.ReceiveDataFlow;
 import projet_e3.esiee.com.projet_e3.ShareDataToTarget;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
@@ -177,8 +176,8 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
             manager = GuestActivity.getaManager();
             channel = GuestActivity.getaChannel();
             dataList = LoadingGuestActivity.getLoadingDatalist();
-            ReceiveDataFlow receiveDataFlow = new ReceiveDataFlow(10014,"upDate",null);
-            receiveDataFlow.start();
+            //ReceiveDataFlow receiveDataFlow = new ReceiveDataFlow(10014,"upDate",null);
+            //receiveDataFlow.start();
             Log.i("bm",getIntent().getStringExtra("bmp_url"));
             BmpToGive = getIntent().getStringExtra("bmp_url");
             try {
@@ -304,9 +303,8 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
             nextTrackName = null;
             HistoryFragment.trackCoverList.add(0, bmp);
             HistoryFragment.trackNameList.add(0, trackName);
-            //requestData();
             getResultsFromApi();
-            lauchSignalToTargets(getApplicationContext());
+            //lauchSignalToTargets(getApplicationContext());
         }
         else if (direction.equals("next") && (nextBmp == null || nextTrackName == null || nextTrackID == null)) {
             Toast.makeText(getApplicationContext(), "Veuillez attendre la recherche du prochain titre", Toast.LENGTH_SHORT).show();

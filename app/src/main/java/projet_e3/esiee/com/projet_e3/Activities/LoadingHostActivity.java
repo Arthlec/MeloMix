@@ -1,8 +1,10 @@
 package projet_e3.esiee.com.projet_e3.Activities;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.WifiManager;
@@ -208,6 +210,7 @@ public class LoadingHostActivity extends AnalyseData {
      * Supprime le Groupe P2p
      */
     public void disconnect(){
+        deleteJson();
         aManager.removeGroup(aChannel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
@@ -216,7 +219,9 @@ public class LoadingHostActivity extends AnalyseData {
             @Override
             public void onFailure(int i) {
             }
+
         });
+        LoadingHostActivity.hostContext.finish();
     }
 
     @Override
@@ -246,6 +251,21 @@ public class LoadingHostActivity extends AnalyseData {
 
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this)
+                .setTitle("Voulez-vous vraiment quitter cette page?")
+                .setMessage("Les données en cours d'utilisation seront perdues")
+                .setNegativeButton(android.R.string.no, null)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface arg0, int arg1) {
+                        disconnect();
+                        LoadingHostActivity.super.onBackPressed();
+                    }
+                }).create().show();
     }
 
     /**

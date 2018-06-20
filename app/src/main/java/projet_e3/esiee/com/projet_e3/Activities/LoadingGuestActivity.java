@@ -18,7 +18,6 @@ import java.util.List;
 
 import projet_e3.esiee.com.projet_e3.AnalyseData;
 import projet_e3.esiee.com.projet_e3.R;
-import projet_e3.esiee.com.projet_e3.ReceiveDataFlow;
 
 public class LoadingGuestActivity extends AnalyseData {
     private HostActivity hostActivity;
@@ -31,8 +30,9 @@ public class LoadingGuestActivity extends AnalyseData {
         setContentView(R.layout.activity_loading_guest);
         findViewById(R.id.loading_panel).setVisibility(View.VISIBLE);
         hostActivity = new HostActivity();
-        ReceiveDataFlow receiveDataFlow = new ReceiveDataFlow(10014,"firstTimeCo",this);
-        receiveDataFlow.start();
+        /*ReceiveDataFlow receiveDataFlow = new ReceiveDataFlow(10014,"firstTimeCo",this);
+        receiveDataFlow.start();*/
+        startHost();
     }
 
     public static List[] getLoadingDatalist() {
