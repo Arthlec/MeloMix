@@ -914,8 +914,8 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
             SearchListResponse searchListResponse = mService.search().list("snippet")
                     .setMaxResults(Long.parseLong("50"))
                     .setTopicId("/m/04rlf")
-                    .setQ(frequentGenres.get(genreNumber) /*+ "music"*/  + " -live -radio -cover -riff -riffs -playlist -compilation -mix -top -best -jam -play -kit -pedal -custom -shop -gameplay -cabinet -chairs -opinion -hearing -first -reverse -when -birthday -karaoke -listening -review")
-                    .setVideoDuration("medium")
+                    .setQ(frequentGenres.get(genreNumber) + "music"  + " -24/7 -how -to -24h/24 -playlist -roblox")
+                    .setVideoDuration("short")
                     .setType("video")
                     .execute();
             Log.i("musicGenre", frequentGenres.get(genreNumber));
