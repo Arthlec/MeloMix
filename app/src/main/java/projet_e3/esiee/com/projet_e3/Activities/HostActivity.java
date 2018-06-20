@@ -178,14 +178,13 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
             dataList = LoadingGuestActivity.getLoadingDatalist();
             //ReceiveDataFlow receiveDataFlow = new ReceiveDataFlow(10014,"upDate",null);
             //receiveDataFlow.start();
-            Log.i("bm",getIntent().getStringExtra("bmp_url"));
-            BmpToGive = getIntent().getStringExtra("bmp_url");
-            try {
+            //BmpToGive = getIntent().getStringExtra("bmp_url");
+            /*try {
                 URL urlBmpGuest = new URL(BmpToGive);
                 bmp = BitmapFactory.decodeStream(urlBmpGuest.openConnection().getInputStream());
             } catch (IOException e) {
                 e.printStackTrace();
-            }
+            }*/
         }
         Bundle bundle = getIntent().getExtras();
         assert bundle != null;
