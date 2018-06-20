@@ -1,8 +1,10 @@
 package projet_e3.esiee.com.projet_e3.Activities;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.WifiManager;
@@ -13,6 +15,7 @@ import android.net.wifi.p2p.WifiP2pManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -27,6 +30,7 @@ import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
 
 import projet_e3.esiee.com.projet_e3.AnalyseData;
@@ -48,6 +52,7 @@ public class LoadingHostActivity extends AnalyseData {
     private TextView loadingText;
 
     private HostActivity hostActivity;
+    private ArrayList<String> frequentGenres;
     private static List[] datalist;
 
     public static List[] getLoadingDatalist() {
@@ -63,7 +68,6 @@ public class LoadingHostActivity extends AnalyseData {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loading_host);
-        findViewById(R.id.loading_panel).setVisibility(View.VISIBLE);
         hostActivity = new HostActivity();
         InitAttribut();
     }
@@ -156,9 +160,9 @@ public class LoadingHostActivity extends AnalyseData {
         intent.putExtra("wifip2pGroup", wifiP2pGroup);
         intent.putExtra("host",1);
         setFrequentGenres();
-        intent.putStringArrayListExtra("frequentGenres", hostActivity.frequentGenres);
+        findViewById(R.id.loading_panel).setVisibility(View.VISIBLE);
+        intent.putStringArrayListExtra("frequentGenres", this.frequentGenres);
         this.loadingText.setText("Traitement de vos données...");
-        this.hostActivity.requestData();
         startActivity(intent);
     }
 
@@ -182,7 +186,8 @@ public class LoadingHostActivity extends AnalyseData {
     };
 
     public void setFrequentGenres() {
-        hostActivity.frequentGenres = this.analyseData(this.getFilesDir());
+        this.frequentGenres = this.analyseData(this.getFilesDir());
+        Log.i("frequentGenresLoadingHo", this.frequentGenres + "");
         datalist = buildListTab();
         hostActivity.availableGenresList = getIntent().getStringArrayListExtra("availableGenres");
         HostActivity.authToken = getIntent().getStringExtra("authToken");
@@ -205,6 +210,7 @@ public class LoadingHostActivity extends AnalyseData {
      * Supprime le Groupe P2p
      */
     public void disconnect(){
+        deleteJson();
         aManager.removeGroup(aChannel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
@@ -213,7 +219,9 @@ public class LoadingHostActivity extends AnalyseData {
             @Override
             public void onFailure(int i) {
             }
+
         });
+        LoadingHostActivity.hostContext.finish();
     }
 
     @Override
@@ -243,6 +251,21 @@ public class LoadingHostActivity extends AnalyseData {
 
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this)
+                .setTitle("Voulez-vous vraiment quitter cette page?")
+                .setMessage("Les données en cours d'utilisation seront perdues")
+                .setNegativeButton(android.R.string.no, null)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface arg0, int arg1) {
+                        disconnect();
+                        LoadingHostActivity.super.onBackPressed();
+                    }
+                }).create().show();
     }
 
     /**

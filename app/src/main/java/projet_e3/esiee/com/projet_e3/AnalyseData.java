@@ -62,6 +62,12 @@ public abstract class AnalyseData extends AppCompatActivity {
         int sizeItemsets = algo.m_largeItemSets.size();
         ArrayList<String> frequentGenres = this.getFrequentGenresList(algo, sizeItemsets);
 
+       /* if(frequentGenres.size()>5){
+            for(String genre:frequentGenres){
+
+            }
+            return frequentGenres;
+        }*/
         return frequentGenres;
     }
 
@@ -70,8 +76,8 @@ public abstract class AnalyseData extends AppCompatActivity {
         int len = OneCentroidBase.numAttributes();
         for(int i=0;i<len;i++){
             Attribute currentAttribut = OneCentroidBase.attribute(i);
-            Log.i("current",currentAttribut+"");
-            Log.i("value",OneCentroidBase.get(0).value(currentAttribut)+"");
+            //Log.i("current",currentAttribut+"");
+            //Log.i("value",OneCentroidBase.get(0).value(currentAttribut)+"");
             if(OneCentroidBase.get(0).value(currentAttribut)!=0){
                oneUserGenre.add(currentAttribut.name());
                Log.i("name",currentAttribut.name());
@@ -180,7 +186,7 @@ public abstract class AnalyseData extends AppCompatActivity {
                     currentInstance.setValue(j, 1);
             }
         }
-        //Log.i("centroidsBaseBinarized", centroidsBaseSimplified.toString());
+        Log.i("centroidsBaseBinarized", centroidsBaseSimplified.toString());
         NumericToBinary filterBinary = new NumericToBinary();
         try {
             filterBinary.setInputFormat(centroidsBaseSimplified);

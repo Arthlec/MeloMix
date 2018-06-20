@@ -65,7 +65,6 @@ import projet_e3.esiee.com.projet_e3.Fragments.SavedMusicsFragment;
 import projet_e3.esiee.com.projet_e3.Fragments.StatsFragment;
 import projet_e3.esiee.com.projet_e3.HostClass;
 import projet_e3.esiee.com.projet_e3.R;
-import projet_e3.esiee.com.projet_e3.ReceiveDataFlow;
 import projet_e3.esiee.com.projet_e3.ShareDataToTarget;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
@@ -95,6 +94,7 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
     private static String nextTrackName;
     public ArrayList<String> availableGenresList = new ArrayList<>();
     public static String authToken = "";
+    private String MY_PREFS = "my_prefs";
     private DrawerLayout mDrawerLayout;
     private Stack<String> tracksIDS = new Stack<>();
     private Stack<Bitmap> tracksCovers = new Stack<>();
@@ -145,9 +145,6 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
         mCredential = MainActivity.mCredential;
         host = getIntent().getIntExtra("host", 0);
 
-        if(host == 1)
-            getResultsFromApi();
-
         android.support.v7.widget.Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionbar = getSupportActionBar();
@@ -162,7 +159,8 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
         showFirstFragment();
         authToken = getIntent().getStringExtra("authToken");
         availableGenresList = getIntent().getStringArrayListExtra("availableGenres");
-        frequentGenres = getIntent().getStringArrayListExtra("frequentGenres");
+        this.frequentGenres = getIntent().getStringArrayListExtra("frequentGenres");
+        Log.i("frequentGenresHost", this.frequentGenres + "");
 
         Log.i("authToken", authToken);
 
@@ -170,6 +168,7 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
 
         if (host == 1)
         {
+            getResultsFromApi();
             manager = LoadingHostActivity.getManager();
             channel = LoadingHostActivity.getChannel();
             dataList = LoadingHostActivity.getLoadingDatalist();
@@ -177,16 +176,15 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
             manager = GuestActivity.getaManager();
             channel = GuestActivity.getaChannel();
             dataList = LoadingGuestActivity.getLoadingDatalist();
-            ReceiveDataFlow receiveDataFlow = new ReceiveDataFlow(10014,"upDate",null);
-            receiveDataFlow.start();
-            Log.i("bm",getIntent().getStringExtra("bmp_url"));
-            BmpToGive = getIntent().getStringExtra("bmp_url");
-            try {
+            //ReceiveDataFlow receiveDataFlow = new ReceiveDataFlow(10014,"upDate",null);
+            //receiveDataFlow.start();
+            //BmpToGive = getIntent().getStringExtra("bmp_url");
+            /*try {
                 URL urlBmpGuest = new URL(BmpToGive);
                 bmp = BitmapFactory.decodeStream(urlBmpGuest.openConnection().getInputStream());
             } catch (IOException e) {
                 e.printStackTrace();
-            }
+            }*/
         }
         Bundle bundle = getIntent().getExtras();
         assert bundle != null;
@@ -304,9 +302,8 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
             nextTrackName = null;
             HistoryFragment.trackCoverList.add(0, bmp);
             HistoryFragment.trackNameList.add(0, trackName);
-            //requestData();
             getResultsFromApi();
-            lauchSignalToTargets(getApplicationContext());
+            //lauchSignalToTargets(getApplicationContext());
         }
         else if (direction.equals("next") && (nextBmp == null || nextTrackName == null || nextTrackID == null)) {
             Toast.makeText(getApplicationContext(), "Veuillez attendre la recherche du prochain titre", Toast.LENGTH_SHORT).show();
@@ -531,7 +528,7 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
 
                 String genreSeed;
                 if (frequentAvailableGenresList.size() == 0) {
-                    Log.i("Note : ", "Search less accurate");
+                    Log.i("Note ", "Search less accurate");
                     for (int i=0; i<frequentGenres.size(); i++) {
                         String[] frequentGenresSplit = frequentGenres.get(i).split(" ");
                         for (int j=0; j<frequentGenresSplit.length; j++)
@@ -602,7 +599,6 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
 
     private void disconnect() {
         //deleteCache(this);
-        String MY_PREFS = "my_prefs";
         SharedPreferences pref = getApplicationContext().getSharedPreferences(MY_PREFS, MODE_PRIVATE);
         pref.edit().remove("user_name").apply(); //clear pref pseudo
         if(pref.contains("userAccountSpotify"))
@@ -908,15 +904,15 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
         private String[] getTracksAttributes() throws IOException {
 
             String[] trackInfo = new String[3];
-
             Random genreSelector = new Random();
             int genreNumber = genreSelector.nextInt(frequentGenres.size());
 
             Log.i("mService", mService.toString());
             SearchListResponse searchListResponse = mService.search().list("snippet")
                     .setMaxResults(Long.parseLong("50"))
-                    .setQ(frequentGenres.get(genreNumber) + "music" + " -live -radio")
-                    .setVideoDuration("short")
+                    .setTopicId("/m/04rlf")
+                    .setQ(frequentGenres.get(genreNumber) /*+ "music"*/  + " -live -radio -cover -riff -riffs -playlist -compilation -mix -top -best -jam -play -kit -pedal -custom -shop -gameplay -cabinet -chairs -opinion -hearing -first -reverse -when -birthday -karaoke -listening -review")
+                    .setVideoDuration("medium")
                     .setType("video")
                     .execute();
             Log.i("musicGenre", frequentGenres.get(genreNumber));

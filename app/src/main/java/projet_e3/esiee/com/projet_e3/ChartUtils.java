@@ -18,34 +18,34 @@ public class ChartUtils extends AppCompatActivity{
     }
 
     public BarData buildBarChart(List[] lists) {
-        List<String> genres = new ArrayList<>();
-        List<Double> values = new ArrayList<>();
+        List<String> genres;
+        List<Double> values;
 
         if(!lists[0].isEmpty()&&!lists[1].isEmpty()) {
             genres = lists[0];
             values = lists[1];
         }
         else{
-            genres = Arrays.asList("Rock","Pop","Jazz","Rap","Chill");
-            values = Arrays.asList(0.1,0.2,0.3,0.4,0.5);
+            genres = Arrays.asList("Chilled Cow","ChillHop","Chill House","Lo-Fi","Chill");
+            values = Arrays.asList(0.1,0.2,0.1,0.2,0.1);
         }
             List<BarEntry> dataEntries = new ArrayList<>();
             int numberOfgenre = genres.size();
             int numberToUse;
-            if(numberOfgenre<5){
+            /*if(numberOfgenre<5){
             numberToUse = numberOfgenre;
             }
             else {
                 numberToUse = 5;
-            }
-            for (int i = 0; i < numberToUse; i++) {
+            }*/
+            for (int i = 0; i < numberOfgenre; i++) {
                 Float currentFloat = Float.valueOf(String.valueOf(values.get(i)));
                 dataEntries.add(new BarEntry(i,currentFloat));
             }
         //Float maxWidth = Float.valueOf(String.valueOf(Collections.max(values)));
 
             BarDataSet barDataSet = new BarDataSet(dataEntries,"");
-            barDataSet.setColors(ColorTemplate.MATERIAL_COLORS);
+            barDataSet.setColors(ColorTemplate.JOYFUL_COLORS);
 
             BarData genreData = new BarData(barDataSet);
             genreData.setBarWidth(0.5f);
