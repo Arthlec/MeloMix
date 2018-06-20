@@ -7,6 +7,10 @@
         <item name="android:textColorSecondary">@color/text_color_secondary</item>
     </style>
 
+    <style name="MeloTheme.ActionBar.TitleTextStyle" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title">
+        <item name="android:textColor">@color/browser_actions_bg_grey</item>
+    </style>
+
     <style name="SplashTheme" parent="MeloTheme">
         <item name="android:windowBackground">@drawable/splash</item>
     </style>

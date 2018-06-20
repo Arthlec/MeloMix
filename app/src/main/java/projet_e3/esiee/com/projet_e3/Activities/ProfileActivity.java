@@ -6,8 +6,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -16,10 +14,6 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.stree.JacksonJrsTreeCodec;
@@ -32,8 +26,6 @@ import projet_e3.esiee.com.projet_e3.R;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    //public static boolean isLoggedInSpotify = false;
-    //private String PERSONAL = "personal.txt";
     private String authToken = "";
     private ArrayList<String> availableGenresList;
     private String MY_PREFS = "my_prefs";
@@ -53,7 +45,7 @@ public class ProfileActivity extends AppCompatActivity {
         if (authToken != null && !authToken.equals("")) {
             textSpotify.setText("Connecté avec le compte : " + myprefs_accountSpotify());
         } else
-            textSpotify.setText("Non connecté");
+            textSpotify.setText(R.string.not_connected);
 
         ImageButton logoSpotify = findViewById(R.id.imageButton);
         logoSpotify.setOnClickListener(new View.OnClickListener() {
@@ -108,7 +100,7 @@ public class ProfileActivity extends AppCompatActivity {
                     AlertDialog alertDialog = new AlertDialog.Builder(ProfileActivity.this).create();
                     alertDialog.setTitle("Information");
                     alertDialog.setMessage("Vous n'êtes pas connecté à Spotify ou avez été déconnecté. \n \n Veuillez vous reconnecter.");
-                    alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE,"OK",
+                    alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "OK",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
                                     dialog.dismiss();

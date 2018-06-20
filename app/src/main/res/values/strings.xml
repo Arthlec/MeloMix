@@ -18,4 +18,5 @@
     <string name="description_role_host">J\'organise l\'évènement</string>
     <string name="description_role_guest">Je suis un participant de l\'évènement</string>
     <string name="description_choose_host_activity">Choisissez l\'organisateur de l\'évènement que vous voulez rejoindre !</string>
+    <string name="not_connected">Non connecté</string>
 </resources>
