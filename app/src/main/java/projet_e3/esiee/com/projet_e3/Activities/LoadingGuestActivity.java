@@ -1,11 +1,11 @@
 package projet_e3.esiee.com.projet_e3.Activities;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -29,8 +29,9 @@ public class LoadingGuestActivity extends AnalyseData {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loading_guest);
+        findViewById(R.id.loading_panel).setVisibility(View.VISIBLE);
         hostActivity = new HostActivity();
-        ReceiveDataFlow receiveDataFlow = new ReceiveDataFlow(getApplication(),10014,"firstTimeCo",this);
+        ReceiveDataFlow receiveDataFlow = new ReceiveDataFlow(10014,"firstTimeCo",this);
         receiveDataFlow.start();
     }
 
@@ -53,12 +54,10 @@ public class LoadingGuestActivity extends AnalyseData {
 
     public static class onSignalReceiveAsyncTask extends AsyncTask<String, String, String> {
 
-        private Context mFilecontext;
         private int PORT;
         private String reason;
         private LoadingGuestActivity currentActivity;
-        public onSignalReceiveAsyncTask(Context context, int port, String rString, LoadingGuestActivity theActivity) {
-            this.mFilecontext = context;
+        public onSignalReceiveAsyncTask(int port, String rString, LoadingGuestActivity theActivity) {
             this.PORT = port;
             this.reason = rString;
             currentActivity = theActivity;
@@ -82,7 +81,7 @@ public class LoadingGuestActivity extends AnalyseData {
                     }
                     bmp_string = String.valueOf(total);
                     serverSocket.close();
-                    return reason;
+                    return String.valueOf(total);
                 } catch (Exception e) {
                     e.printStackTrace();
                     return null;
@@ -96,12 +95,15 @@ public class LoadingGuestActivity extends AnalyseData {
         protected void onPostExecute(String result) {
             if (result != null) {
                 if (!TextUtils.isEmpty(result)) {
-                    if(result.equals("firstTimeCo")&&currentActivity!=null){
+                    if(reason.equals("firstTimeCo")&&currentActivity!=null){
                         currentActivity.startHost();
                         Log.i("first",reason);
                     }
+                    else{
+                        HostActivity.setBmp(result);
+                    }
                     Log.i("up",reason);
-                    onSignalReceiveAsyncTask onSignalReceiveAsyncTask = new onSignalReceiveAsyncTask(mFilecontext,10014,"upDate",null);
+                    onSignalReceiveAsyncTask onSignalReceiveAsyncTask = new onSignalReceiveAsyncTask(10014,"upDate",null);
                     onSignalReceiveAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 }
             }
