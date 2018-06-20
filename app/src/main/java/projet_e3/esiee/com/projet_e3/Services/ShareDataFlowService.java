@@ -3,6 +3,7 @@ package projet_e3.esiee.com.projet_e3.Services;
 import android.app.IntentService;
 import android.content.Intent;
 import android.os.Handler;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.io.ByteArrayInputStream;
@@ -44,10 +45,11 @@ public class ShareDataFlowService extends IntentService {
                 socket.connect((new InetSocketAddress(target, port)), SOCKET_TIMEOUT);
                 OutputStream outputStream = socket.getOutputStream();
                 outputStream.flush();
-
-                assert bmp != null;
-                InputStream stream = new ByteArrayInputStream(bmp.getBytes());
+                Log.i("sendbpm",bmp);
+                InputStream stream = new ByteArrayInputStream(Objects.requireNonNull(bmp).getBytes());
+                Log.i("streamBpm",stream+"");
                 sendObjet(stream,outputStream,bmp.getBytes().length);
+
                 outputStream.close();
             } catch (IOException e) {
                 e.printStackTrace();

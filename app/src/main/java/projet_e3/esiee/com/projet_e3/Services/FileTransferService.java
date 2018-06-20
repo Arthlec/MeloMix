@@ -62,9 +62,10 @@ public class FileTransferService extends IntentService {
                 InputStream inputStream = new FileInputStream(JsonFile);
 
                 GuestActivity.copyFile(inputStream, outputStream);
-
+                GuestActivity.setFirstTimeCo(false);
             } catch (IOException e) {
                 e.printStackTrace();
+                GuestActivity.setFirstTimeCo(true);
                 mHandler.post(new Runnable() {
                     public void run() {
                         Toast.makeText(FileTransferService.this, "L'hôte n'est pas prêt à recevoir votre fichier", Toast.LENGTH_LONG).show();

@@ -65,7 +65,6 @@ import projet_e3.esiee.com.projet_e3.Fragments.SavedMusicsFragment;
 import projet_e3.esiee.com.projet_e3.Fragments.StatsFragment;
 import projet_e3.esiee.com.projet_e3.HostClass;
 import projet_e3.esiee.com.projet_e3.R;
-import projet_e3.esiee.com.projet_e3.ReceiveDataFlow;
 import projet_e3.esiee.com.projet_e3.ShareDataToTarget;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
@@ -177,8 +176,8 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
             manager = GuestActivity.getaManager();
             channel = GuestActivity.getaChannel();
             dataList = LoadingGuestActivity.getLoadingDatalist();
-            ReceiveDataFlow receiveDataFlow = new ReceiveDataFlow(10014,"upDate",null);
-            receiveDataFlow.start();
+            //ReceiveDataFlow receiveDataFlow = new ReceiveDataFlow(10014,"upDate",null);
+            //receiveDataFlow.start();
             Log.i("bm",getIntent().getStringExtra("bmp_url"));
             BmpToGive = getIntent().getStringExtra("bmp_url");
             try {
@@ -304,7 +303,6 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
             nextTrackName = null;
             HistoryFragment.trackCoverList.add(0, bmp);
             HistoryFragment.trackNameList.add(0, trackName);
-            //requestData();
             getResultsFromApi();
             //lauchSignalToTargets(getApplicationContext());
         }
@@ -914,8 +912,8 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
             SearchListResponse searchListResponse = mService.search().list("snippet")
                     .setMaxResults(Long.parseLong("50"))
                     .setTopicId("/m/04rlf")
-                    .setQ(frequentGenres.get(genreNumber) + "music"  + " -24/7 -how -to -24h/24 -playlist -roblox")
-                    .setVideoDuration("short")
+                    .setQ(frequentGenres.get(genreNumber) /*+ "music"*/  + " -live -radio -cover -riff -riffs -playlist -compilation -mix -top -best -jam -play -kit -pedal -custom -shop -gameplay -cabinet -chairs -opinion -hearing -first -reverse -when -birthday -karaoke -listening -review")
+                    .setVideoDuration("medium")
                     .setType("video")
                     .execute();
             Log.i("musicGenre", frequentGenres.get(genreNumber));

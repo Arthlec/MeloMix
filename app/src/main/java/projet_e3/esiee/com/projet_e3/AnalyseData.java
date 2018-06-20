@@ -62,6 +62,12 @@ public abstract class AnalyseData extends AppCompatActivity {
         int sizeItemsets = algo.m_largeItemSets.size();
         ArrayList<String> frequentGenres = this.getFrequentGenresList(algo, sizeItemsets);
 
+       /* if(frequentGenres.size()>5){
+            for(String genre:frequentGenres){
+
+            }
+            return frequentGenres;
+        }*/
         return frequentGenres;
     }
 
