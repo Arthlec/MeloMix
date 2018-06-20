@@ -11,6 +11,8 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:text=""
+        android:textSize="21sp"
+        android:textColor="@color/text_color_primary"
         app:layout_constraintBottom_toTopOf="@+id/textDescription"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -25,13 +27,13 @@
         android:background="@null"
         android:text="@string/non_connect"
         android:textAlignment="center"
-        android:textAppearance="@style/TextAppearance.AppCompat"
+        android:textColor="@color/text_color_secondary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.286"
+        app:layout_constraintHorizontal_bias="0.292"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.548" />
+        app:layout_constraintTop_toBottomOf="@+id/imageButton"
+        app:layout_constraintVertical_bias="0.089" />
 
     <ImageButton
         android:id="@+id/imageButton"
@@ -41,10 +43,10 @@
         android:scaleType="centerCrop"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.186"
+        app:layout_constraintHorizontal_bias="0.191"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.418"
+        app:layout_constraintVertical_bias="0.545"
         app:srcCompat="@drawable/logo_spotify"
         tools:background="#f9f9f9" />
 
@@ -56,10 +58,10 @@
         android:contentDescription="@string/bouton_actualiser"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.178"
+        app:layout_constraintHorizontal_bias="0.216"
         app:layout_constraintStart_toEndOf="@+id/imageButton"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.436"
+        app:layout_constraintVertical_bias="0.54"
         app:srcCompat="@drawable/ic_refresh" />
 
     <ImageButton
@@ -70,10 +72,10 @@
         android:contentDescription="@string/bouton_d_connecter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.888"
+        app:layout_constraintHorizontal_bias="0.855"
         app:layout_constraintStart_toEndOf="@+id/imageButton"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.436"
+        app:layout_constraintVertical_bias="0.54"
         app:srcCompat="@drawable/ic_exit" />
 
     <Button

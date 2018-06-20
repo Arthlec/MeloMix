@@ -17,6 +17,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -171,15 +172,15 @@ public class GuestActivity extends AppCompatActivity {
         public void onConnectionInfoAvailable(WifiP2pInfo info) {
             GoAdress = info.groupOwnerAddress;
             if (info.groupFormed && !info.isGroupOwner) {
-                if(FirstTimeCo){
+                Log.i("firt",FirstTimeCo+"");
                     GuestClass guestClass = new GuestClass(GoAdress, getApplicationContext());
                     guestClass.start();
-
+                    Log.i("pendant",FirstTimeCo+"");
                     Intent intent = new Intent(GuestActivity.this, LoadingGuestActivity.class);
                     intent.putExtra("authToken", getIntent().getStringExtra("authToken"));
                     intent.putExtra("wifip2pGroup", wifiP2pGroup);
                     startActivity(intent);
-                }
+                Log.i("après",FirstTimeCo+"");
             }
         }
     };

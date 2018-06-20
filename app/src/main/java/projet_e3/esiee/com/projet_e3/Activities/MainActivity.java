@@ -6,12 +6,10 @@ import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GooglePlayServicesAvailabilityIOException;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
-
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.ExponentialBackOff;
-
 import com.google.api.services.youtube.YouTubeScopes;
 import com.google.api.services.youtube.model.*;
 
@@ -21,22 +19,18 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -69,11 +63,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private static final String PREF_ACCOUNT_NAME = "accountName";
     private static final String[] SCOPES = {YouTubeScopes.YOUTUBE_READONLY};
 
-    private String defaut = "Veuillez entrer un nom d'utilisateur valide";
     private Button mEnter = null;
     private String MY_PREFS = "my_prefs";
-    private String userName = null;
-    private boolean agreed = false;
 
 
     EditText pseudo = null;
@@ -168,6 +159,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 mEnter.setEnabled(false);
             } else {
                 mEnter.setEnabled(true);
+                String defaut = "Veuillez entrer un nom d'utilisateur valide";
                 result.setText(defaut);
             }
         }
@@ -216,6 +208,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private String readFile() throws IOException {
         Scanner scanner = null;
         String text = "";
+        StringBuilder sb = new StringBuilder();
         InputStream inputStream = this.getResources().openRawResource(R.raw.license_agreement);
         try {
             scanner = new Scanner(inputStream);
@@ -226,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             while (scanner.hasNext()) {
                 String[] lines = scanner.nextLine().split("\t");
                 for (String line : lines) {
-                    text += line + "\n";
+                    text = sb.append(line).append("\n").toString();
                 }
             }
         }
@@ -235,14 +228,12 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
     public String myprefs_name() {
         SharedPreferences pref = getApplicationContext().getSharedPreferences(MY_PREFS, MODE_PRIVATE);
-        userName = pref.getString("user_name", null);//null is the default value.
-        return userName;
+        return pref.getString("user_name", null);
     }
 
     private boolean myprefs_license() {
         SharedPreferences pref = getApplicationContext().getSharedPreferences(MY_PREFS, MODE_PRIVATE);
-        agreed = pref.getBoolean("agreed", false);//false is the default value.
-        return agreed;
+        return pref.getBoolean("agreed", false);
     }
 
     /**

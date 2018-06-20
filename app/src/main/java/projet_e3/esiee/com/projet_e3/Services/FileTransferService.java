@@ -62,7 +62,7 @@ public class FileTransferService extends IntentService {
                 InputStream inputStream = new FileInputStream(JsonFile);
 
                 GuestActivity.copyFile(inputStream, outputStream);
-                GuestActivity.setFirstTimeCo(false);
+                //GuestActivity.setFirstTimeCo(false);
             } catch (IOException e) {
                 e.printStackTrace();
                 GuestActivity.setFirstTimeCo(true);
