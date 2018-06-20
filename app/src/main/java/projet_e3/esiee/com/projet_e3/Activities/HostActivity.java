@@ -95,18 +95,18 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
     private static String nextTrackName;
     public ArrayList<String> availableGenresList = new ArrayList<>();
     public static String authToken = "";
+    private String MY_PREFS = "my_prefs";
     private DrawerLayout mDrawerLayout;
     private Stack<String> tracksIDS = new Stack<>();
     private Stack<Bitmap> tracksCovers = new Stack<>();
     private Stack<String> tracksNames = new Stack<>();
-    private String MY_PREFS = "my_prefs";
     private WifiP2pGroup wifiP2pGroup;
     private WifiP2pManager manager;
     private WifiP2pManager.Channel channel;
-    private BroadCast mReceiver;
     private IntentFilter mIntent;
     private List[] dataList = new List[2];
     private int host;
+    private String BmpToGive;
 
     //FOR FRAGMENTS
     // 1 - Declare fragment handled by Navigation Drawer
@@ -124,31 +124,17 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
     private static final int FRAGMENT_HISTORY = 3;
     private static final int FRAGMENT_GUESTS_LIST = 4;
 
-    //Getters
-    public static Bitmap getBmp() {
-        return bmp;
+
+    public static void setBmp(String bmp) {
+        try {
+            HostActivity.bmp = BitmapFactory.decodeStream(new URL(bmp).openConnection().getInputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-    public static Bitmap getNextBmp() {
-        return nextBmp;
-    }
-    public static String getTrackName() {
-        return trackName;
-    }
-    public static String getNextTrackName() {
-        return nextTrackName;
-    }
-    //Setters
-    public static void setBmp(Bitmap bmp) {
-        HostActivity.bmp = bmp;
-    }
-    public static void setNextBmp(Bitmap nextBmp) {
-        HostActivity.nextBmp = nextBmp;
-    }
-    public static void setTrackName(String trackName) {
-        HostActivity.trackName = trackName;
-    }
-    public static void setNextTrackName(String nextTrackName) {
-        HostActivity.nextTrackName = nextTrackName;
+
+    public void setBmpToGive(String object) {
+        this.BmpToGive = object;
     }
 
     @Override
@@ -159,9 +145,6 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
         isInitialisation = true;
         mCredential = MainActivity.mCredential;
         host = getIntent().getIntExtra("host", 0);
-
-        if(host == 1)
-            getResultsFromApi();
 
         android.support.v7.widget.Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -177,7 +160,8 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
         showFirstFragment();
         authToken = getIntent().getStringExtra("authToken");
         availableGenresList = getIntent().getStringArrayListExtra("availableGenres");
-        frequentGenres = getIntent().getStringArrayListExtra("frequentGenres");
+        this.frequentGenres = getIntent().getStringArrayListExtra("frequentGenres");
+        Log.i("frequentGenresHost", this.frequentGenres + "");
 
         Log.i("authToken", authToken);
 
@@ -185,21 +169,29 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
 
         if (host == 1)
         {
+            getResultsFromApi();
             manager = LoadingHostActivity.getManager();
             channel = LoadingHostActivity.getChannel();
             dataList = LoadingHostActivity.getLoadingDatalist();
         }else if(host ==0){
-            bmp = getIntent().getExtras().getParcelable("GuestBmp");
             manager = GuestActivity.getaManager();
             channel = GuestActivity.getaChannel();
             dataList = LoadingGuestActivity.getLoadingDatalist();
-            ReceiveDataFlow receiveDataFlow = new ReceiveDataFlow(getApplicationContext(),10014,"upDate",null);
+            ReceiveDataFlow receiveDataFlow = new ReceiveDataFlow(10014,"upDate",null);
             receiveDataFlow.start();
+            Log.i("bm",getIntent().getStringExtra("bmp_url"));
+            BmpToGive = getIntent().getStringExtra("bmp_url");
+            try {
+                URL urlBmpGuest = new URL(BmpToGive);
+                bmp = BitmapFactory.decodeStream(urlBmpGuest.openConnection().getInputStream());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         Bundle bundle = getIntent().getExtras();
         assert bundle != null;
         wifiP2pGroup = bundle.getParcelable("wifip2pGroup");
-        mReceiver = new BroadCast(manager,channel,null,null,this, wifiManager);
+        BroadCast mReceiver = new BroadCast(manager, channel, null, null, this, wifiManager);
         mIntent = new IntentFilter();
         setAction();
 
@@ -244,7 +236,7 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
     }
 
     public void sendDataToTarget(String targetAdress){
-        ShareDataToTarget shareDataToTarget = new ShareDataToTarget(targetAdress, getApplicationContext());
+        ShareDataToTarget shareDataToTarget = new ShareDataToTarget(targetAdress, getApplicationContext(),BmpToGive);
         shareDataToTarget.start();
     }
 
@@ -476,7 +468,7 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
         @Override
         public void onConnectionInfoAvailable(WifiP2pInfo info) {
             if(host==1){
-                HostClass hostClass = new HostClass(getApplicationContext());
+                HostClass hostClass = new HostClass(getApplicationContext(),null);
                 hostClass.start();
             }
         }
@@ -630,15 +622,6 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
             File dir = context.getCacheDir();
             deleteDir(dir);
         } catch (Exception e) {}
-    }
-
-    public void deleteJson(){
-        File[] files = getJSONFiles(this.getFilesDir());
-        for (File current : files) {
-            if (!current.getName().contains("userGenres")) {
-                current.delete();
-            }
-        }
     }
 
     public static boolean deleteDir(File dir) {
@@ -885,6 +868,7 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
             try {
                 if(isInitialisation) {
                     trackInfos = getTracksAttributes();
+
                     URL trackURL = new URL(trackInfos[2]);
                     trackID = trackInfos[0];
                     bmp = BitmapFactory.decodeStream(trackURL.openConnection().getInputStream());
@@ -916,22 +900,22 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-
+            setBmpToGive(trackInfos[2]);
             return trackInfos[0];
         }
 
         private String[] getTracksAttributes() throws IOException {
 
             String[] trackInfo = new String[3];
-
             Random genreSelector = new Random();
             int genreNumber = genreSelector.nextInt(frequentGenres.size());
 
             Log.i("mService", mService.toString());
             SearchListResponse searchListResponse = mService.search().list("snippet")
                     .setMaxResults(Long.parseLong("50"))
-                    .setQ(frequentGenres.get(genreNumber) + "music" + " -live -radio")
-                    .setVideoDuration("short")
+                    .setTopicId("/m/04rlf")
+                    .setQ(frequentGenres.get(genreNumber) /*+ "music"*/  + " -live -radio -cover -riff -riffs -playlist -compilation -mix -top -best -jam -play -kit -pedal -custom -shop -gameplay -cabinet -chairs -opinion -hearing -first -reverse -when -birthday -karaoke -listening -review")
+                    .setVideoDuration("medium")
                     .setType("video")
                     .execute();
             Log.i("musicGenre", frequentGenres.get(genreNumber));

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Handler;
 import android.widget.Toast;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -21,10 +22,12 @@ public class ShareDataFlowService extends IntentService {
     public static final String EXTRAS_TARGET_ADDRESS = "go_host";
     public static final String EXTRAS_TARGET_PORT = "go_port";
 
+    public static final String EXTRAS_URL_BMP = "basic_bmp";
     public static int PORT = 10014;
 
     public ShareDataFlowService() {
         super("ShareDataFlowService");
+        mHandler = new Handler();
     }
 
     @Override
@@ -34,11 +37,17 @@ public class ShareDataFlowService extends IntentService {
             String target = Objects.requireNonNull(intent.getExtras()).getString(EXTRAS_TARGET_ADDRESS);
             Socket socket = new Socket();
             int port = intent.getExtras().getInt(EXTRAS_TARGET_PORT);
+            String bmp = intent.getExtras().getString(EXTRAS_URL_BMP);
+
             try {
                 socket.bind(null);
                 socket.connect((new InetSocketAddress(target, port)), SOCKET_TIMEOUT);
                 OutputStream outputStream = socket.getOutputStream();
                 outputStream.flush();
+
+                assert bmp != null;
+                InputStream stream = new ByteArrayInputStream(bmp.getBytes());
+                sendObjet(stream,outputStream,bmp.getBytes().length);
                 outputStream.close();
             } catch (IOException e) {
                 e.printStackTrace();

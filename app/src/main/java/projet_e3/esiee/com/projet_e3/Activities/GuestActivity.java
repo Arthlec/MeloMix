@@ -50,6 +50,7 @@ public class GuestActivity extends AppCompatActivity {
     private ArrayList<WifiP2pDevice> deviceArray;
     private InetAddress GoAdress;
     private WifiP2pGroup wifiP2pGroup;
+    private Boolean FirstTimeCo = true;
     public static Activity guestContext;
 
     private final WifiP2pConfig config = new WifiP2pConfig();
@@ -170,13 +171,15 @@ public class GuestActivity extends AppCompatActivity {
         public void onConnectionInfoAvailable(WifiP2pInfo info) {
             GoAdress = info.groupOwnerAddress;
             if (info.groupFormed && !info.isGroupOwner) {
-                GuestClass guestClass = new GuestClass(GoAdress, getApplicationContext());
-                guestClass.start();
-
-                Intent intent = new Intent(GuestActivity.this, LoadingGuestActivity.class);
-                intent.putExtra("authToken", getIntent().getStringExtra("authToken"));
-                intent.putExtra("wifip2pGroup", wifiP2pGroup);
-                startActivity(intent);
+                if(FirstTimeCo){
+                    GuestClass guestClass = new GuestClass(GoAdress, getApplicationContext());
+                    guestClass.start();
+                    Intent intent = new Intent(GuestActivity.this, LoadingGuestActivity.class);
+                    intent.putExtra("authToken", getIntent().getStringExtra("authToken"));
+                    intent.putExtra("wifip2pGroup", wifiP2pGroup);
+                    startActivity(intent);
+                }
+                FirstTimeCo = false;
             }
         }
     };
@@ -236,16 +239,19 @@ public class GuestActivity extends AppCompatActivity {
             public void run() {
                 new Thread(new Runnable() {
                     public void run() {
-                        Intent serviceIntent = new Intent(getApplicationContext(), DisconnectSignal.class);
-                        serviceIntent.setAction(DisconnectSignal.ACTION_SEND_DEATH);
-                        String HostAdd = GoAdress.getHostAddress();
-                        if (!TextUtils.isEmpty(HostAdd) && HostAdd.length() > 0) {
-                            DisconnectSignal.PORT = 9899;
-                            int sub_port = DisconnectSignal.PORT;
-                            serviceIntent.putExtra(DisconnectSignal.EXTRAS_GROUP_OWNER_ADDRESS,HostAdd);
-                            serviceIntent.putExtra(DisconnectSignal.EXTRAS_GROUP_OWNER_PORT, DisconnectSignal.PORT);
-                            if (sub_port != -1) {
-                                getApplication().startService(serviceIntent);
+                        if(GoAdress != null) {
+                            Intent serviceIntent = new Intent(getApplicationContext(), DisconnectSignal.class);
+                            serviceIntent.setAction(DisconnectSignal.ACTION_SEND_DEATH);
+
+                            String HostAdd = GoAdress.getHostAddress();
+                            if (!TextUtils.isEmpty(HostAdd) && HostAdd.length() > 0) {
+                                DisconnectSignal.PORT = 9899;
+                                int sub_port = DisconnectSignal.PORT;
+                                serviceIntent.putExtra(DisconnectSignal.EXTRAS_GROUP_OWNER_ADDRESS, HostAdd);
+                                serviceIntent.putExtra(DisconnectSignal.EXTRAS_GROUP_OWNER_PORT, DisconnectSignal.PORT);
+                                if (sub_port != -1) {
+                                    getApplication().startService(serviceIntent);
+                                }
                             }
                         }
                     }

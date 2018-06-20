@@ -70,8 +70,8 @@ public abstract class AnalyseData extends AppCompatActivity {
         int len = OneCentroidBase.numAttributes();
         for(int i=0;i<len;i++){
             Attribute currentAttribut = OneCentroidBase.attribute(i);
-            Log.i("current",currentAttribut+"");
-            Log.i("value",OneCentroidBase.get(0).value(currentAttribut)+"");
+            //Log.i("current",currentAttribut+"");
+            //Log.i("value",OneCentroidBase.get(0).value(currentAttribut)+"");
             if(OneCentroidBase.get(0).value(currentAttribut)!=0){
                oneUserGenre.add(currentAttribut.name());
                Log.i("name",currentAttribut.name());
@@ -180,7 +180,7 @@ public abstract class AnalyseData extends AppCompatActivity {
                     currentInstance.setValue(j, 1);
             }
         }
-        //Log.i("centroidsBaseBinarized", centroidsBaseSimplified.toString());
+        Log.i("centroidsBaseBinarized", centroidsBaseSimplified.toString());
         NumericToBinary filterBinary = new NumericToBinary();
         try {
             filterBinary.setInputFormat(centroidsBaseSimplified);
@@ -232,11 +232,8 @@ public abstract class AnalyseData extends AppCompatActivity {
 
     private void executeKmeans(int numberOfUsers, SimpleKMeans simpleKMeans, Instances dataBase, int numberOfIterations, double a, double b){
         try {
-            /*if(numberOfUsers == 2)
-                simpleKMeans.setNumClusters(1);
-            else*/
-                simpleKMeans.setNumClusters((int)Math.round(a*numberOfUsers + b));
 
+            simpleKMeans.setNumClusters((int)Math.round(a*numberOfUsers + b));
             simpleKMeans.setMaxIterations(numberOfIterations);
             simpleKMeans.setPreserveInstancesOrder(true);
             simpleKMeans.buildClusterer(dataBase);
@@ -324,6 +321,18 @@ public abstract class AnalyseData extends AppCompatActivity {
         File[] files = rootDataDir.listFiles(jsonFilter);
         Log.i("FILE[s]", Arrays.toString(files));
         return files;
+    }
+
+    /**
+     * Supprime les JSON des guests chez le HOST
+     */
+    public void deleteJson(){
+        File[] files = getJSONFiles(this.getFilesDir());
+        for (File current : files) {
+            if (!current.getName().contains("userGenres")) {
+                current.delete();
+            }
+        }
     }
 
     /**

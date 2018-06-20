@@ -1,6 +1,5 @@
 package projet_e3.esiee.com.projet_e3.Activities;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -8,17 +7,17 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.NumberPicker;
-import android.widget.Toast;
 
+import projet_e3.esiee.com.projet_e3.AnalyseData;
 import projet_e3.esiee.com.projet_e3.R;
 
-public class ChooseGroupActivity extends AppCompatActivity implements NumberPicker.OnValueChangeListener {
+public class ChooseGroupActivity extends AnalyseData implements NumberPicker.OnValueChangeListener {
     private WifiManager wifiManager;
 
     @Override
@@ -70,6 +69,8 @@ public class ChooseGroupActivity extends AppCompatActivity implements NumberPick
                 startActivity(intent);
             }
         });
+
+        deleteJson();
     }
 
     public boolean isWifi() {
@@ -94,8 +95,7 @@ public class ChooseGroupActivity extends AppCompatActivity implements NumberPick
         newFragment.show(getFragmentManager(), "time picker");
     }
 
-    @SuppressLint("ValidFragment")
-    public class NumberDialogFragment extends DialogFragment {
+    public static class NumberDialogFragment extends DialogFragment {
         private NumberPicker.OnValueChangeListener valueChangeListener;
 
         @Override
@@ -106,7 +106,7 @@ public class ChooseGroupActivity extends AppCompatActivity implements NumberPick
             numberPicker.setMaxValue(10);
             int maxValue = numberPicker.getMaxValue()-numberPicker.getMinValue()+1;
             String[] displayedValues = new String[maxValue];
-            String texte = "";
+            String texte;
             for (int i=0;i<maxValue;i++)
             {
                 if(i<2)
@@ -127,12 +127,27 @@ public class ChooseGroupActivity extends AppCompatActivity implements NumberPick
                     valueChangeListener.onValueChange(numberPicker,
                             numberPicker.getValue(), numberPicker.getValue());
 
-                        Intent intent = new Intent(ChooseGroupActivity.this, LoadingHostActivity.class);
-                        intent.putExtra("authToken", getIntent().getStringExtra("authToken"));
-                        intent.putExtra("availableGenres", getIntent().getStringArrayListExtra("availableGenres"));
+                        Intent intent = new Intent(getActivity().getApplicationContext()/*ChooseGroupActivity.this*/, LoadingHostActivity.class);
+                        intent.putExtra("authToken", getActivity().getIntent()/*getIntent()*/.getStringExtra("authToken"));
+                        intent.putExtra("availableGenres", getActivity().getIntent()/*getIntent()*/.getStringArrayListExtra("availableGenres"));
                         intent.putExtra("host", 1);
                         intent.putExtra("guestNumber", numberPicker.getValue());
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        // only for Nougat and newer versions
                         startActivity(intent);
+                    }
+                    else {
+                        AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
+                        alertDialog.setTitle("Information");
+                        alertDialog.setMessage("Toute les fonctionalités ne sont pas disponible pour cette version d'Android. \n \n Vous devez avoir une version 7.0 ou supérieur.");
+                        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE,"OK",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                        alertDialog.show();
+                    }
                 }
             });
             builder.setNegativeButton("annuler", new DialogInterface.OnClickListener() {
