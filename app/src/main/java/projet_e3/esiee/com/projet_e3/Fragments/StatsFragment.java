@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,16 +15,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.animation.Easing;
-import com.github.mikephil.charting.buffer.BarBuffer;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.components.LegendEntry;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
-import com.github.mikephil.charting.listener.OnChartGestureListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -121,6 +117,8 @@ public class StatsFragment extends Fragment{
             holder.chart.setFitBars(true);
             holder.chart.setKeepPositionOnRotation(true);
 
+            holder.chart.setScaleYEnabled(false);
+            holder.chart.setScaleXEnabled(true);
             Legend legend = holder.chart.getLegend();
             legend.setEnabled(false);
             holder.chart.animateY(1000, Easing.EasingOption.EaseInOutBack);
