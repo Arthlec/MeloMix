@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.text.TextUtils;
 import android.transition.Scene;
 import android.transition.TransitionInflater;
 import android.transition.TransitionManager;
@@ -264,6 +265,9 @@ public class MainFragment extends Fragment {
         bmpCover = bmpTrackCover;
         TextView trackNameField = view.findViewById(R.id.trackName);
         trackNameField.setText(trackName);
+        trackNameField.setEllipsize(TextUtils.TruncateAt.MARQUEE);
+        trackNameField.setSingleLine(true);
+        trackNameField.setSelected(true);
         name = trackName;
         ImageView nextTrackCover = view.findViewById(R.id.nextTrackCover);
         TextView nextTrackNameField = view.findViewById(R.id.nextTrackName);
