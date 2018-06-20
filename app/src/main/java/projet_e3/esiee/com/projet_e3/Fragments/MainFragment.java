@@ -267,6 +267,7 @@ public class MainFragment extends Fragment {
         trackNameField.setText(trackName);
         trackNameField.setEllipsize(TextUtils.TruncateAt.MARQUEE);
         trackNameField.setSingleLine(true);
+        trackNameField.setMarqueeRepeatLimit(-1);
         trackNameField.setSelected(true);
         name = trackName;
         ImageView nextTrackCover = view.findViewById(R.id.nextTrackCover);
