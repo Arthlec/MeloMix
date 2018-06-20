@@ -27,6 +27,7 @@ public class ShareDataFlowService extends IntentService {
 
     public ShareDataFlowService() {
         super("ShareDataFlowService");
+        mHandler = new Handler();
     }
 
     @Override

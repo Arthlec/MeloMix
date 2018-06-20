@@ -50,6 +50,7 @@ public class GuestActivity extends AppCompatActivity {
     private ArrayList<WifiP2pDevice> deviceArray;
     private InetAddress GoAdress;
     private WifiP2pGroup wifiP2pGroup;
+    private Boolean FirstTimeCo = true;
     public static Activity guestContext;
 
     private final WifiP2pConfig config = new WifiP2pConfig();
@@ -170,13 +171,15 @@ public class GuestActivity extends AppCompatActivity {
         public void onConnectionInfoAvailable(WifiP2pInfo info) {
             GoAdress = info.groupOwnerAddress;
             if (info.groupFormed && !info.isGroupOwner) {
-                GuestClass guestClass = new GuestClass(GoAdress, getApplicationContext());
-                guestClass.start();
-
-                Intent intent = new Intent(GuestActivity.this, LoadingGuestActivity.class);
-                intent.putExtra("authToken", getIntent().getStringExtra("authToken"));
-                intent.putExtra("wifip2pGroup", wifiP2pGroup);
-                startActivity(intent);
+                if(FirstTimeCo){
+                    GuestClass guestClass = new GuestClass(GoAdress, getApplicationContext());
+                    guestClass.start();
+                    Intent intent = new Intent(GuestActivity.this, LoadingGuestActivity.class);
+                    intent.putExtra("authToken", getIntent().getStringExtra("authToken"));
+                    intent.putExtra("wifip2pGroup", wifiP2pGroup);
+                    startActivity(intent);
+                }
+                FirstTimeCo = false;
             }
         }
     };

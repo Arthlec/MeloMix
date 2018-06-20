@@ -95,6 +95,7 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
     private static String nextTrackName;
     public ArrayList<String> availableGenresList = new ArrayList<>();
     public static String authToken = "";
+    private String MY_PREFS = "my_prefs";
     private DrawerLayout mDrawerLayout;
     private Stack<String> tracksIDS = new Stack<>();
     private Stack<Bitmap> tracksCovers = new Stack<>();
@@ -602,7 +603,6 @@ public class HostActivity extends AnalyseData implements EasyPermissions.Permiss
 
     private void disconnect() {
         //deleteCache(this);
-        String MY_PREFS = "my_prefs";
         SharedPreferences pref = getApplicationContext().getSharedPreferences(MY_PREFS, MODE_PRIVATE);
         pref.edit().remove("user_name").apply(); //clear pref pseudo
         if(pref.contains("userAccountSpotify"))

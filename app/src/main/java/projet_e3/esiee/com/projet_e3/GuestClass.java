@@ -28,7 +28,7 @@ public class GuestClass extends Thread {
             FileTransferService.PORT = 8988;
             int sub_port = FileTransferService.PORT;
             serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_ADDRESS,HostAdd);
-             serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_PORT, FileTransferService.PORT);
+            serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_PORT, FileTransferService.PORT);
 
             if (HostAdd != null && sub_port != -1) {
                 context.startService(serviceIntent);
