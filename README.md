@@ -1,8 +1,6 @@
-# Projet_E3 - MeloMix
+# MeloMix
 
-Projet de Troisième année à ESIEE Paris (Application Android de musique)
-
-Equipe composée de :
+Project made by third year students at ESIEE Paris in 4 months from may to july 2018.
 
 - SEBAN Dan
 - VALENCE Corentin
