@@ -7,3 +7,6 @@ Project made by third year students at ESIEE Paris in 4 months from may to july 
 - NGOUANSAVANH Cléa
 - POULAIN Steven
 - LECERT Arthur
+
+This app fetches users' favorite musical genres to choose the one that will be enjoyed the most in a group.
+For the moment, only Spotify can be used to collect data.
